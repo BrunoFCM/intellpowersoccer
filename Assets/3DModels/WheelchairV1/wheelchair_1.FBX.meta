@@ -51,6 +51,7 @@ ModelImporter:
     100090: WheelLarge_8
     100092: WheelSmall_16
     100094: WheelSmall_16 1
+    100096: Wheelchair
     400000: Arm_2
     400002: Arm_3
     400004: ArmPad_4
@@ -99,6 +100,7 @@ ModelImporter:
     400090: WheelLarge_8
     400092: WheelSmall_16
     400094: WheelSmall_16 1
+    400096: Wheelchair
     2100000: 'Material #25'
     2100002: 'Material #26'
     2100004: 'Material #27'
