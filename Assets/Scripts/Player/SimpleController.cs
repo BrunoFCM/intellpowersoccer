@@ -92,49 +92,12 @@ public class SimpleController : MonoBehaviour {
 		largeWheelR.AddTorque(transform.right * (- vectorMagnitude * CalculateConstantC(controllerAngle, true) * motorForce));
 		largeWheelL.AddTorque( transform.right * (- vectorMagnitude * CalculateConstantC(controllerAngle, false) * motorForce));
 
-		/*		
-			//DEBUG
-			Debug.Log("X: " + m_horizontalInput + "\n");
-			Debug.Log("Y: " + m_verticalInput + "\n");
-
-			Debug.Log("Motor Torque R: " + largeWheelR.motorTorque + "\n");
-			Debug.Log("Motor Torque L: " + largeWheelL.motorTorque + "\n");
-
-			Debug.Log("Controller Angle: " + controllerAngle + "\n");
-			Debug.Log("Vector Magnitude: " + vectorMagnitude + "\n");
-			Debug.Log("Constant C Right: " + CalculateConstantC(controllerAngle, true) + "\n");
-			Debug.Log("Constant C Left: " + CalculateConstantC(controllerAngle, false) + "\n");
-		*/
-
 	}
-
-	/*private void UpdateWheelPoses()
-	{
-		UpdateWheelPose(largeWheelLCol, largeWheelLT);
-		UpdateWheelPose(largeWheelRCol, largeWheelRT);
-	}
-
-	private void UpdateWheelPose(CapsuleCollider _collider, Transform _transform)
-	{
-		Vector3 _pos = _transform.position;
-		Quaternion _quat = _transform.rotation;
-
-		_collider.GetWorldPose(out _pos, out _quat);
-
-		_transform.position = _pos;
-		_transform.rotation = _quat;
-	}
-
-	private void StopJitter(){
-		largeWheelR.ConfigureVehicleSubsteps(5,12,15);
-		largeWheelL.ConfigureVehicleSubsteps(5,12,15);
-	}*/
 
 	private void FixedUpdate()
 	{
 		GetInput();
 		Accelerate();
-
 	}
 
 }
