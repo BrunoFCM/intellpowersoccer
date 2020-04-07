@@ -1133,7 +1133,7 @@ GameObject:
   - component: {fileID: 5620915854244026299}
   - component: {fileID: 4518598081257841923}
   - component: {fileID: 4518598081257841921}
-  - component: {fileID: 4518598081257841920}
+  - component: {fileID: 1715600908856746524}
   m_Layer: 9
   m_Name: Agent1
   m_TagString: Untagged
@@ -1211,6 +1211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f4a5a7b5622fdb489b0a4f08674d4a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agentCore: {fileID: 0}
   Ball: {fileID: 0}
 --- !u!114 &4518598081257841922
 MonoBehaviour:
@@ -1228,13 +1229,7 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   maxStep: 0
-  feetCollisions: {fileID: 0}
-  goalAreaBlue: {fileID: 0}
-  goalAreaRed: {fileID: 0}
-  halfSideAreaBlue: {fileID: 0}
-  halfSideAreaRed: {fileID: 0}
-  smallAreaBlue: {fileID: 0}
-  smallAreaRed: {fileID: 0}
+  agentCore: {fileID: 1715600908856746524}
   largeWheelL: {fileID: 7890015582446064646}
   largeWheelR: {fileID: 7185305730712755291}
   largeWheelLCol: {fileID: 7890015582446064647}
@@ -1297,20 +1292,31 @@ MonoBehaviour:
   DecisionPeriod: 10
   RepeatAction: 1
   offsetStep: 0
---- !u!114 &4518598081257841920
+--- !u!114 &1715600908856746524
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4518598081257841924}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50f710d360a49461cad67ff5e6bcefe1, type: 3}
+  m_Script: {fileID: 11500000, guid: 535232bce0f27674da00b932aa328223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  record: 1
-  demonstrationName: ToutchBall
+  gameEnvironment: {fileID: 0}
+  wheelchairAgentController: {fileID: 0}
+  team: 0
+  type: 0
+  feetCollisions: {fileID: 0}
+  goalAreaBlue: {fileID: 0}
+  goalAreaRed: {fileID: 0}
+  halfSideAreaBlue: {fileID: 0}
+  halfSideAreaRed: {fileID: 0}
+  smallAreaBlue: {fileID: 0}
+  smallAreaRed: {fileID: 0}
+  outsideArea: {fileID: 0}
+  ball: {fileID: 0}
 --- !u!1 &4774100743691135992
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,24 +4,21 @@ using MLAgents;
 
 public class WheelchairAgentController : Agent
 {
-
     Rigidbody agentRBody;
-    public FeetCollisions feetCollisions;
-    public GoalAreaBlue goalAreaBlue;
-    public GoalAreaRed goalAreaRed;
-    public HalfSideAreaBlue halfSideAreaBlue;
-    public HalfSideAreaRed halfSideAreaRed;
-    public SmallAreaBlue smallAreaBlue;
-    public SmallAreaRed smallAreaRed;
-    public OutsideArea outsideArea;
+    public AgentCore agentCore;
 
+
+    //WHEELCHAIR CONTROLLER VARS
 	public Rigidbody largeWheelL, largeWheelR;
 	public CapsuleCollider largeWheelLCol, largeWheelRCol;
 	public Transform largeWheelLT, largeWheelRT;
 	public float motorForce;
 	public float maxAngularVelocity;
+
+
+    //AGENT VARS
+    float timeLeft = 2000.0f;
     public Transform Target;
-     float timeLeft = 2000.0f;
      
      void Update()
      {
@@ -30,7 +27,7 @@ public class WheelchairAgentController : Agent
 
     void Start()
     {
-        agentRBody = GetComponent<Rigidbody>();
+        agentRBody = agentCore.getAgentRBody();
         largeWheelL.maxAngularVelocity = maxAngularVelocity;
 		largeWheelR.maxAngularVelocity = maxAngularVelocity;
     }
@@ -99,42 +96,6 @@ public class WheelchairAgentController : Agent
 		else return 0;
 	}
 
-    public void DetectAreaCollisions(){
-        if(goalAreaBlue.getDetected()){
-            Debug.Log("Collision with goalAreaBlue");
-            goalAreaBlue.SetDetectedFalse();
-        }
-
-        if(goalAreaRed.getDetected()){
-            Debug.Log("Collision with goalAreaRed");
-            goalAreaRed.SetDetectedFalse();
-        }
-
-        if(halfSideAreaBlue.getDetected()){
-            Debug.Log("Collision with halfSideAreaBlue");
-            halfSideAreaBlue.SetDetectedFalse();
-        }
-
-        if(halfSideAreaRed.getDetected()){
-            Debug.Log("Collision with halfSideAreaRed");
-            halfSideAreaRed.SetDetectedFalse();
-        }
-
-        if(smallAreaBlue.getDetected()){
-            Debug.Log("Collision with smallAreaBlue");
-            smallAreaBlue.SetDetectedFalse();
-        }
-
-        if(smallAreaRed.getDetected()){
-            Debug.Log("Collision with smallAreaRed");
-            smallAreaRed.SetDetectedFalse();
-        }
-
-        if(outsideArea.getDetected()){
-            Debug.Log("Collision with outsideArea");
-            outsideArea.SetDetectedFalse();
-        }
-    }
     public override void AgentAction(float[] vectorAction)
     {
 
@@ -155,59 +116,10 @@ public class WheelchairAgentController : Agent
 		largeWheelL.AddTorque(transform.right * (- vectorMagnitude * CalculateConstantC(controllerAngle, false) * motorForce));
 
         // Rewards
-        float distanceToTarget = Vector3.Distance(transform.position, Target.position);
-
-        // Detect area collisions
-         if(goalAreaBlue.getDetected()){
-            Debug.Log("Collision with goalAreaBlue");
-            goalAreaBlue.SetDetectedFalse();
-        }
-
-        if(goalAreaRed.getDetected()){
-            Debug.Log("Collision with goalAreaRed");
-            goalAreaRed.SetDetectedFalse();
-        }
-
-        if(halfSideAreaBlue.getDetected()){
-            Debug.Log("Collision with halfSideAreaBlue");
-            halfSideAreaBlue.SetDetectedFalse();
-        }
-
-        if(halfSideAreaRed.getDetected()){
-            Debug.Log("Collision with halfSideAreaRed");
-            halfSideAreaRed.SetDetectedFalse();
-        }
-
-        if(smallAreaBlue.getDetected()){
-            Debug.Log("Collision with smallAreaBlue");
-            smallAreaBlue.SetDetectedFalse();
-        }
-
-        if(smallAreaRed.getDetected()){
-            Debug.Log("Collision with smallAreaRed");
-            smallAreaRed.SetDetectedFalse();
-        }
-
-        if(outsideArea.getDetected()){
-            Debug.Log("Collision with outsideArea");
-            outsideArea.SetDetectedFalse();
-        }
-
-        // Reached target
-        if (feetCollisions.getDetected())
-        {
-            Debug.Log("Ball Found, REWARD TAKEN");
-            feetCollisions.SetDetectedFalse();
-
-            //Reward increases by being faster to reach the ball
-            SetReward(4000.0f / timeLeft);
-
-            timeLeft = 2000.0f;
-            Done();
-        }
+        float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 
         // Target or WheelChair Fell off platform or Bugged
-        if (Target.position.y < 0 || transform.position.y > 0.5f || transform.position.y < 0.1f){
+        if (Target.localPosition.y < 0 || transform.localPosition.y > 0.5f || transform.localPosition.y < 0.1f){
             Debug.Log("Target or WheelChair Fell off platform or Bugged");
             SetReward(-0.01f);
             Done();
@@ -222,6 +134,16 @@ public class WheelchairAgentController : Agent
         }
     }
 
+    public void playerTouchedBall(){
+        Debug.Log("Ball Found, REWARD TAKEN");
+
+        //Reward increases by being faster to reach the ball
+        SetReward(4000.0f / timeLeft);
+
+        timeLeft = 2000.0f;
+        Done();
+    }
+
     public override float[] Heuristic()
     {
         var action = new float[2];
@@ -232,15 +154,11 @@ public class WheelchairAgentController : Agent
 
     public override void AgentReset()
     {
-        //Distance from whellchair to target
-        //float distanceToBall = Vector3.Distance(transform.position, Target.position);
-        
-
         //Move Wheelchair to origin if Bug or Fell from Patform
-        if(transform.position.y > 0.5f || transform.position.y < 0.1f || timeLeft <= 0){
+        if(transform.localPosition.y > 0.5f || transform.localPosition.y < 0.1f || timeLeft <= 0){
             agentRBody.angularVelocity = Vector3.zero;
             agentRBody.velocity = Vector3.zero;
-            transform.position = new Vector3(0, 0.25f, 0);
+            transform.localPosition = new Vector3(0, 0.25f, 0);
             transform.rotation = Quaternion.identity;
         }
 
@@ -255,6 +173,6 @@ public class WheelchairAgentController : Agent
         float z = Random.Range(-1.0f, 1.0f) * 7.0f;
 
         // Move the target to a new spot
-        Target.position = new Vector3(x, 0.5f, z);
+        Target.localPosition = new Vector3(x, 0.5f, z);
     }
 }

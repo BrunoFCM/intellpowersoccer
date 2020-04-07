@@ -4,27 +4,18 @@ using UnityEngine;
 
 public class SmallAreaBlue : MonoBehaviour
 {
-    bool detected;
+    public AgentCore agentCore;
     public Collider Agent;
 
     // Start is called before the first frame update
     void Start()
     {
-        detected = false;
+
     }
 
     private void OnTriggerStay(Collider collision) {
         if (collision.name == Agent.name){
-            detected = true;
+            agentCore.setPlayersAtSmallAreaBlue();
         }
-    }
-
-
-    public bool getDetected(){
-        return detected;
-    }
-
-    public void SetDetectedFalse(){
-        detected = false;
     }
 }

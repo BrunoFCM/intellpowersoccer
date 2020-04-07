@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6367237887165913851}
   - component: {fileID: 6367237887165913850}
   - component: {fileID: 6367237887165913849}
+  - component: {fileID: 419523652658996931}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Ball
@@ -123,6 +124,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0
   angularSpeed: 0
+--- !u!114 &419523652658996931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6367237887165913848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06f19b2296dfc1748b60678840b61deb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6367237887515135326
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,6 +227,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6367237888197406778}
+  - component: {fileID: 304552648428974652}
   m_Layer: 0
   m_Name: Environment1
   m_TagString: Untagged
@@ -240,6 +254,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &304552648428974652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6367237888197406777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd0560e1d2007b74ab30759bfcc526ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  redTeamAgents: []
+  blueTeamAgents: []
 --- !u!1 &6367237888220636608
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,6 +419,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6367237888197406778}
     m_Modifications:
+    - target: {fileID: 1715600908856746524, guid: 5815efa9a813730469773f6819f3570f,
+        type: 3}
+      propertyPath: gameEnvironment
+      value: 
+      objectReference: {fileID: 304552648428974652}
+    - target: {fileID: 1715600908856746524, guid: 5815efa9a813730469773f6819f3570f,
+        type: 3}
+      propertyPath: wheelchairAgentController
+      value: 
+      objectReference: {fileID: 7415651896724660253}
+    - target: {fileID: 1715600908856746524, guid: 5815efa9a813730469773f6819f3570f,
+        type: 3}
+      propertyPath: feetCollisions
+      value: 
+      objectReference: {fileID: 1405548247865282122}
     - target: {fileID: 4518598081257841922, guid: 5815efa9a813730469773f6819f3570f,
         type: 3}
       propertyPath: Target
@@ -475,3 +518,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6367237887252694303}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1405548247865282122 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5466661521406151509, guid: 5815efa9a813730469773f6819f3570f,
+    type: 3}
+  m_PrefabInstance: {fileID: 6367237887252694303}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f4a5a7b5622fdb489b0a4f08674d4a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7415651896724660253 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4518598081257841922, guid: 5815efa9a813730469773f6819f3570f,
+    type: 3}
+  m_PrefabInstance: {fileID: 6367237887252694303}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb0c07d57412b534994ddcc0e85428fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

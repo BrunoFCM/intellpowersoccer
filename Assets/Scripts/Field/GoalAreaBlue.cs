@@ -4,27 +4,18 @@ using UnityEngine;
 
 public class GoalAreaBlue : MonoBehaviour
 {
-    bool detected;
-    public Collider Agent;
+    public GameEnvironmentInfo gameEnvironment;
+    public Collider Ball;
 
     // Start is called before the first frame update
     void Start()
     {
-        detected = false;
+
     }
 
-    private void OnTriggerStay(Collider collision) {
-        if (collision.name == Agent.name){
-            detected = true;
+    private void OnTriggerEnter(Collider collision) {
+        if (collision.name == Ball.name){
+            gameEnvironment.setGoalAtBlueGoal();
         }
-    }
-
-
-    public bool getDetected(){
-        return detected;
-    }
-
-    public void SetDetectedFalse(){
-        detected = false;
     }
 }
