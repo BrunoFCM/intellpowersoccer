@@ -38,18 +38,24 @@ public class GameEnvironmentInfo : MonoBehaviour
         playerWithBall = null;
         lastPlayerTouchingTheBall = null;
         opponent = null;
+
+        playersAtHalfSideAreaBlue = new List<AgentCore>();
+        playersAtHalfSideAreaRed = new List<AgentCore>();
+        playersAtSmallAreaBlue = new List<AgentCore>();
+        playersAtSmallAreaRed = new List<AgentCore>();
+        playersAtOutsideArea = new List<AgentCore>();
     }
 
     // Update is called once per frame
     void Update()
     {
         setPlayerWithBallAndOpponent();
-        if(lastPlayerTouchingTheBall != null)
-            Debug.Log("Last Player touching the ball: ", lastPlayerTouchingTheBall);
+        //if(lastPlayerTouchingTheBall != null)
+            //Debug.Log("Last Player touching the ball: " + lastPlayerTouchingTheBall.name);
         if(playerWithBall != null)
-            Debug.Log("Player with ball possession: ", playerWithBall);
+            Debug.Log("Player with ball possession: " + playerWithBall.name);
         if(opponent != null)
-            Debug.Log("Opponent: ", opponent);
+            Debug.Log("Opponent: " + opponent.name);
   
     }
 
@@ -60,7 +66,14 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         possibleAgentsNearBall.AddRange(blueTeamAgents);
         possibleAgentsNearBall.AddRange(redTeamAgents);
-        possibleAgentsNearBall.OrderBy(x => x.distanceToBall());
+        possibleAgentsNearBall = possibleAgentsNearBall.OrderBy(x => x.distanceToBall()).ToList();
+
+/*
+        Debug.Log("-------------------------");
+        foreach(AgentCore agent in possibleAgentsNearBall){
+            Debug.Log(agent.name + " distance: " +agent.distanceToBall());
+        }
+*/
 
         if(possibleAgentsNearBall[0].isNearBall()){
             playerWithBall = possibleAgentsNearBall[0];
@@ -133,9 +146,13 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void setGoalAtRedGoal(){
         blueScore += 1;
+        Debug.Log("Score: Blue - " + blueScore);
+        Debug.Log("Score: Red - " + redScore);
     }
 
     public void setGoalAtBlueGoal(){
         redScore += 1;
+        Debug.Log("Score: Blue - " + blueScore);
+        Debug.Log("Score: Red - " + redScore);
     }
 }

@@ -13,7 +13,7 @@ public class HalfSideAreaRed : MonoBehaviour
 
     }
 
-    private void OnTriggerStay(Collider collision) {
+    private void OnTriggerEnter(Collider collision) {
         if (collision.name == Agent.name){
             agentCore.setPlayersAtHalfSideAreaRed();
         }

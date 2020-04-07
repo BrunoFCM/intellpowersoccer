@@ -2,7 +2,7 @@
 using UnityEngine;
 using MLAgents;
 
-public class WheelchairAgentController : Agent
+public class agentController2 : Agent
 {
     Rigidbody agentRBody;
     public AgentCore agentCore;
