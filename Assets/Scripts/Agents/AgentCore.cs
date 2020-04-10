@@ -85,22 +85,22 @@ public class AgentCore : MonoBehaviour
     }
 
     public void setPlayersAtHalfSideAreaBlue(){
-        Debug.Log("Collision with halfSideAreaBlue");
+        //Debug.Log("Collision with halfSideAreaBlue");
         gameEnvironment.setPlayersAtHalfSideAreaBlue(this);
     }
 
     public void setPlayersAtHalfSideAreaRed(){
-        Debug.Log("Collision with halfSideAreaRed");
+        //Debug.Log("Collision with halfSideAreaRed");
         gameEnvironment.setPlayersAtHalfSideAreaRed(this);
     }
 
     public void setPlayersAtSmallAreaBlue(){
-        Debug.Log("Collision with smallAreaBlue");
+        //Debug.Log("Collision with smallAreaBlue");
         gameEnvironment.setPlayersAtSmallAreaBlue(this);
     }
 
     public void setPlayersAtSmallAreaRed(){
-        Debug.Log("Collision with smallAreaRed");
+        //Debug.Log("Collision with smallAreaRed");
         gameEnvironment.setPlayersAtSmallAreaRed(this);
     }
 
@@ -122,6 +122,7 @@ public class AgentCore : MonoBehaviour
     public int getNrOfNeutralFaults(){
         return nrOfNeutralFaults;
     }
+
     public int getNrOfYellowCards(){
         return nrOfYellowCards;
     }
@@ -130,20 +131,27 @@ public class AgentCore : MonoBehaviour
         return agentRBody;
     }
 
+
     //SETS
     public void setNrOfGoals(){
         nrOfGoals += 1;
     }
 
-    public void setNrOfNeutralFaults(){
-        nrOfNeutralFaults += 1;
+    public void setFault(){
+        if(nrOfNeutralFaults >= 1)
+            setNrOfYellowCards();
+        else
+            nrOfNeutralFaults += 1;
     }
-    public void setNrOfYellowCards(){
-         nrOfYellowCards += 1;
 
-         if(nrOfYellowCards == 2){
-             isExpelled = true;
-         }
+    public void setNrOfYellowCards(){
+        nrOfYellowCards += 1;
+         if(nrOfYellowCards == 2)
+            setExpelled();            
+    }
+
+    public void setExpelled(){
+         isExpelled = true;
     }
 
 

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SmallAreaBlue : MonoBehaviour
 {
-    public AgentCore agentCore;
-    public Collider Agent;
+    public GameEnvironmentInfo gameEnvironment;
+    public Collider Ball;
 
     // Start is called before the first frame update
     void Start()
@@ -14,8 +14,15 @@ public class SmallAreaBlue : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider collision) {
-        if (collision.name == Agent.name){
-            agentCore.setPlayersAtSmallAreaBlue();
+        if (collision.name == Ball.name){
+            gameEnvironment.setBallOutOfBoundsTimeOut(false);
+            Debug.Log("Ball in SmallSide Blue");
+        }
+
+        foreach(AgentCore agentCore in gameEnvironment.redTeamAgents){
+            if (collision.name == agentCore.name){
+                agentCore.setPlayersAtSmallAreaBlue();
+            }
         }
     }
 }

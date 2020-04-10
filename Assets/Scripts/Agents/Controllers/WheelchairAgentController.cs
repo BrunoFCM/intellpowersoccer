@@ -27,7 +27,7 @@ public class WheelchairAgentController : Agent
 
     void Start()
     {
-        agentRBody = agentCore.getAgentRBody();
+        agentRBody = GetComponent<Rigidbody>();
         largeWheelL.maxAngularVelocity = maxAngularVelocity;
 		largeWheelR.maxAngularVelocity = maxAngularVelocity;
     }
@@ -127,7 +127,6 @@ public class WheelchairAgentController : Agent
         }
     */
 
-
         // Wheelchair took to mutch time to find it, probably a Bug
         if(timeLeft < 0)
         {
@@ -175,6 +174,6 @@ public class WheelchairAgentController : Agent
         float z = Random.Range(-1.0f, 1.0f) * 7.0f;
 
         // Move the target to a new spot
-        Target.localPosition = new Vector3(x, 0.5f, z);
+        Target.localPosition = new Vector3(0f, 0.44f, 2.0f);
     }
 }
