@@ -213,6 +213,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
         else{
             Debug.Log("Timeout for ball out of bounds");
+            setPlayerTakingTheOutBoundsKick();
+            ballOutOfBoundsMechanism(outBoundsAgent);
+            setOutOfBounds(true);
         }
     }
 
@@ -236,11 +239,9 @@ public class GameEnvironmentInfo : MonoBehaviour
     //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
     private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){        
 
-        //Spawn player/agent
-        agent.stopChair(rotation);
-
         agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
         agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
+        agent.stopChair(rotation);
 
         ballPos = Ball.transform.localPosition;
         outBoundsAgentPos = new Vector3(x, y, z);
@@ -258,7 +259,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         redAgents = redAgents.OrderBy(x => x.distanceToBall()).ToList();
         blueAgents = blueAgents.OrderBy(x => x.distanceToBall()).ToList();
 
-        if(lastPlayerTouchingTheBall.team == AgentCore.Team.RED){
+        if(lastPlayerTouchingTheBall.team != AgentCore.Team.RED){
             outBoundsAgent = blueAgents[0];
         }
         else{
