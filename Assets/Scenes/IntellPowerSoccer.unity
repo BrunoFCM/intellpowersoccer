@@ -4181,6 +4181,11 @@ PrefabInstance:
       propertyPath: ball
       value: 
       objectReference: {fileID: 6367237887534481006}
+    - target: {fileID: 1520940530668784671, guid: 2050ea05b94f9d04780775c105064010,
+        type: 3}
+      propertyPath: team
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1526022835587999783, guid: 2050ea05b94f9d04780775c105064010,
         type: 3}
       propertyPath: m_ConnectedAnchor.x
@@ -4244,7 +4249,7 @@ PrefabInstance:
     - target: {fileID: 2153275973659152187, guid: 2050ea05b94f9d04780775c105064010,
         type: 3}
       propertyPath: team
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2342617613995551694, guid: 2050ea05b94f9d04780775c105064010,
         type: 3}
@@ -4299,7 +4304,7 @@ PrefabInstance:
     - target: {fileID: 2483748228780368444, guid: 2050ea05b94f9d04780775c105064010,
         type: 3}
       propertyPath: team
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2488916397511596942, guid: 2050ea05b94f9d04780775c105064010,
         type: 3}
@@ -4626,6 +4631,11 @@ PrefabInstance:
       propertyPath: ball
       value: 
       objectReference: {fileID: 6367237887534481006}
+    - target: {fileID: 5734191665407944451, guid: 2050ea05b94f9d04780775c105064010,
+        type: 3}
+      propertyPath: team
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5798552622862173863, guid: 2050ea05b94f9d04780775c105064010,
         type: 3}
       propertyPath: m_ConnectedAnchor.x

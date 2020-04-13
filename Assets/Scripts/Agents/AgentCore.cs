@@ -74,6 +74,22 @@ public class AgentCore : MonoBehaviour
         wheelchairAgentController.playerTouchedBall();
     }
 
+    public void stopChair(float rotation){
+        agentRBody.angularVelocity = Vector3.zero;
+        agentRBody.velocity = Vector3.zero;
+
+        transform.GetChild(2).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(4).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(4).gameObject.GetComponent<Rigidbody>().AddTorque(Vector3.zero);
+        transform.GetChild(5).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(5).gameObject.GetComponent<Rigidbody>().AddTorque(Vector3.zero);
+        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity * Quaternion.Euler(0, 0, 0);
+        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity * Quaternion.Euler(0, 0, 0);
+    }
+
     //Player Distance to another Player player
     public float distanceToPlayer(AgentCore player){
         return Vector3.Distance(transform.localPosition, player.transform.localPosition);

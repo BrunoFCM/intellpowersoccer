@@ -207,7 +207,9 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setBallOutOfBounds(){
         if(!ballOutOfBoundsTimeOut){
             Debug.Log("Out of Bounds");
-            ballOutOfBoundsMechanism(lastPlayerTouchingTheBall);
+            setPlayerTakingTheOutBoundsKick();
+            ballOutOfBoundsMechanism(outBoundsAgent);
+            setOutOfBounds(true);
         }
         else{
             Debug.Log("Timeout for ball out of bounds");
@@ -220,39 +222,48 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Limits the area which the agent/player can walk when in a free/indirect kick
     private void limitWalkingArea(){
-        Debug.Log("kjabdaksdbajkb");
         Vector3 centerPosition = ballPos; //center of circle
         float distance = Vector3.Distance(outBoundsAgent.transform.localPosition, centerPosition);
         
         if (distance > 3)
         {
-            Debug.Log("entra");
             spawnWheelchairAtNewSpot(outBoundsAgentPos.x, outBoundsAgentPos.y, outBoundsAgentPos.z, outBoundsAgent, outBoundRot);
         }
     }
 
-    IEnumerator waiter(int sec){
-        yield return new WaitForSeconds(sec);
-    }
+
 
     //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
     private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){        
 
         //Spawn player/agent
-        agent.getAgentRBody().angularVelocity = Vector3.zero;
-        agent.getAgentRBody().velocity = Vector3.zero;
+        agent.stopChair(rotation);
+
         agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
         agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
 
         ballPos = Ball.transform.localPosition;
         outBoundsAgentPos = new Vector3(x, y, z);
-        outBoundsAgent = agent;
         outBoundRot = rotation;
+    }
 
-        waiter(50);
+    public void setPlayerTakingTheOutBoundsKick(){
+        Debug.Log(lastPlayerTouchingTheBall.name);
+        var redAgents = new List<AgentCore>(redTeamAgents.Count);
+        var blueAgents = new List<AgentCore>(blueTeamAgents.Count);
 
-        setOutOfBounds(true);
+        redAgents.AddRange(redTeamAgents);
+        blueAgents.AddRange(blueTeamAgents);
+        
+        redAgents = redAgents.OrderBy(x => x.distanceToBall()).ToList();
+        blueAgents = blueAgents.OrderBy(x => x.distanceToBall()).ToList();
 
+        if(lastPlayerTouchingTheBall.team == AgentCore.Team.RED){
+            outBoundsAgent = blueAgents[0];
+        }
+        else{
+            outBoundsAgent = redAgents[0];
+        }
     }
 
     //Responsible for spawning player and ball at the right positions after BallOutOfBounds
