@@ -37,6 +37,13 @@ public class GameEnvironmentInfo : MonoBehaviour
         private List<AgentCore> playersAtSmallAreaRed;
         private List<AgentCore> playersAtOutsideArea;
 
+    //BALL OUT OF BOUNDS INFO
+        private bool outOfBounds;
+        private Vector3 ballPos;
+        private Vector3 outBoundsAgentPos;
+        private AgentCore outBoundsAgent;
+        private float outBoundRot;
+
 
 
     // Start is called before the first frame update
@@ -65,12 +72,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             Debug.Log("Player with ball possession: " + playerWithBall.name);
         if(opponent != null)
             Debug.Log("Opponent: " + opponent.name);*/
+        if(outOfBounds)
+            limitWalkingArea();
   
     }
 
     // Sets the player that has the ball and the opponent; sets null e there is none respectively;
     // It also checks if anyone commited the two-on-one fault
-    // Opponent is the player who is in a radious of 3m of the player with the ball
+    // Opponent is the player who is in a radius of 3m of the player with the ball
     public void setPlayerWithBallAndOpponent(){
 
         var possibleAgentsNearBall = new List<AgentCore>(blueTeamAgents.Count + redTeamAgents.Count);
@@ -205,14 +214,44 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
     }
 
-    //Spawns the player and Constrains the radious bounds of the indirect kick where player can move before shoot/pass the ball
-    private void limitIndirectKickArea(float x, float y, float z, float radious, AgentCore agent, float rotation){
+    public void setOutOfBounds(bool b){
+        outOfBounds = b;
+    }
+
+    //Limits the area which the agent/player can walk when in a free/indirect kick
+    private void limitWalkingArea(){
+        Debug.Log("kjabdaksdbajkb");
+        Vector3 centerPosition = ballPos; //center of circle
+        float distance = Vector3.Distance(outBoundsAgent.transform.localPosition, centerPosition);
+        
+        if (distance > 3)
+        {
+            Debug.Log("entra");
+            spawnWheelchairAtNewSpot(outBoundsAgentPos.x, outBoundsAgentPos.y, outBoundsAgentPos.z, outBoundsAgent, outBoundRot);
+        }
+    }
+
+    IEnumerator waiter(int sec){
+        yield return new WaitForSeconds(sec);
+    }
+
+    //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
+    private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){        
+
         //Spawn player/agent
         agent.getAgentRBody().angularVelocity = Vector3.zero;
         agent.getAgentRBody().velocity = Vector3.zero;
         agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
         agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
 
+        ballPos = Ball.transform.localPosition;
+        outBoundsAgentPos = new Vector3(x, y, z);
+        outBoundsAgent = agent;
+        outBoundRot = rotation;
+
+        waiter(50);
+
+        setOutOfBounds(true);
 
     }
 
@@ -222,32 +261,38 @@ public class GameEnvironmentInfo : MonoBehaviour
         float y = Ball.transform.localPosition.y;
         float z = Ball.transform.localPosition.z;
 
-        Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
         if(x < 0){
             if(z > 0){
                 //Top Left Half Field Bounds
                 if(z > 7.5){
                     Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
-                    limitIndirectKickArea(x, 0.25f, 8.5f, 2, agent, 0);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(x, 0.25f, 8.6f, agent, 0);
                 }
                 //Top Left Corner
                 else{
                     Ball.transform.position = new Vector3(-14f, 0.44f, 7.5f);
-                    limitIndirectKickArea(-15f, 0.25f, 8.5f, 2, agent, -45);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(-15.1f, 0.25f, 8.6f, agent, -45);
                 }
             }
             else{
                 //Bottom Left Corner
                 if(z > -7.5){
                     Ball.transform.position = new Vector3(-14f, 0.44f, -7.5f);
-                    limitIndirectKickArea(-15f, 0.25f, -8.5f, 2, agent, 225);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(-15.1f, 0.25f, -8.6f, agent, 225);
                 }
                 //Bottom Left Half Field Bounds
                 else{
                     Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
-                    limitIndirectKickArea(x, 0.25f, -8.5f, 2, agent, 180);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(x, 0.25f, -8.6f, agent, 180);
                 }
             }
         }else{
@@ -255,27 +300,35 @@ public class GameEnvironmentInfo : MonoBehaviour
                 //Top Right Half Field Bounds
                 if(z > 7.5){
                     Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
-                    limitIndirectKickArea(x, 0.25f, 8.5f, 2, agent, 0);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(x, 0.25f, 8.6f, agent, 0);
                 }
                 //Top Right Corner
                 else{
                     Ball.transform.position = new Vector3(14f, 0.44f, 7.5f);
-                    limitIndirectKickArea(15, 0.25f, 8.5f, 2, agent, 45);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(15.1f, 0.25f, 8.6f, agent, 45);
                 }
             }
             else{
                 //Bottom Right Corner
                 if(z > -7.5){
                     Ball.transform.position = new Vector3(14f, 0.44f, -7.5f);
-                    limitIndirectKickArea(15, 0.25f, -8.5f, 2, agent, 135);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(15.1f, 0.25f, -8.6f, agent, 135);
                 }
                 //Bottom Right Half Field Bounds
                 else{
                     Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
-                    limitIndirectKickArea(x, 0.25f, -8.5f, 2, agent, 180);
+                    Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    spawnWheelchairAtNewSpot(x, 0.25f, -8.6f, agent, 180);
                 }
             }
         }
-        
+
     }
 }

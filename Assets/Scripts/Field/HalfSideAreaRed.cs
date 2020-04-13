@@ -16,6 +16,7 @@ public class HalfSideAreaRed : MonoBehaviour
     private void OnTriggerEnter(Collider collision) {
         if (collision.name == Ball.name){
             gameEnvironment.setBallOutOfBoundsTimeOut(false);
+            gameEnvironment.setOutOfBounds(false);
             Debug.Log("Ball in HalfSide Red");
         }
 
