@@ -132,10 +132,21 @@ public class GameEnvironmentInfo : MonoBehaviour
                         for(int j = i+1; j < possibleAgentsNearBall.Count; j++){
                             if(possibleAgentsNearBall[j].distanceToPlayer(playerWithBall) < 3){
                                 if(possibleAgentsNearBall[j].team == playerWithBall.team){
-                                    if(possibleAgentsNearBall[j].type != AgentCore.Type.GOALKEEPER){
-                                        //Found a player commiting a foul
-                                        twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
-                                        Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
+                                    if(possibleAgentsNearBall[j].type != AgentCore.Type.GOALKEEPER && possibleAgentsNearBall[j-1].type != AgentCore.Type.GOALKEEPER){
+                                        
+                                        if(j+1 < possibleAgentsNearBall.Count){
+                                            if(possibleAgentsNearBall[j+1].type != AgentCore.Type.GOALKEEPER){
+                                                //Found a player commiting a foul
+                                                twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
+                                                Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
+                                            }
+                                        }else{
+                                            //Found a player commiting a foul
+                                            twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
+                                            Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
+                                        }
+
+                                        
                                     }
                                 }
                             }
