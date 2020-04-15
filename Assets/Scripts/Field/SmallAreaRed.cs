@@ -22,7 +22,12 @@ public class SmallAreaRed : MonoBehaviour
         }
 
         foreach(AgentCore agentCore in gameEnvironment.redTeamAgents){
-            if (collision.name == agentCore.name){
+            if (collision.name == agentCore.transform.GetChild(13).name){
+                agentCore.setPlayersAtSmallAreaRed();
+            }
+        }
+        foreach(AgentCore agentCore in gameEnvironment.blueTeamAgents){
+            if (collision.name == agentCore.transform.GetChild(13).name){
                 agentCore.setPlayersAtSmallAreaRed();
             }
         }

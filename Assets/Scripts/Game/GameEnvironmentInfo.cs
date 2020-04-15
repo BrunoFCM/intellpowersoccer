@@ -15,8 +15,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         public Ball Ball;
 
-        //While this is true, players cannot commit faults bacause they are in a indirect free kick
-        private bool faultTimeOut;
+        //While this is true, players cannot commit fouls bacause they are in a indirect free kick
+        private bool foulTimeOut;
         //While this is true, players cannot commit Ball Out of Bounds because they are in a indirect free kick
         private bool ballOutOfBoundsTimeOut;
 
@@ -44,12 +44,12 @@ public class GameEnvironmentInfo : MonoBehaviour
         private AgentCore outBoundsAgent;
         private float outBoundsAgentRot;
 
-    //FAULT INFO
-        private bool faultCommited;
-        private Vector3 faultBallPos;
-        private Vector3 faultAgentPos;
-        private AgentCore faultAgent;
-        private float faultAgentRot;
+    //foul INFO
+        private bool foulCommited;
+        private Vector3 foulBallPos;
+        private Vector3 foulAgentPos;
+        private AgentCore foulAgent;
+        private float foulAgentRot;
 
 
 
@@ -82,45 +82,21 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(outOfBounds)
             limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
 
-        if(faultCommited)
-            limitWalkingArea(faultAgent, faultAgentPos, faultAgentRot);
+        if(foulCommited)
+            limitWalkingArea(foulAgent, foulAgentPos, foulAgentRot);
 
-        //if(checkTwoOnOneFault())
-          //  Debug.Log("Two on One Falt");
+        if(threeInTheGoalAreafoul())
+            Debug.Log("Two on One Falt");
   
     }
 
-    public bool checkTwoOnOneFault(){
-        int teamMembersInAreaCounter = 0;
 
-        if(playerWithBall.team == AgentCore.Team.RED){
-            if(playersAtSmallAreaBlue.Count > 2){
-                for(int i = 0; i < playersAtSmallAreaBlue.Count; i++){
-                    if(playersAtSmallAreaBlue[i].team == AgentCore.Team.BLUE){
-                        teamMembersInAreaCounter++;
-                    }
-                }
-                if(teamMembersInAreaCounter > 2)
-                    return true;
-            }
-        }
-        else{
-            if(playersAtSmallAreaRed.Count > 2){
-                for(int i = 0; i < playersAtSmallAreaRed.Count; i++){
-                    if(playersAtSmallAreaRed[i].team == AgentCore.Team.RED){
-                        teamMembersInAreaCounter++;
-                    }
-                }
-                if(teamMembersInAreaCounter > 2)
-                    return true;
-            }
-        }
 
-        return false;
-    }
 
-    // Sets the player that has the ball and the opponent; sets null e there is none respectively;
-    // It also checks if anyone commited the two-on-one fault
+// ----------------------------------------------------------- GENERAL GAME FUNCS -----------------------------------------------------------
+
+    // Sets the player that has the ball and the opponent; sets null if there is none respectively;
+    // It also checks if anyone commited the two-on-one foul
     // Opponent is the player who is in a radius of 3m of the player with the ball
     public void setPlayerWithBallAndOpponent(){
 
@@ -152,14 +128,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                         opponent = possibleAgentsNearBall[i];
                        // Debug.Log("Opponent: " + opponent.name);
 
-                        //Since there's an opponnent already, we need to check if theres anyone commiting the two-on-one fault
+                        //Since there's an opponnent already, we need to check if theres anyone commiting the two-on-one foul
                         for(int j = i+1; j < possibleAgentsNearBall.Count; j++){
                             if(possibleAgentsNearBall[j].distanceToPlayer(playerWithBall) < 3){
                                 if(possibleAgentsNearBall[j].team == playerWithBall.team){
                                     if(possibleAgentsNearBall[j].type != AgentCore.Type.GOALKEEPER){
-                                        //Found a player commiting a fault
-                                        faultMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
-                                        Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One Fault!");
+                                        //Found a player commiting a foul
+                                        twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
+                                        Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
                                     }
                                 }
                             }
@@ -201,39 +177,50 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtSmallAreaBlue.Remove(agent);
         playersAtSmallAreaRed.Remove(agent);
         playersAtOutsideArea.Remove(agent);
+        playersAtHalfSideAreaBlue.Remove(agent);
+        
         playersAtHalfSideAreaBlue.Add(agent);
     }
 
     public void setPlayersAtHalfSideAreaRed(AgentCore agent){
-        playersAtHalfSideAreaRed.Add(agent);
+        playersAtHalfSideAreaRed.Remove(agent);
         playersAtSmallAreaBlue.Remove(agent);
         playersAtSmallAreaRed.Remove(agent);
         playersAtOutsideArea.Remove(agent);
         playersAtHalfSideAreaBlue.Remove(agent);
+
+        playersAtHalfSideAreaRed.Add(agent);
     }
 
     public void setPlayersAtSmallAreaBlue(AgentCore agent){
+        Debug.Log("Entra");
         playersAtHalfSideAreaRed.Remove(agent);
-        playersAtSmallAreaBlue.Add(agent);
+        playersAtSmallAreaBlue.Remove(agent);
         playersAtSmallAreaRed.Remove(agent);
         playersAtOutsideArea.Remove(agent);
         playersAtHalfSideAreaBlue.Remove(agent);
+
+        playersAtSmallAreaBlue.Add(agent);
     }
 
     public void setPlayersAtSmallAreaRed(AgentCore agent){
         playersAtHalfSideAreaRed.Remove(agent);
         playersAtSmallAreaBlue.Remove(agent);
-        playersAtSmallAreaRed.Add(agent);
+        playersAtSmallAreaRed.Remove(agent);
         playersAtOutsideArea.Remove(agent);
         playersAtHalfSideAreaBlue.Remove(agent);
+
+        playersAtSmallAreaRed.Add(agent);
     }
 
     public void setPlayersAtOutsideArea(AgentCore agent){
         playersAtHalfSideAreaRed.Remove(agent);
         playersAtSmallAreaBlue.Remove(agent);
         playersAtSmallAreaRed.Remove(agent);
-        playersAtOutsideArea.Add(agent);
+        playersAtOutsideArea.Remove(agent);
         playersAtHalfSideAreaBlue.Remove(agent);
+
+        playersAtOutsideArea.Add(agent);
     }
 
     public void setGoalAtRedGoal(){
@@ -248,6 +235,89 @@ public class GameEnvironmentInfo : MonoBehaviour
         Debug.Log("Score: Red - " + redScore);
     }
 
+
+
+
+// ----------------------------------------------------------- foul FUNCS -----------------------------------------------------------
+
+
+    public void twoOnOnefoulMechanism(AgentCore playerWithBall, AgentCore opponent, AgentCore playerCommitedfoul){
+
+        if(playerCommitedfoul.team == AgentCore.Team.RED){
+            if(Ball.positionInField == Ball.Areas.smallBlueArea){
+                Debug.Log("Penalty");
+            }
+        }else{
+            if(Ball.positionInField == Ball.Areas.smallRedArea){
+                Debug.Log("Penalty");
+            }
+        }
+        /*setfoulCommited(true);
+        playerCommitedfoul.setfoul();
+        foulAgent = playerWithBall;
+        foulBallPos = Ball.transform.localPosition;
+        
+        if(foulAgent.transform.localPosition.x >= 0){
+            foulAgentPos = new Vector3();
+            foulAgentRot
+            spawnWheelchairAtNewSpot(1,1,1, foulAgent, 0);
+        }
+        else{
+
+        }*/
+        
+    }
+
+    public void updatePlayersTwoOnOneRegularPositions(AgentCore playerTakingTheKick){
+
+    }
+
+    public void updatePlayersTwoOnOnePenaltyPositions(AgentCore playerTakingTheKick){
+
+    }
+
+    public void updatePlayersThreeInTheGoalAreaPositions(AgentCore playerTakingTheKick){
+
+    }
+
+    public bool threeInTheGoalAreafoul(){
+        int teamMembersInAreaCounter = 0;
+
+        Debug.Log("Palyers at small area Blue: " + playersAtSmallAreaBlue.Count);
+
+        if(playerWithBall == null)
+            return false;
+
+        if(playerWithBall.team == AgentCore.Team.RED){
+            if(playersAtSmallAreaBlue.Count > 2){
+                for(int i = 0; i < playersAtSmallAreaBlue.Count; i++){
+                    if(playersAtSmallAreaBlue[i].team == AgentCore.Team.BLUE){
+                        teamMembersInAreaCounter++;
+                    }
+                }
+                if(teamMembersInAreaCounter > 2)
+                    return true;
+            }
+        }
+        else if(playerWithBall.team == AgentCore.Team.BLUE){
+            if(playersAtSmallAreaRed.Count > 2){
+                for(int i = 0; i < playersAtSmallAreaRed.Count; i++){
+                    if(playersAtSmallAreaRed[i].team == AgentCore.Team.RED){
+                        teamMembersInAreaCounter++;
+                    }
+                }
+                if(teamMembersInAreaCounter > 2)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    
+
+// ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
+
     public void setBallOutOfBounds(){
         if(!ballOutOfBoundsTimeOut){
             Debug.Log("Out of Bounds");
@@ -260,107 +330,6 @@ public class GameEnvironmentInfo : MonoBehaviour
             outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
             setOutOfBounds(true);
-        }
-    }
-
-    public void faultMechanism(AgentCore playerWithBall, AgentCore opponent, AgentCore playerCommitedFault){
-
-        if(playerCommitedFault.team == AgentCore.Team.RED){
-            if(Ball.positionInField == Ball.Areas.smallBlueArea){
-                Debug.Log("Penalty");
-            }
-        }else{
-            if(Ball.positionInField == Ball.Areas.smallRedArea){
-                Debug.Log("Penalty");
-            }
-        }
-        /*setFaultCommited(true);
-        playerCommitedFault.setFault();
-        faultAgent = playerWithBall;
-        faultBallPos = Ball.transform.localPosition;
-        
-        if(faultAgent.transform.localPosition.x >= 0){
-            faultAgentPos = new Vector3();
-            faultAgentRot
-            spawnWheelchairAtNewSpot(1,1,1, faultAgent, 0);
-        }
-        else{
-
-        }*/
-        
-    }
-
-    public void setOutOfBounds(bool b){
-        outOfBounds = b;
-    }
-
-    public void setFaultCommited(bool b){
-        faultCommited = b;
-    }
-
-    //Limits the area which the agent/player can walk when in a free/indirect/outofbounds kick
-    private void limitWalkingArea(AgentCore agent, Vector3 pos, float rot){
-        Vector3 centerPosition = outBoundsBallPos; //center of circle
-        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
-        
-        if (distance > 3)
-        {
-            spawnWheelchairAtNewSpot(pos.x, pos.y, pos.z, agent, rot);
-        }
-    }
-
-
-
-    //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
-    private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){        
-
-        agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
-        agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
-        
-        agent.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        agent.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        agent.transform.GetChild(2).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                agent.transform.GetChild(2).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        agent.transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                agent.transform.GetChild(3).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        agent.transform.GetChild(4).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                agent.transform.GetChild(4).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        agent.transform.GetChild(5).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    agent.transform.GetChild(5).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        agent.transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        agent.transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        agent.transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
-
-        agent.transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        agent.transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        agent.transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
-
-        outBoundsBallPos = Ball.transform.localPosition;
-        outBoundsAgentPos = new Vector3(x, y, z);
-        outBoundsAgentRot = rotation;
-    }
-
-    public AgentCore getPlayerTakingsKick(AgentCore player){
-        Debug.Log(player.name);
-        var redAgents = new List<AgentCore>(redTeamAgents.Count);
-        var blueAgents = new List<AgentCore>(blueTeamAgents.Count);
-
-        redAgents.AddRange(redTeamAgents);
-        blueAgents.AddRange(blueTeamAgents);
-        
-        redAgents = redAgents.OrderBy(x => x.distanceToBall()).ToList();
-        blueAgents = blueAgents.OrderBy(x => x.distanceToBall()).ToList();
-
-        if(player.team == AgentCore.Team.RED){
-            return blueAgents[0];
-        }
-        else{
-            return redAgents[0];
         }
     }
 
@@ -438,6 +407,79 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
         }
+    }
 
+    public void setOutOfBounds(bool b){
+        outOfBounds = b;
+    }
+
+    public void setfoulCommited(bool b){
+        foulCommited = b;
+    }
+
+    //Limits the area which the agent/player can walk when in a free/indirect/outofbounds kick
+    private void limitWalkingArea(AgentCore agent, Vector3 pos, float rot){
+        Vector3 centerPosition = outBoundsBallPos; //center of circle
+        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
+        
+        if (distance > 3)
+        {
+            spawnWheelchairAtNewSpot(pos.x, pos.y, pos.z, agent, rot);
+        }
+    }
+
+
+
+    //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
+    private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){        
+
+        agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
+        agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
+        
+        agent.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        agent.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(2).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                agent.transform.GetChild(2).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                agent.transform.GetChild(3).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(4).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                agent.transform.GetChild(4).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(5).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    agent.transform.GetChild(5).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        agent.transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        agent.transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+
+        agent.transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        agent.transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        agent.transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+
+        outBoundsBallPos = Ball.transform.localPosition;
+        outBoundsAgentPos = new Vector3(x, y, z);
+        outBoundsAgentRot = rotation;
+    }
+
+    public AgentCore getPlayerTakingsKick(AgentCore player){
+        Debug.Log(player.name);
+        var redAgents = new List<AgentCore>(redTeamAgents.Count);
+        var blueAgents = new List<AgentCore>(blueTeamAgents.Count);
+
+        redAgents.AddRange(redTeamAgents);
+        blueAgents.AddRange(blueTeamAgents);
+        
+        redAgents = redAgents.OrderBy(x => x.distanceToBall()).ToList();
+        blueAgents = blueAgents.OrderBy(x => x.distanceToBall()).ToList();
+
+        if(player.team != AgentCore.Team.RED){
+            return blueAgents[0];
+        }
+        else{
+            return redAgents[0];
+        }
     }
 }
