@@ -86,7 +86,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             limitWalkingArea(foulAgent, foulAgentPos, foulAgentRot);
 
         if(threeInTheGoalAreafoul())
-            Debug.Log("Two on One Falt");
+            Debug.Log("3 in the Goal Area Foul Committed");
   
     }
 
@@ -254,7 +254,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void twoOnOnefoulMechanism(AgentCore playerWithBall, AgentCore opponent, AgentCore playerCommitedfoul){
 
-        if(playerCommitedfoul.team == AgentCore.Team.RED){
+        if(playerCommitedfoul.team == AgentCore.Team.BLUE){
             if(Ball.positionInField == Ball.Areas.smallBlueArea){
                 Debug.Log("Penalty");
             }
@@ -293,8 +293,6 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public bool threeInTheGoalAreafoul(){
         int teamMembersInAreaCounter = 0;
-
-        //Debug.Log("Palyers at small area Blue: " + playersAtSmallAreaBlue.Count);
 
         if(playerWithBall == null)
             return false;
