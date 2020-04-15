@@ -178,7 +178,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtSmallAreaRed.Remove(agent);
         playersAtOutsideArea.Remove(agent);
         playersAtHalfSideAreaBlue.Remove(agent);
-        
+
         playersAtHalfSideAreaBlue.Add(agent);
     }
 
@@ -283,7 +283,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     public bool threeInTheGoalAreafoul(){
         int teamMembersInAreaCounter = 0;
 
-        Debug.Log("Palyers at small area Blue: " + playersAtSmallAreaBlue.Count);
+        //Debug.Log("Palyers at small area Blue: " + playersAtSmallAreaBlue.Count);
 
         if(playerWithBall == null)
             return false;
