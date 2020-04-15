@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
+    public enum Areas{
+        smallRedArea,
+        smallBlueArea,
+        halfFieldBlue,
+        halfFieldRed,
+    }
+
+    public Areas positionInField;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,5 +22,9 @@ public class Ball : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void setPositionInField(Areas area){
+        positionInField = area;
     }
 }

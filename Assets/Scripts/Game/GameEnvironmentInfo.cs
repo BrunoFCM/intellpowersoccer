@@ -13,7 +13,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         public List<AgentCore> redTeamAgents;
         public List<AgentCore> blueTeamAgents;
 
-        public GameObject Ball;
+        public Ball Ball;
 
         //While this is true, players cannot commit faults bacause they are in a indirect free kick
         private bool faultTimeOut;
@@ -39,10 +39,17 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //BALL OUT OF BOUNDS INFO
         private bool outOfBounds;
-        private Vector3 ballPos;
+        private Vector3 outBoundsBallPos;
         private Vector3 outBoundsAgentPos;
         private AgentCore outBoundsAgent;
-        private float outBoundRot;
+        private float outBoundsAgentRot;
+
+    //FAULT INFO
+        private bool faultCommited;
+        private Vector3 faultBallPos;
+        private Vector3 faultAgentPos;
+        private AgentCore faultAgent;
+        private float faultAgentRot;
 
 
 
@@ -73,8 +80,43 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(opponent != null)
             Debug.Log("Opponent: " + opponent.name);*/
         if(outOfBounds)
-            limitWalkingArea();
+            limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
+
+        if(faultCommited)
+            limitWalkingArea(faultAgent, faultAgentPos, faultAgentRot);
+
+        //if(checkTwoOnOneFault())
+          //  Debug.Log("Two on One Falt");
   
+    }
+
+    public bool checkTwoOnOneFault(){
+        int teamMembersInAreaCounter = 0;
+
+        if(playerWithBall.team == AgentCore.Team.RED){
+            if(playersAtSmallAreaBlue.Count > 2){
+                for(int i = 0; i < playersAtSmallAreaBlue.Count; i++){
+                    if(playersAtSmallAreaBlue[i].team == AgentCore.Team.BLUE){
+                        teamMembersInAreaCounter++;
+                    }
+                }
+                if(teamMembersInAreaCounter > 2)
+                    return true;
+            }
+        }
+        else{
+            if(playersAtSmallAreaRed.Count > 2){
+                for(int i = 0; i < playersAtSmallAreaRed.Count; i++){
+                    if(playersAtSmallAreaRed[i].team == AgentCore.Team.RED){
+                        teamMembersInAreaCounter++;
+                    }
+                }
+                if(teamMembersInAreaCounter > 2)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     // Sets the player that has the ball and the opponent; sets null e there is none respectively;
@@ -113,10 +155,12 @@ public class GameEnvironmentInfo : MonoBehaviour
                         //Since there's an opponnent already, we need to check if theres anyone commiting the two-on-one fault
                         for(int j = i+1; j < possibleAgentsNearBall.Count; j++){
                             if(possibleAgentsNearBall[j].distanceToPlayer(playerWithBall) < 3){
-                                if(possibleAgentsNearBall[j].team != playerWithBall.team){
-                                    //Found a player commiting a fault
-                                    possibleAgentsNearBall[j].setFault();
-                                    // Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One Fault!");
+                                if(possibleAgentsNearBall[j].team == playerWithBall.team){
+                                    if(possibleAgentsNearBall[j].type != AgentCore.Type.GOALKEEPER){
+                                        //Found a player commiting a fault
+                                        faultMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
+                                        Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One Fault!");
+                                    }
                                 }
                             }
                             else{
@@ -207,30 +251,61 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setBallOutOfBounds(){
         if(!ballOutOfBoundsTimeOut){
             Debug.Log("Out of Bounds");
-            setPlayerTakingTheOutBoundsKick();
+            outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
             setOutOfBounds(true);
         }
         else{
             Debug.Log("Timeout for ball out of bounds");
-            setPlayerTakingTheOutBoundsKick();
+            outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
             setOutOfBounds(true);
         }
+    }
+
+    public void faultMechanism(AgentCore playerWithBall, AgentCore opponent, AgentCore playerCommitedFault){
+
+        if(playerCommitedFault.team == AgentCore.Team.RED){
+            if(Ball.positionInField == Ball.Areas.smallBlueArea){
+                Debug.Log("Penalty");
+            }
+        }else{
+            if(Ball.positionInField == Ball.Areas.smallRedArea){
+                Debug.Log("Penalty");
+            }
+        }
+        /*setFaultCommited(true);
+        playerCommitedFault.setFault();
+        faultAgent = playerWithBall;
+        faultBallPos = Ball.transform.localPosition;
+        
+        if(faultAgent.transform.localPosition.x >= 0){
+            faultAgentPos = new Vector3();
+            faultAgentRot
+            spawnWheelchairAtNewSpot(1,1,1, faultAgent, 0);
+        }
+        else{
+
+        }*/
+        
     }
 
     public void setOutOfBounds(bool b){
         outOfBounds = b;
     }
 
-    //Limits the area which the agent/player can walk when in a free/indirect kick
-    private void limitWalkingArea(){
-        Vector3 centerPosition = ballPos; //center of circle
-        float distance = Vector3.Distance(outBoundsAgent.transform.localPosition, centerPosition);
+    public void setFaultCommited(bool b){
+        faultCommited = b;
+    }
+
+    //Limits the area which the agent/player can walk when in a free/indirect/outofbounds kick
+    private void limitWalkingArea(AgentCore agent, Vector3 pos, float rot){
+        Vector3 centerPosition = outBoundsBallPos; //center of circle
+        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
         
         if (distance > 3)
         {
-            spawnWheelchairAtNewSpot(outBoundsAgentPos.x, outBoundsAgentPos.y, outBoundsAgentPos.z, outBoundsAgent, outBoundRot);
+            spawnWheelchairAtNewSpot(pos.x, pos.y, pos.z, agent, rot);
         }
     }
 
@@ -241,15 +316,37 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
         agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
-        agent.stopChair(rotation);
+        
+        agent.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        agent.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        ballPos = Ball.transform.localPosition;
+        agent.transform.GetChild(2).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                agent.transform.GetChild(2).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                agent.transform.GetChild(3).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(4).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                agent.transform.GetChild(4).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(5).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+                    agent.transform.GetChild(5).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        agent.transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        agent.transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        agent.transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+
+        agent.transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        agent.transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        agent.transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+
+        outBoundsBallPos = Ball.transform.localPosition;
         outBoundsAgentPos = new Vector3(x, y, z);
-        outBoundRot = rotation;
+        outBoundsAgentRot = rotation;
     }
 
-    public void setPlayerTakingTheOutBoundsKick(){
-        Debug.Log(lastPlayerTouchingTheBall.name);
+    public AgentCore getPlayerTakingsKick(AgentCore player){
+        Debug.Log(player.name);
         var redAgents = new List<AgentCore>(redTeamAgents.Count);
         var blueAgents = new List<AgentCore>(blueTeamAgents.Count);
 
@@ -259,11 +356,11 @@ public class GameEnvironmentInfo : MonoBehaviour
         redAgents = redAgents.OrderBy(x => x.distanceToBall()).ToList();
         blueAgents = blueAgents.OrderBy(x => x.distanceToBall()).ToList();
 
-        if(lastPlayerTouchingTheBall.team != AgentCore.Team.RED){
-            outBoundsAgent = blueAgents[0];
+        if(player.team == AgentCore.Team.RED){
+            return blueAgents[0];
         }
         else{
-            outBoundsAgent = redAgents[0];
+            return redAgents[0];
         }
     }
 
@@ -281,14 +378,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(x, 0.25f, 8.6f, agent, 0);
+                    spawnWheelchairAtNewSpot(x, 0.2327683f, 8.65f, agent, 0);
                 }
                 //Top Left Corner
                 else{
                     Ball.transform.position = new Vector3(-14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(-15.1f, 0.25f, 8.6f, agent, -45);
+                    spawnWheelchairAtNewSpot(-15.15f, 0.2327683f, 8.65f, agent, -45);
                 }
             }
             else{
@@ -297,14 +394,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(-14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(-15.1f, 0.25f, -8.6f, agent, 225);
+                    spawnWheelchairAtNewSpot(-15.15f, 0.2327683f, -8.65f, agent, 225);
                 }
                 //Bottom Left Half Field Bounds
                 else{
                     Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(x, 0.25f, -8.6f, agent, 180);
+                    spawnWheelchairAtNewSpot(x, 0.2327683f, -8.65f, agent, 180);
                 }
             }
         }else{
@@ -314,14 +411,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(x, 0.25f, 8.6f, agent, 0);
+                    spawnWheelchairAtNewSpot(x, 0.2327683f, 8.65f, agent, 0);
                 }
                 //Top Right Corner
                 else{
                     Ball.transform.position = new Vector3(14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(15.1f, 0.25f, 8.6f, agent, 45);
+                    spawnWheelchairAtNewSpot(15.15f, 0.2327683f, 8.65f, agent, 45);
                 }
             }
             else{
@@ -330,14 +427,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(15.1f, 0.25f, -8.6f, agent, 135);
+                    spawnWheelchairAtNewSpot(15.15f, 0.2327683f, -8.65f, agent, 135);
                 }
                 //Bottom Right Half Field Bounds
                 else{
                     Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(x, 0.25f, -8.6f, agent, 180);
+                    spawnWheelchairAtNewSpot(x, 0.2327683f, -8.65f, agent, 180);
                 }
             }
         }

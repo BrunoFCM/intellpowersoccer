@@ -5,7 +5,7 @@ using UnityEngine;
 public class SmallAreaBlue : MonoBehaviour
 {
     public GameEnvironmentInfo gameEnvironment;
-    public Collider Ball;
+    public Ball Ball;
 
     // Start is called before the first frame update
     void Start()
@@ -17,6 +17,8 @@ public class SmallAreaBlue : MonoBehaviour
         if (collision.name == Ball.name){
             gameEnvironment.setBallOutOfBoundsTimeOut(false);
             gameEnvironment.setOutOfBounds(false);
+            Ball.setPositionInField(Ball.Areas.smallBlueArea);
+
             Debug.Log("Ball in SmallSide Blue");
         }
 

@@ -15,7 +15,7 @@ public class AgentCore : MonoBehaviour
     public enum Type{
         DEFENSIVE,
         ATTACK,
-        CENTRAL,
+        GOALKEEPER,
     }
 
 
@@ -79,15 +79,24 @@ public class AgentCore : MonoBehaviour
         agentRBody.velocity = Vector3.zero;
 
         transform.GetChild(2).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(2).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(3).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         transform.GetChild(4).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        transform.GetChild(4).gameObject.GetComponent<Rigidbody>().AddTorque(Vector3.zero);
+        transform.GetChild(4).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         transform.GetChild(5).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        transform.GetChild(5).gameObject.GetComponent<Rigidbody>().AddTorque(Vector3.zero);
+        transform.GetChild(5).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity * Quaternion.Euler(0, 0, 0);
+        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity * Quaternion.Euler(0, 0, 0);
+        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
     }
 
     //Player Distance to another Player player
