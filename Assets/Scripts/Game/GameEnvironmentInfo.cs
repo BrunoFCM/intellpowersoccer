@@ -412,6 +412,34 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
     }
 
+    public void playerRecieveingBall(AgentCore agent){
+        if(agent.team != AgentCore.Team.BLUE){
+            AgentCore possibleAgent = redTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[1];
+            Vector3 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+
+            possibleAgent.transform.localPosition = newPos;
+        }
+        else{
+            AgentCore possibleAgent = blueTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[1];
+            Vector3 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+
+            possibleAgent.transform.localPosition = newPos;
+        }
+    }
+
+    public Vector3 calculatePlayerWhoRecievesTheBallNewPos(AgentCore agent){
+
+            float xBall = Ball.transform.localPosition.x;
+            float zBall = Ball.transform.localPosition.z;
+            float xAgent = agent.transform.localPosition.x;
+            float zAgent = agent.transform.localPosition.z;
+            float t = 3/agent.distanceToBall();
+            float newX = ((1 - t)*xBall + t*xAgent);
+            float newZ = ((1 - t)*zBall + t*zAgent);
+
+            return new Vector3(newX, agent.transform.localPosition.y, newZ);
+    }
+
     //Responsible for spawning player and ball at the right positions after BallOutOfBounds
     private void ballOutOfBoundsMechanism(AgentCore agent){
         float x = Ball.transform.localPosition.x;
@@ -486,6 +514,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
         }
+
+        playerRecieveingBall(agent);
     }
 
     public void setOutOfBounds(bool b){
