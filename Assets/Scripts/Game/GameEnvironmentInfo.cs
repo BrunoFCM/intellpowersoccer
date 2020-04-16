@@ -38,6 +38,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         private List<AgentCore> playersAtOutsideArea;
 
     //BALL OUT OF BOUNDS INFO
+        //If outOfBound is set to true means that we are in a Ball Out Of Bounds period of the game (all agents are paused)
         private bool outOfBounds;
         private Vector3 outBoundsBallPos;
         private Vector3 outBoundsAgentPos;
@@ -45,6 +46,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         private float outBoundsAgentRot;
 
     //foul INFO
+        //if foulCommited is set to true mean that we are in a fault period of the game (all agents are paused)
         private bool foulCommited;
         private Vector3 foulBallPos;
         private Vector3 foulAgentPos;
@@ -189,6 +191,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtHalfSideAreaBlue.Remove(agent);
 
         playersAtHalfSideAreaBlue.Add(agent);
+        agent.setCurrentPositionInField(AgentCore.Areas.halfFieldBlue);
     }
 
     public void setPlayersAtHalfSideAreaRed(AgentCore agent){
@@ -199,6 +202,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtHalfSideAreaBlue.Remove(agent);
 
         playersAtHalfSideAreaRed.Add(agent);
+        agent.setCurrentPositionInField(AgentCore.Areas.halfFieldRed);
     }
 
     public void setPlayersAtSmallAreaBlue(AgentCore agent){
@@ -209,6 +213,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtHalfSideAreaBlue.Remove(agent);
 
         playersAtSmallAreaBlue.Add(agent);
+        agent.setCurrentPositionInField(AgentCore.Areas.smallBlueArea);
     }
 
     public void setPlayersAtSmallAreaRed(AgentCore agent){
@@ -219,6 +224,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtHalfSideAreaBlue.Remove(agent);
 
         playersAtSmallAreaRed.Add(agent);
+        agent.setCurrentPositionInField(AgentCore.Areas.smallRedArea);
     }
 
     public void setPlayersAtOutsideArea(AgentCore agent){
@@ -281,14 +287,16 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(playerCommitedfoul.team == AgentCore.Team.RED){
                 foreach(AgentCore agent in redTeamAgents){
                     if(agent.distanceToBall() < 3){
-                        updatePlayerTwoOnOneRegularPosition(agent);
+                        updatePlayerTwoOnOneRegularPosition(agent, AgentCore.Team.RED);
                     }
                 }
             }
             else{
                 foreach(AgentCore agent in blueTeamAgents){
+                    Debug.Log("1");
                     if(agent.distanceToBall() < 3){
-                        updatePlayerTwoOnOneRegularPosition(agent);
+                        Debug.Log("2");
+                        updatePlayerTwoOnOneRegularPosition(agent, AgentCore.Team.BLUE);
                     }
                 }
             }
@@ -313,9 +321,35 @@ public class GameEnvironmentInfo : MonoBehaviour
         
     }
 
-    public void updatePlayerTwoOnOneRegularPosition(AgentCore agent){
+    public void updatePlayerTwoOnOneRegularPosition(AgentCore agent, AgentCore.Team team){
         float distanceToBall = agent.distanceToBall();
-        Debug.Log("ENTRAAAAAAAAAAAA");
+        float newX = 0;
+        
+        //Fall back 3m relative to the ball for their own part of the field
+        if(team == AgentCore.Team.RED){
+            //Agent is farest from his field
+            if(Ball.transform.localPosition.x < agent.transform.localPosition.x)
+                newX = agent.transform.localPosition.x - distanceToBall - 3;
+            //Agent is nearest from his field
+            else{
+                newX = agent.transform.localPosition.x - distanceToBall;
+            }
+        }
+        else{
+            Debug.Log("3");
+            //Agent is farest from his field
+            if(Ball.transform.localPosition.x > agent.transform.localPosition.x)
+                newX = agent.transform.localPosition.x + distanceToBall + 3;
+            //Agent is nearest from his field
+            else{
+                newX = agent.transform.localPosition.x + distanceToBall;
+            }
+        }
+        Debug.Log("Old X: " + agent.transform.localPosition.x);
+        Debug.Log("New X: " + newX);
+
+        agent.transform.localPosition = new Vector3(newX, agent.transform.localPosition.y, agent.transform.localPosition.z);
+
         agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
     }
 

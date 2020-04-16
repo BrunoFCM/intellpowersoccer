@@ -18,6 +18,15 @@ public class AgentCore : MonoBehaviour
         GOALKEEPER,
     }
 
+    public enum Areas{
+        smallRedArea,
+        smallBlueArea,
+        halfFieldBlue,
+        halfFieldRed,
+    }
+
+    private Areas currentPositionInField;
+
 
     //AGENT GENERAL INFORMATION
         //Blue Team or Red Team
@@ -130,6 +139,10 @@ public class AgentCore : MonoBehaviour
         gameEnvironment.setPlayersAtSmallAreaRed(this);
     }
 
+    public void setCurrentPositionInField(Areas a){
+        currentPositionInField = a;
+    }
+
     public void setPlayersAtOutsideArea(){
         Debug.Log("Collision with outsideArea");
         gameEnvironment.setPlayersAtOutsideArea(this);
@@ -155,6 +168,10 @@ public class AgentCore : MonoBehaviour
 
     public Rigidbody getAgentRBody(){
         return agentRBody;
+    }
+
+    public Areas getCurrentPositionInField(){
+        return currentPositionInField;
     }
 
 
