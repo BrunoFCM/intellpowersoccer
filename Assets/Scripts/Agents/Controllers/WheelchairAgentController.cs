@@ -34,7 +34,7 @@ public class WheelchairAgentController : Agent
 
     public override void InitializeAgent() {
         // Move the target to a new spot
-        updateTargetPos();
+        //updateTargetPos();
     }
 
     public override void CollectObservations()
@@ -174,6 +174,6 @@ public class WheelchairAgentController : Agent
         float z = Random.Range(-1.0f, 1.0f) * 7.0f;
 
         // Move the target to a new spot
-        Target.localPosition = new Vector3(0f, 0.44f, 2.0f);
+        //Target.localPosition = new Vector3(0f, 0.44f, 2.0f);
     }
 }

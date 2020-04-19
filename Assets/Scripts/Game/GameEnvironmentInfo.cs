@@ -12,8 +12,8 @@ public class GameEnvironmentInfo : MonoBehaviour
         private int blueScore = 0;
         public List<AgentCore> redTeamAgents;
         public List<AgentCore> blueTeamAgents;
-
         public Ball Ball;
+        private AgentCore.Team tossingWinner;
 
         //While this is true, players cannot commit fouls bacause they are in a indirect free kick
         private bool foulTimeOut;
@@ -69,6 +69,18 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtOutsideArea = new List<AgentCore>();
 
         ballOutOfBoundsTimeOut = false;
+
+        setBallCenterPos();
+
+        if (new System.Random().Next(0, 2) == 0)
+            tossingWinner = AgentCore.Team.BLUE;
+        else
+            tossingWinner = AgentCore.Team.RED;
+
+        setInitialPositions();
+
+        //setBallPenaltyPos(AgentCore.Team.BLUE);
+        //setPenaltyPositions(AgentCore.Team.BLUE);
     }
 
     // Update is called once per frame
@@ -94,6 +106,105 @@ public class GameEnvironmentInfo : MonoBehaviour
 
 
 // ----------------------------------------------------------- GENERAL GAME FUNCS -----------------------------------------------------------
+
+    //Sets the initial positions os the players in the field
+    public void setInitialPositions(){
+        if(tossingWinner == AgentCore.Team.BLUE){
+            redTeamAgents[0].transform.localPosition = new Vector3(-4f, 0.25f, 0f);
+            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.localPosition = new Vector3(-7, 0.25f, 4.5f);
+            redTeamAgents[3].transform.localPosition = new Vector3(-7, 0.25f, -4.5f);
+
+            blueTeamAgents[0].transform.localPosition = new Vector3(1.15f, 0.25f, 0f);
+            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.localPosition = new Vector3(2f, 0.25f, 5f);
+            blueTeamAgents[3].transform.localPosition = new Vector3(2f, 0.25f, -5f);
+        }
+        else{
+            redTeamAgents[0].transform.localPosition = new Vector3(-1.15f, 0.25f, 0f);
+            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.localPosition = new Vector3(-2, 0.25f, 5f);
+            redTeamAgents[3].transform.localPosition = new Vector3(-2, 0.25f, -5f);
+
+            blueTeamAgents[0].transform.localPosition = new Vector3(4f, 0.25f, 0f);
+            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.localPosition = new Vector3(7f, 0.25f, 4.5f);
+            blueTeamAgents[3].transform.localPosition = new Vector3(7f, 0.25f, -4.5f);
+        }
+
+        foreach(AgentCore agent in redTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+        foreach(AgentCore agent in blueTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+    }
+
+
+    public void setPenaltyPositions(AgentCore.Team teamTakingKick){
+        if(teamTakingKick == AgentCore.Team.RED){
+            redTeamAgents[0].transform.localPosition = new Vector3(10f, 0.25f, 0f);
+            redTeamAgents[1].transform.localPosition = new Vector3(-3f, 0.25f, 0f);
+            redTeamAgents[2].transform.localPosition = new Vector3(4f, 0.25f, 4.5f);
+            redTeamAgents[3].transform.localPosition = new Vector3(4f, 0.25f, -4.5f);
+
+            blueTeamAgents[0].transform.localPosition = new Vector3(5f, 0.25f, 0f);
+            blueTeamAgents[1].transform.localPosition = new Vector3(14.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.localPosition = new Vector3(6f, 0.25f, 3f);
+            blueTeamAgents[3].transform.localPosition = new Vector3(6f, 0.25f, -3f);
+        }
+        else{
+            redTeamAgents[0].transform.localPosition = new Vector3(-5f, 0.25f, 0f);
+            redTeamAgents[1].transform.localPosition = new Vector3(-14.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.localPosition = new Vector3(-6, 0.25f, 3f);
+            redTeamAgents[3].transform.localPosition = new Vector3(-6, 0.25f, -3f);
+
+            blueTeamAgents[0].transform.localPosition = new Vector3(-10f, 0.25f, 0f);
+            blueTeamAgents[1].transform.localPosition = new Vector3(3f, 0.25f, 0f);
+            blueTeamAgents[2].transform.localPosition = new Vector3(-4f, 0.25f, 4.5f);
+            blueTeamAgents[3].transform.localPosition = new Vector3(-4f, 0.25f, -4.5f);
+        }
+
+        foreach(AgentCore agent in redTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+        foreach(AgentCore agent in blueTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+    }
+
+    public void disableAllChairs(AgentCore exception1, AgentCore exception2){
+        foreach(AgentCore agent in redTeamAgents){
+            if(agent != exception1 && agent != exception2){
+                agent.stopChair();
+            }
+        }
+        foreach(AgentCore agent in blueTeamAgents){
+            if(agent != exception1 && agent != exception2){
+                agent.stopChair();
+            }
+        }
+    }
+
+    public void enableAllChairs(){
+        foreach(AgentCore agent in redTeamAgents){
+            agent.resumeChair();
+        }
+        foreach(AgentCore agent in blueTeamAgents){
+            agent.resumeChair();
+        }
+    }
+
+    public void setBallCenterPos(){
+        Ball.transform.localPosition = new Vector3(0, 0.44f, 0);
+    }
+
+    public void setBallPenaltyPos(AgentCore.Team teamTakingTheKick){
+        if(teamTakingTheKick == AgentCore.Team.RED)
+            Ball.transform.localPosition = new Vector3(11.5f, 0.44f, 0);
+        else
+            Ball.transform.localPosition = new Vector3(-11.5f, 0.44f, 0);
+    }
 
     // Sets the player that has the ball and the opponent; sets null if there is none respectively;
     // It also checks if anyone commited the two-on-one foul
