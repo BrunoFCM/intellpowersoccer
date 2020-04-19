@@ -44,6 +44,11 @@ public class GameEnvironmentInfo : MonoBehaviour
         private Vector3 outBoundsAgentPos;
         private AgentCore outBoundsAgent;
         private float outBoundsAgentRot;
+        private bool outOfBoundsAreaFreeKick;
+        private Vector3 outBoundsAreaFreeKickAgentPos;
+        private AgentCore outBoundsFreeKickAgent;
+        private float outBoundsFreeKickAgentRot;
+
 
     //foul INFO
         //if foulCommited is set to true mean that we are in a fault period of the game (all agents are paused)
@@ -81,6 +86,9 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         //setBallPenaltyPos(AgentCore.Team.BLUE);
         //setPenaltyPositions(AgentCore.Team.BLUE);
+        //setBallFreeGoalAreaKick(AgentCore.Team.BLUE);
+        //setFreeGoalAreaKickPositions(AgentCore.Team.BLUE);
+    
     }
 
     // Update is called once per frame
@@ -97,8 +105,15 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(outOfBounds)
             limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
 
+        if(outOfBoundsAreaFreeKick)
+            limitWalkingArea(outBoundsFreeKickAgent, outBoundsAreaFreeKickAgentPos, outBoundsFreeKickAgentRot);
+
         if(threeInTheGoalAreafoul())
             Debug.Log("3 in the Goal Area Foul Committed");
+
+        if(lastPlayerTouchingTheBall != null){
+            outOfBoundsAreaFreeKick = false;
+        }
   
     }
 
@@ -173,6 +188,48 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
     }
 
+    public void setFreeGoalAreaKickPositions(AgentCore.Team teamTakingKick){
+        setBallFreeGoalAreaKick(teamTakingKick);
+
+        if(teamTakingKick == AgentCore.Team.BLUE){
+            redTeamAgents[0].transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.localPosition = new Vector3(-3.5f, 0.25f, 4.5f);
+            redTeamAgents[3].transform.localPosition = new Vector3(-3.5f, 0.25f, -4.5f);
+
+            blueTeamAgents[0].transform.localPosition = new Vector3(4f, 0.25f, 0f);
+            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.localPosition = new Vector3(7f, 0.25f, 4f);
+            blueTeamAgents[3].transform.localPosition = new Vector3(7f, 0.25f, -4f);
+
+            outBoundsAreaFreeKickAgentPos = new Vector3(11.5f, 0.25f, 0f);
+            outBoundsFreeKickAgent = blueTeamAgents[1];
+            outBoundsFreeKickAgentRot = 90;
+        }
+        else{
+            redTeamAgents[0].transform.localPosition = new Vector3(-4f, 0.25f, 0f);
+            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.localPosition = new Vector3(-7f, 0.25f, 4f);
+            redTeamAgents[3].transform.localPosition = new Vector3(-7f, 0.25f, -4f);
+
+            blueTeamAgents[0].transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.localPosition = new Vector3(3.5f, 0.25f, 4.5f);
+            blueTeamAgents[3].transform.localPosition = new Vector3(3.5f, 0.25f, -4.5f);
+
+            outBoundsAreaFreeKickAgentPos = new Vector3(-11.5f, 0.25f, 0f);
+            outBoundsFreeKickAgent = redTeamAgents[1];
+            outBoundsFreeKickAgentRot = 0;
+        }
+
+        foreach(AgentCore agent in redTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+        foreach(AgentCore agent in blueTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+    }
+
     public void disableAllChairs(AgentCore exception1, AgentCore exception2){
         foreach(AgentCore agent in redTeamAgents){
             if(agent != exception1 && agent != exception2){
@@ -197,6 +254,13 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void setBallCenterPos(){
         Ball.transform.localPosition = new Vector3(0, 0.44f, 0);
+    }
+
+    public void setBallFreeGoalAreaKick(AgentCore.Team teamTakingTheKick){
+        if(teamTakingTheKick == AgentCore.Team.BLUE)
+            Ball.transform.localPosition = new Vector3(10f, 0.44f, 0);
+        else
+            Ball.transform.localPosition = new Vector3(-10f, 0.44f, 0);
     }
 
     public void setBallPenaltyPos(AgentCore.Team teamTakingTheKick){
@@ -513,7 +577,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             Debug.Log("Out of Bounds");
             outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
-            setOutOfBounds(true);
+            lastPlayerTouchingTheBall = null;
         }
         else{
             Debug.Log("Timeout for ball out of bounds");
@@ -557,6 +621,8 @@ public class GameEnvironmentInfo : MonoBehaviour
         float y = Ball.transform.localPosition.y;
         float z = Ball.transform.localPosition.z;
 
+        bool notCorner = false;
+
 
         if(x < 0){
             if(z > 0){
@@ -572,7 +638,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(-14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(-15.15f, 0.2327683f, 8.65f, agent, -45);
+
+                    if(agent.team == AgentCore.Team.RED){
+                        outOfBounds = false;
+                        setFreeGoalAreaKickPositions(AgentCore.Team.RED);
+                        notCorner = true;    
+                    }
+                    else
+                        spawnWheelchairAtNewSpot(-15.15f, 0.2327683f, 8.65f, agent, -45);
                 }
             }
             else{
@@ -581,7 +654,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(-14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(-15.15f, 0.2327683f, -8.65f, agent, 225);
+
+                    if(agent.team == AgentCore.Team.RED){
+                        outOfBounds = false;
+                        setFreeGoalAreaKickPositions(AgentCore.Team.RED);
+                        notCorner = true;    
+                    }
+                    else
+                        spawnWheelchairAtNewSpot(-15.15f, 0.2327683f, -8.65f, agent, 225);
                 }
                 //Bottom Left Half Field Bounds
                 else{
@@ -605,7 +685,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(15.15f, 0.2327683f, 8.65f, agent, 45);
+
+                    if(agent.team == AgentCore.Team.BLUE){
+                        outOfBounds = false;
+                        setFreeGoalAreaKickPositions(AgentCore.Team.BLUE);
+                        notCorner = true;    
+                    }
+                    else
+                        spawnWheelchairAtNewSpot(15.15f, 0.2327683f, 8.65f, agent, 45);
                 }
             }
             else{
@@ -614,7 +701,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                     Ball.transform.position = new Vector3(14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    spawnWheelchairAtNewSpot(15.15f, 0.2327683f, -8.65f, agent, 135);
+
+                    if(agent.team == AgentCore.Team.BLUE){
+                        outOfBounds = false;
+                        setFreeGoalAreaKickPositions(AgentCore.Team.BLUE);
+                        notCorner = true;
+                    }
+                    else
+                        spawnWheelchairAtNewSpot(15.15f, 0.2327683f, -8.65f, agent, 135);
                 }
                 //Bottom Right Half Field Bounds
                 else{
@@ -626,7 +720,13 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
 
-        playerRecieveingBall(agent);
+        if(!notCorner){
+            playerRecieveingBall(agent);
+            setOutOfBounds(true);
+        }
+        else{
+            outOfBoundsAreaFreeKick = true;
+        }
     }
 
     public void setOutOfBounds(bool b){
