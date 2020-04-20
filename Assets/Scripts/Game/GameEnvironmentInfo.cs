@@ -57,6 +57,10 @@ public class GameEnvironmentInfo : MonoBehaviour
         private Vector3 foulAgentPos;
         private AgentCore foulAgent;
         private float foulAgentRot;
+        private bool penaltyActive;
+        private AgentCore penaltyAgent;
+        private Vector3 penaltyAgentPos;
+        private float penaltyAgentRot;
 
 
 
@@ -113,6 +117,11 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if(lastPlayerTouchingTheBall != null){
             outOfBoundsAreaFreeKick = false;
+            penaltyActive = false;
+        }
+
+        if(penaltyActive){
+            limitWalkingArea(penaltyAgent, penaltyAgentPos, penaltyAgentRot);
         }
   
     }
@@ -157,6 +166,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
 
     public void setPenaltyPositions(AgentCore.Team teamTakingKick){
+        setBallPenaltyPos(teamTakingKick);
+        
         if(teamTakingKick == AgentCore.Team.RED){
             redTeamAgents[0].transform.localPosition = new Vector3(10f, 0.25f, 0f);
             redTeamAgents[1].transform.localPosition = new Vector3(-3f, 0.25f, 0f);
@@ -167,6 +178,10 @@ public class GameEnvironmentInfo : MonoBehaviour
             blueTeamAgents[1].transform.localPosition = new Vector3(14.5f, 0.25f, 0f);
             blueTeamAgents[2].transform.localPosition = new Vector3(6f, 0.25f, 3f);
             blueTeamAgents[3].transform.localPosition = new Vector3(6f, 0.25f, -3f);
+
+            penaltyAgent = redTeamAgents[0];
+            penaltyAgentPos = new Vector3(10f, 0.25f, 0f);
+            penaltyAgentRot = -90;
         }
         else{
             redTeamAgents[0].transform.localPosition = new Vector3(-5f, 0.25f, 0f);
@@ -178,6 +193,10 @@ public class GameEnvironmentInfo : MonoBehaviour
             blueTeamAgents[1].transform.localPosition = new Vector3(3f, 0.25f, 0f);
             blueTeamAgents[2].transform.localPosition = new Vector3(-4f, 0.25f, 4.5f);
             blueTeamAgents[3].transform.localPosition = new Vector3(-4f, 0.25f, -4.5f);
+
+            penaltyAgent = blueTeamAgents[0];
+            penaltyAgentPos = new Vector3(-10f, 0.25f, 0f);
+            penaltyAgentRot = 0;
         }
 
         foreach(AgentCore agent in redTeamAgents){
@@ -245,10 +264,10 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void enableAllChairs(){
         foreach(AgentCore agent in redTeamAgents){
-            agent.resumeChair();
+            agent.enableChair();
         }
         foreach(AgentCore agent in blueTeamAgents){
-            agent.resumeChair();
+            agent.enableChair();
         }
     }
 
@@ -477,7 +496,17 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
         else{
-
+            if(playerCommitedfoul.team == AgentCore.Team.RED){
+                setPenaltyPositions(AgentCore.Team.BLUE);
+                lastPlayerTouchingTheBall = null;
+                penaltyActive = true;
+            }
+            else
+            {
+                setPenaltyPositions(AgentCore.Team.RED);
+                lastPlayerTouchingTheBall = null;
+                penaltyActive = true;
+            }
         }
         
         /*setfoulCommited(true);
