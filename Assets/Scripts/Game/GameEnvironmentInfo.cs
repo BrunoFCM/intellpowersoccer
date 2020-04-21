@@ -266,10 +266,15 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setBallCenterPos(){
+        Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
         Ball.transform.localPosition = new Vector3(0, 0.44f, 0);
     }
 
     public void setBallFreeGoalAreaKick(AgentCore.Team teamTakingTheKick){
+        Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         if(teamTakingTheKick == AgentCore.Team.BLUE)
             Ball.transform.localPosition = new Vector3(10f, 0.44f, 0);
         else
@@ -277,6 +282,9 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setBallPenaltyPos(AgentCore.Team teamTakingTheKick){
+        Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         if(teamTakingTheKick == AgentCore.Team.RED)
             Ball.transform.localPosition = new Vector3(11.5f, 0.44f, 0);
         else
@@ -486,9 +494,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
             else{
                 foreach(AgentCore agent in blueTeamAgents){
-                    Debug.Log("1");
                     if(agent.distanceToBall() < 3){
-                        Debug.Log("2");
                         updatePlayerTwoOnOneRegularPosition(agent, AgentCore.Team.BLUE);
                     }
                 }
@@ -539,7 +545,6 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
         else{
-            Debug.Log("3");
             //Agent is farest from his field
             if(Ball.transform.localPosition.x > agent.transform.localPosition.x)
                 newX = agent.transform.localPosition.x + distanceToBall + 3;
@@ -565,8 +570,6 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public bool threeInTheGoalAreafoul(){
-        Debug.Log("teamMembersInSmallAreaBlue: " + playersAtSmallAreaBlue.Count);
-                Debug.Log("teamMembersInSmallAreaRed: " + playersAtSmallAreaRed.Count);
 
                 /*
                 foreach(AgentCore ag in playersAtSmallAreaBlue){
@@ -620,6 +623,40 @@ public class GameEnvironmentInfo : MonoBehaviour
         return false;
     }
 
+    //Generates a random point inside circle
+    public Vector2 getPointInsideAnnulus(Vector2 centerPos, float minRadius, float maxRadius, float limit){
+
+        float theta = Random.Range(Mathf.PI/2, 3/2*Mathf.PI);
+        float w = Random.Range(0, 1);
+        float r = Mathf.Sqrt( (1.0f - w) * minRadius * minRadius + w * maxRadius * maxRadius );
+        return new Vector2(r * Mathf.Cos(theta) + centerPos.x, r * Mathf.Sin(theta) + centerPos.y);
+    }
+
+
+    public void indirectFreeKickOutsideGoalArea(AgentCore agentSufferingFoul, AgentCore agentCommitingFoul, Vector3 foulPos){
+        
+        if(agentSufferingFoul.team == AgentCore.Team.RED){
+            //Team RED suffer foul in Blue Area (Attacking)
+            if(foulPos.x > 0){
+                //Player spawns must be mainly at Bottom
+                if(foulPos.z > 0){
+
+                }
+                //Player spawns must be mainly at Top
+                else{
+
+                }
+            }
+            //Team RED suffer foul in RED Area (Defending)
+            else{
+
+            }
+        }
+        else{
+            
+        }
+    }
+
     
 
 // ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
@@ -642,15 +679,37 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void playerRecieveingBall(AgentCore agent){
         if(agent.team != AgentCore.Team.BLUE){
             AgentCore possibleAgent = redTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[1];
-            Vector3 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+            Vector3 newPos = new Vector3();
+
+            if(possibleAgent.type != AgentCore.Type.GOALKEEPER){
+                newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+            }
+            else{
+                possibleAgent = redTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[2];
+                newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+            }
 
             possibleAgent.transform.localPosition = newPos;
+            Debug.Log("Ball x: " + Ball.transform.position.x);
+            Debug.Log("Ball z: " + Ball.transform.position.z);
+            possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
         }
         else{
             AgentCore possibleAgent = blueTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[1];
-            Vector3 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+            Vector3 newPos = new Vector3();
+
+            if(possibleAgent.type != AgentCore.Type.GOALKEEPER){
+                newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+            }
+            else{
+                possibleAgent = blueTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[2];
+                newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
+            }
 
             possibleAgent.transform.localPosition = newPos;
+            Debug.Log("Ball x: " + Ball.transform.position.x);
+            Debug.Log("Ball z: " + Ball.transform.position.z);
+            possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
         }
     }
 
@@ -660,7 +719,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             float zBall = Ball.transform.localPosition.z;
             float xAgent = agent.transform.localPosition.x;
             float zAgent = agent.transform.localPosition.z;
-            float t = 3/agent.distanceToBall();
+            float t = 4.5f/agent.distanceToBall();
             float newX = ((1 - t)*xBall + t*xAgent);
             float newZ = ((1 - t)*zBall + t*zAgent);
 
@@ -801,15 +860,16 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
-    private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){        
-        agent.getAgentRBody().transform.rotation = Quaternion.identity * Quaternion.Euler(0, rotation, 0);
+    private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){ 
         agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
-        
         agent.stopChair();
 
         outBoundsBallPos = Ball.transform.localPosition;
         outBoundsAgentPos = new Vector3(x, y, z);
         outBoundsAgentRot = rotation;
+
+        agent.getAgentRBody().transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+
     }
 
     public AgentCore getPlayerTakingsKick(AgentCore player){
