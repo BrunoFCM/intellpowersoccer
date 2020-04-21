@@ -82,11 +82,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         setBallCenterPos();
 
         if (new System.Random().Next(0, 2) == 0)
-            tossingWinner = AgentCore.Team.BLUE;
+            setInitialPositions(AgentCore.Team.BLUE);
         else
-            tossingWinner = AgentCore.Team.RED;
-
-        setInitialPositions();
+            setInitialPositions(AgentCore.Team.RED);
 
         //setBallPenaltyPos(AgentCore.Team.BLUE);
         //setPenaltyPositions(AgentCore.Team.BLUE);
@@ -100,20 +98,16 @@ public class GameEnvironmentInfo : MonoBehaviour
     {   
         if(!foulCommited)
             foulControlSystem();
-        /*if(lastPlayerTouchingTheBall != null)
-            //Debug.Log("Last Player touching the ball: " + lastPlayerTouchingTheBall.name);
-        if(playerWithBall != null)
-            Debug.Log("Player with ball possession: " + playerWithBall.name);
-        if(opponent != null)
-            Debug.Log("Opponent: " + opponent.name);*/
+
         if(outOfBounds)
             limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
 
         if(outOfBoundsAreaFreeKick)
             limitWalkingArea(outBoundsFreeKickAgent, outBoundsAreaFreeKickAgentPos, outBoundsFreeKickAgentRot);
 
-        if(threeInTheGoalAreafoul())
+        if(threeInTheGoalAreafoul()){
             Debug.Log("3 in the Goal Area Foul Committed");
+        }
 
         if(lastPlayerTouchingTheBall != null){
             outOfBoundsAreaFreeKick = false;
@@ -132,8 +126,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 // ----------------------------------------------------------- GENERAL GAME FUNCS -----------------------------------------------------------
 
     //Sets the initial positions os the players in the field
-    public void setInitialPositions(){
-        if(tossingWinner == AgentCore.Team.BLUE){
+    public void setInitialPositions(AgentCore.Team team){
+        if(team == AgentCore.Team.BLUE){
             redTeamAgents[0].transform.localPosition = new Vector3(-4f, 0.25f, 0f);
             redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
             redTeamAgents[2].transform.localPosition = new Vector3(-7, 0.25f, 4.5f);
@@ -422,6 +416,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setPlayersAtOutsideArea(AgentCore agent){
+
         playersAtHalfSideAreaRed.Remove(agent);
         playersAtSmallAreaBlue.Remove(agent);
         playersAtSmallAreaRed.Remove(agent);
@@ -433,12 +428,16 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void setGoalAtRedGoal(){
         blueScore += 1;
+        setBallCenterPos();
+        setInitialPositions(AgentCore.Team.RED);
         Debug.Log("Score: Blue - " + blueScore);
         Debug.Log("Score: Red - " + redScore);
     }
 
     public void setGoalAtBlueGoal(){
         redScore += 1;
+        setBallCenterPos();
+        setInitialPositions(AgentCore.Team.BLUE);
         Debug.Log("Score: Blue - " + blueScore);
         Debug.Log("Score: Red - " + redScore);
     }
@@ -566,6 +565,15 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public bool threeInTheGoalAreafoul(){
+        Debug.Log("teamMembersInSmallAreaBlue: " + playersAtSmallAreaBlue.Count);
+                Debug.Log("teamMembersInSmallAreaRed: " + playersAtSmallAreaRed.Count);
+
+                /*
+                foreach(AgentCore ag in playersAtSmallAreaBlue){
+                    Debug.Log("kjlkank: " + ag.name);
+                }
+                */
+
         int teamMembersInAreaCounter = 0;
 
         if(playerWithBall == null)
@@ -578,8 +586,16 @@ public class GameEnvironmentInfo : MonoBehaviour
                         teamMembersInAreaCounter++;
                     }
                 }
-                if(teamMembersInAreaCounter > 2)
+                if(teamMembersInAreaCounter > 2){
+                    if(Ball.positionInField == Ball.Areas.smallBlueArea){
+                        Debug.Log("Penalty");
+                        setPenaltyPositions(AgentCore.Team.RED);
+                        lastPlayerTouchingTheBall = null;
+                        penaltyActive = true;
+                    }
+
                     return true;
+                }
             }
         }
         else if(playerWithBall.team == AgentCore.Team.BLUE){
@@ -589,8 +605,15 @@ public class GameEnvironmentInfo : MonoBehaviour
                         teamMembersInAreaCounter++;
                     }
                 }
-                if(teamMembersInAreaCounter > 2)
+                if(teamMembersInAreaCounter > 2){
+                    if(Ball.positionInField == Ball.Areas.smallRedArea){
+                        Debug.Log("Penalty");
+                        setPenaltyPositions(AgentCore.Team.BLUE);
+                        lastPlayerTouchingTheBall = null;
+                        penaltyActive = true;
+                    }
                     return true;
+                }
             }
         }
 

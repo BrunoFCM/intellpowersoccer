@@ -13,7 +13,7 @@ public class SmallAreaBlue : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter(Collider collision) {
+    private void OnTriggerStay(Collider collision) {
         if (collision.name == Ball.name){
             gameEnvironment.setBallOutOfBoundsTimeOut(false);
             gameEnvironment.setOutOfBounds(false);
