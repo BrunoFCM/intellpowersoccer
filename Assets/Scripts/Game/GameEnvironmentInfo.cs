@@ -538,7 +538,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(team == AgentCore.Team.RED){
             //Agent is farest from his field
             if(Ball.transform.localPosition.x < agent.transform.localPosition.x)
-                newX = agent.transform.localPosition.x - distanceToBall - 3;
+                newX = agent.transform.localPosition.x - distanceToBall - 4.5f;
             //Agent is nearest from his field
             else{
                 newX = agent.transform.localPosition.x - distanceToBall;
@@ -547,7 +547,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         else{
             //Agent is farest from his field
             if(Ball.transform.localPosition.x > agent.transform.localPosition.x)
-                newX = agent.transform.localPosition.x + distanceToBall + 3;
+                newX = agent.transform.localPosition.x + distanceToBall + 4.5f;
             //Agent is nearest from his field
             else{
                 newX = agent.transform.localPosition.x + distanceToBall;
@@ -691,6 +691,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
             }
 
+            Debug.Log("Nr of players: "+redTeamAgents.Count);
+
             possibleAgent.transform.localPosition = newPos;
             Debug.Log("Ball x: " + Ball.transform.position.x);
             Debug.Log("Ball z: " + Ball.transform.position.z);
@@ -707,6 +709,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 possibleAgent = blueTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[2];
                 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
             }
+
+            Debug.Log("Nr of players: "+blueTeamAgents.Count);
 
             possibleAgent.transform.localPosition = newPos;
             Debug.Log("Ball x: " + Ball.transform.position.x);
@@ -854,9 +858,17 @@ public class GameEnvironmentInfo : MonoBehaviour
         
         //BLUE ATTACKING
         if(teamTakingKick == AgentCore.Team.BLUE){
-            List<AgentCore> remainBlueTeamAgents = blueTeamAgents;
+            List<AgentCore> remainBlueTeamAgents = new List<AgentCore>(blueTeamAgents.Count);
+
+            foreach(AgentCore agent in blueTeamAgents){
+                remainBlueTeamAgents.Add(agent);
+            }
+
             remainBlueTeamAgents.Remove(playerTakingTheKick);
             remainBlueTeamAgents.Remove(playerRecieveingBall);
+
+
+
 
             //ZONE 1
             if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
@@ -1000,7 +1012,12 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
         else{
-            List<AgentCore> remainRedTeamAgents = redTeamAgents;
+            List<AgentCore> remainRedTeamAgents = new List<AgentCore>(redTeamAgents.Count);
+
+            foreach(AgentCore agent in blueTeamAgents){
+                remainRedTeamAgents.Add(agent);
+            }
+
             remainRedTeamAgents.Remove(playerTakingTheKick);
             remainRedTeamAgents.Remove(playerRecieveingBall);
 
@@ -1181,20 +1198,12 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public AgentCore getPlayerTakingsKick(AgentCore player){
         Debug.Log(player.name);
-        var redAgents = new List<AgentCore>(redTeamAgents.Count);
-        var blueAgents = new List<AgentCore>(blueTeamAgents.Count);
-
-        redAgents.AddRange(redTeamAgents);
-        blueAgents.AddRange(blueTeamAgents);
-        
-        redAgents = redAgents.OrderBy(x => x.distanceToBall()).ToList();
-        blueAgents = blueAgents.OrderBy(x => x.distanceToBall()).ToList();
 
         if(player.team == AgentCore.Team.RED){
-            return blueAgents[0];
+            return blueTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[0];
         }
         else{
-            return redAgents[0];
+            return redTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[0];
         }
     }
 }
