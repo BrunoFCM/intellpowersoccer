@@ -122,6 +122,10 @@ public class GameEnvironmentInfo : MonoBehaviour
   
     }
 
+    private void FixedUpdate() {
+        detectPlayersAtSamePosBug();
+    }
+
 
 
 
@@ -656,6 +660,30 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
         else{
             
+        }
+    }
+
+    public void detectPlayersAtSamePosBug(){
+        List<AgentCore> allPlayers = new List<AgentCore>(blueTeamAgents.Count + redTeamAgents.Count);
+
+        allPlayers.AddRange(blueTeamAgents);
+        allPlayers.AddRange(redTeamAgents);
+
+        while(allPlayers.Count > 1){
+            for(int j = 1; j < allPlayers.Count; j++){
+                if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 0.5){
+                    Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
+                    if(allPlayers[0].team == AgentCore.Team.RED){
+                        allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x - 1.5f, 0.25f, allPlayers[0].transform.localPosition.z);
+                        allPlayers[j].transform.localPosition = new Vector3(allPlayers[j].transform.localPosition.x + 1.5f, 0.25f, allPlayers[j].transform.localPosition.z);
+                    }
+                    else{
+                        allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 1.5f, 0.25f, allPlayers[0].transform.localPosition.z);
+                        allPlayers[j].transform.localPosition = new Vector3(allPlayers[j].transform.localPosition.x - 1.5f, 0.25f, allPlayers[j].transform.localPosition.z);
+                    }
+                }
+            }
+            allPlayers.Remove(allPlayers[0]);
         }
     }
 
