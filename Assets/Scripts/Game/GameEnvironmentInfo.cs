@@ -567,21 +567,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
     }
 
-    public void updatePlayersTwoOnOnePenaltyPositions(AgentCore playerTakingTheKick){
-
-    }
-
-    public void updatePlayersThreeInTheGoalAreaPositions(AgentCore playerTakingTheKick){
-
-    }
-
     public bool threeInTheGoalAreafoul(){
-
-                /*
-                foreach(AgentCore ag in playersAtSmallAreaBlue){
-                    Debug.Log("kjlkank: " + ag.name);
-                }
-                */
 
         int teamMembersInAreaCounter = 0;
 
@@ -601,6 +587,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                         setPenaltyPositions(AgentCore.Team.RED);
                         lastPlayerTouchingTheBall = null;
                         penaltyActive = true;
+                    }else{
+                        placeTeamByAreaFoul(playerWithBall, playerWithBall.team);
                     }
 
                     return true;
@@ -608,6 +596,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
         else if(playerWithBall.team == AgentCore.Team.BLUE){
+            Debug.Log("ENTRA QUARALHO 1 :" + playersAtSmallAreaRed.Count);
             if(playersAtSmallAreaRed.Count > 2){
                 for(int i = 0; i < playersAtSmallAreaRed.Count; i++){
                     if(playersAtSmallAreaRed[i].team == AgentCore.Team.RED){
@@ -615,27 +604,22 @@ public class GameEnvironmentInfo : MonoBehaviour
                     }
                 }
                 if(teamMembersInAreaCounter > 2){
+                    Debug.Log("ENTRA QUARALHO 2");
                     if(Ball.positionInField == Ball.Areas.smallRedArea){
                         Debug.Log("Penalty");
                         setPenaltyPositions(AgentCore.Team.BLUE);
                         lastPlayerTouchingTheBall = null;
                         penaltyActive = true;
+                    }else{
+                        placeTeamByAreaFoul(playerWithBall, playerWithBall.team);
                     }
+
                     return true;
                 }
             }
         }
 
         return false;
-    }
-
-    //Generates a random point inside circle
-    public Vector2 getPointInsideAnnulus(Vector2 centerPos, float minRadius, float maxRadius, float limit){
-
-        float theta = Random.Range(Mathf.PI/2, 3/2*Mathf.PI);
-        float w = Random.Range(0, 1);
-        float r = Mathf.Sqrt( (1.0f - w) * minRadius * minRadius + w * maxRadius * maxRadius );
-        return new Vector2(r * Mathf.Cos(theta) + centerPos.x, r * Mathf.Sin(theta) + centerPos.y);
     }
 
 
@@ -671,7 +655,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         while(allPlayers.Count > 1){
             for(int j = 1; j < allPlayers.Count; j++){
-                if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 0.5){
+                if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 0.7){
                     Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
                     if(allPlayers[0].team == AgentCore.Team.RED){
                         allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x - 1.5f, 0.25f, allPlayers[0].transform.localPosition.z);
@@ -687,7 +671,370 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
     }
 
-    
+    public void placeTeamByAreaFoul(AgentCore playerTakingTheKick, AgentCore.Team teamTakingKick){
+
+        Vector3 ballSavedPosition = new Vector3(Ball.transform.localPosition.x, Ball.transform.localPosition.y, Ball.transform.localPosition.z);
+        
+        //BLUE ATTACKING
+        if(teamTakingKick == AgentCore.Team.BLUE){
+            List<AgentCore> remainBlueTeamAgents = new List<AgentCore>(blueTeamAgents.Count);
+
+            foreach(AgentCore agent in blueTeamAgents){
+                remainBlueTeamAgents.Add(agent);
+            }
+
+            remainBlueTeamAgents.Remove(playerTakingTheKick);
+
+
+
+            //ZONE 1
+            if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
+                if(Ball.transform.localPosition.z > 0){
+
+                    positionPlayer(redTeamAgents[0], -7.5f, 2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -13f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -11.5f, 3f, -90);
+                    positionPlayer(redTeamAgents[3], -6f, 0f, -90);
+
+                     if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], -5f, -3f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -9f, 5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], -5f, -3f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -9f, 5f, 90);
+                    }
+
+                }
+                else{
+
+                    positionPlayer(redTeamAgents[0], -7.5f, -2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -13f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -11.5f, -3f, -90);
+                    positionPlayer(redTeamAgents[3], -6f, 0f, -90);
+
+                    if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], -5f, 3f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -9f, -5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], -5f, 3f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -9f, -5f, 90);
+                    }
+
+                }
+            }
+            //ZONE 2
+            else if(Ball.transform.localPosition.x >= -7 && Ball.transform.localPosition.x < 0){
+                if(Ball.transform.localPosition.z > 0){
+
+                    positionPlayer(redTeamAgents[0], -4.5f, 2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -11.5f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -9f, 4f, -90);
+                    positionPlayer(redTeamAgents[3], -7f, 0f, -90);
+
+                     if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], 1f, 3f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -6f, 5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], 1f, 3f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -6f, 5f, -90);
+                    }
+
+                }
+                else{
+
+                    positionPlayer(redTeamAgents[0], -4.5f, -2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -11.5f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -9f, -4f, -90);
+                    positionPlayer(redTeamAgents[3], -7f, 0f, -90);
+
+                     if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], 1f, -3f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -6f, -5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], 1f, -3f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], -2f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], -6f, -5f, -90);
+                    }
+                }
+
+            }
+            //ZONE 3
+            else if(Ball.transform.localPosition.x >= 0 && Ball.transform.localPosition.x < 7){
+                if(Ball.transform.localPosition.z > 0){
+                    positionPlayer(redTeamAgents[0], 0f, 2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -10.5f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -5.5f, 4f, -90);
+                    positionPlayer(redTeamAgents[3], -3f, -0.5f, -90);
+
+                     if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], 9f, 2f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], 4f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 5f, 5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], 9f, 2f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], 4f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 5f, 5f, 90);
+                    }
+                }
+                else{
+                    positionPlayer(redTeamAgents[0], 0f, -2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -10.5f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -5.5f, -4f, -90);
+                    positionPlayer(redTeamAgents[3], -3f, -0.5f, -90);
+
+                    if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], 9f, -2f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], 4f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 5f, -5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], 9f, -2f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], 4f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 5f, -5f, 90);
+                    }
+                }
+            }
+            //ZONE 4
+            else if(Ball.transform.localPosition.x >= 7 && Ball.transform.localPosition.x <= 14){
+                if(Ball.transform.localPosition.z > 0){
+                    positionPlayer(redTeamAgents[0], 4f, 2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -6f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -1.5f, 4f, -90);
+                    positionPlayer(redTeamAgents[3], 1f, -0.5f, -90);
+
+                     if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], 12f, 2f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], 7.5f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 6f, 5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], 12f, 2f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], 7.5f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 6f, 5f, -90);                  
+                        }
+                }
+                else{
+                    positionPlayer(redTeamAgents[0], 4f, -2.5f, -90);
+                    positionPlayer(redTeamAgents[1], -6f, 0f, -90);
+                    positionPlayer(redTeamAgents[2], -1.5f, -4f, -90);
+                    positionPlayer(redTeamAgents[3], 1f, 0.5f, -90);
+
+                     if(remainBlueTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainBlueTeamAgents[0], 12f, -2f, 90);
+                        positionPlayer(remainBlueTeamAgents[1], 7.5f, 0f, 90);
+                        positionPlayer(remainBlueTeamAgents[2], 6f, -5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainBlueTeamAgents[1], 12f, -2f, 90);
+                        positionPlayer(remainBlueTeamAgents[0], 7.5f, 0f, 90); 
+                        positionPlayer(remainBlueTeamAgents[2], 6f, -5f, -90);                   
+                        }
+                }
+            }
+        }
+        else{
+            List<AgentCore> remainRedTeamAgents = new List<AgentCore>(redTeamAgents.Count);
+
+            foreach(AgentCore agent in redTeamAgents){
+                remainRedTeamAgents.Add(agent);
+            }
+
+            remainRedTeamAgents.Remove(playerTakingTheKick);
+
+            //ZONE 1
+            if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
+                if(Ball.transform.localPosition.z > 0){
+                    positionPlayer(blueTeamAgents[0], -4f, 2.5f, 90);
+                    positionPlayer(blueTeamAgents[1], 6f, 0f, 90);
+                    positionPlayer(blueTeamAgents[2], 1.5f, 4f, 90);
+                    positionPlayer(blueTeamAgents[3], -1f, -0.5f, 90);
+
+                     if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], -12f, 2f, -90);
+                        positionPlayer(remainRedTeamAgents[1], -7.5f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -6f, 5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], -12f, 2f, -90);
+                        positionPlayer(remainRedTeamAgents[0], -7.5f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -6f, 5f, 90);                   
+                        }
+                }
+                else{
+                    positionPlayer(blueTeamAgents[0], -4f, -2.5f, 90);
+                    positionPlayer(blueTeamAgents[1], 6f, 0f, 90);
+                    positionPlayer(blueTeamAgents[2], 1.5f, -4f, 90);
+                    positionPlayer(blueTeamAgents[3], -1f, 0.5f, 90);
+
+                     if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], -12f, -2f, -90);
+                        positionPlayer(remainRedTeamAgents[1], -7.5f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -6f, -5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], -12f, -2f, -90);
+                        positionPlayer(remainRedTeamAgents[0], -7.5f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -6f, -5f, 90);                    
+                        }
+
+                }
+            }
+            //ZONE 2
+            else if(Ball.transform.localPosition.x >= -7 && Ball.transform.localPosition.x < 0){
+                if(Ball.transform.localPosition.z > 0){
+                    positionPlayer(blueTeamAgents[0], 0f, 2.5f, 90);
+                    positionPlayer(blueTeamAgents[1], 10.5f, 0f, 90);
+                    positionPlayer(blueTeamAgents[2], 5.5f, 4f, 90);
+                    positionPlayer(blueTeamAgents[3], 3f, -0.5f, 90);
+
+                     if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], -9f, 2f, -90);
+                        positionPlayer(remainRedTeamAgents[1], -4f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -5f, 5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], -9f, 2f, -90);
+                        positionPlayer(remainRedTeamAgents[0], -4f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -5f, 5f, -90);
+                    }
+                }
+                else{
+                    positionPlayer(blueTeamAgents[0], 0f, -2.5f, 90);
+                    positionPlayer(blueTeamAgents[1], 10.5f, 0f, 90);
+                    positionPlayer(blueTeamAgents[2], 5.5f, -4f, 90);
+                    positionPlayer(blueTeamAgents[3], 3f, -0.5f, 90);
+
+                    if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], -9f, -2f, -90);
+                        positionPlayer(remainRedTeamAgents[1], -4f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -5f, -5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], -9f, -2f, -90);
+                        positionPlayer(remainRedTeamAgents[0], -4f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[2], -5f, -5f, -90);
+                    }
+                }
+
+            }
+            //ZONE 3
+            else if(Ball.transform.localPosition.x >= 0 && Ball.transform.localPosition.x < 7){
+                if(Ball.transform.localPosition.z > 0){
+                    positionPlayer(blueTeamAgents[0], 0f, 2.5f, -90);
+                    positionPlayer(blueTeamAgents[1], 10.5f, 0f, -90);
+                    positionPlayer(blueTeamAgents[2], 3f, 4f, -90);
+                    positionPlayer(blueTeamAgents[3], 3f, -0.5f, -90);
+
+                    if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], -9f, 2f, 90);
+                        positionPlayer(remainRedTeamAgents[1], -4f, 0f, 90);
+                        positionPlayer(remainRedTeamAgents[2], 6f, 5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], -9f, 2f, 90);
+                        positionPlayer(remainRedTeamAgents[0], -4f, 0f, 90);
+                        positionPlayer(remainRedTeamAgents[2], 6f, 5f, 90);
+                    }
+                }
+                else{
+                    positionPlayer(blueTeamAgents[0], 0f, -2.5f, -90);
+                    positionPlayer(blueTeamAgents[1], 10.5f, 0f, -90);
+                    positionPlayer(blueTeamAgents[2], 3f, -4f, -90);
+                    positionPlayer(blueTeamAgents[3], 3f, -0.5f, -90);
+
+                    if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], -9f, -2f, 90);
+                        positionPlayer(remainRedTeamAgents[1], -4f, 0f, 90);
+                        positionPlayer(remainRedTeamAgents[2], 6f, -5f, 90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], -9f, -2f, 90);
+                        positionPlayer(remainRedTeamAgents[0], -4f, 0f, 90);
+                        positionPlayer(remainRedTeamAgents[2], 6f, -5f, 90);
+                    }
+                }
+            }
+            //ZONE 4
+            else if(Ball.transform.localPosition.x >= 7 && Ball.transform.localPosition.x <= 14){
+                if(Ball.transform.localPosition.z > 0){
+
+                    positionPlayer(blueTeamAgents[0], 7.5f, 2.5f, 90);
+                    positionPlayer(blueTeamAgents[1], 13f, 0f, 90);
+                    positionPlayer(blueTeamAgents[2], 11.5f, 3f, 90);
+                    positionPlayer(blueTeamAgents[3], 6f, 0f, 90);
+
+                     if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], 2f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[1], 5f, -3f, -90);
+                        positionPlayer(remainRedTeamAgents[2], 9f, 5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], 2f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[0], 5f, -3f, -90);
+                        positionPlayer(remainRedTeamAgents[2], 9f, 5f, -90);
+                    }
+
+                }
+                else{
+
+                    positionPlayer(blueTeamAgents[0], 7.5f, -2.5f, 90);
+                    positionPlayer(blueTeamAgents[1], 13f, 0f, 90);
+                    positionPlayer(blueTeamAgents[2], 11.5f, -3f, 90);
+                    positionPlayer(blueTeamAgents[3], 6f, 0f, 90);
+
+                    if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
+                        positionPlayer(remainRedTeamAgents[0], 2f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[1], 5f, 3f, -90);
+                        positionPlayer(remainRedTeamAgents[2], 9f, -5f, -90);
+                    }
+                    else{
+                        positionPlayer(remainRedTeamAgents[1], 2f, 0f, -90);
+                        positionPlayer(remainRedTeamAgents[0], 5f, 3f, -90);
+                        positionPlayer(remainRedTeamAgents[2], 9f, -5f, -90);
+                    }
+
+                }
+            }
+        }
+
+        detectPlayersAtSamePosBugAfterFoul(playerTakingTheKick);
+        Ball.transform.localPosition = ballSavedPosition;
+
+    }
+
+    public void detectPlayersAtSamePosBugAfterFoul(AgentCore agentTakingKick){
+        List<AgentCore> allPlayers = new List<AgentCore>(blueTeamAgents.Count + redTeamAgents.Count);
+
+        allPlayers.AddRange(blueTeamAgents);
+        allPlayers.AddRange(redTeamAgents);
+        allPlayers.Remove(agentTakingKick);
+
+
+        foreach(AgentCore player in allPlayers){
+            if(agentTakingKick.distanceToPlayer(player) < 1.5){
+                if(player.team == AgentCore.Team.RED){
+                    player.transform.localPosition = new Vector3(player.transform.localPosition.x - 2.5f, 0.25f, player.transform.localPosition.z);
+                }
+                else{
+                    player.transform.localPosition = new Vector3(player.transform.localPosition.x + 2.5f, 0.25f, player.transform.localPosition.z);
+                }
+            }
+        }
+    }
+
+
 
 // ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
 

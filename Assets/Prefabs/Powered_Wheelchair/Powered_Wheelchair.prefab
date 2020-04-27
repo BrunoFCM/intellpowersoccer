@@ -915,6 +915,7 @@ GameObject:
   - component: {fileID: 614038161033520319}
   - component: {fileID: 205972924487669083}
   - component: {fileID: 3552532660947185960}
+  - component: {fileID: 1621780170317948686}
   m_Layer: 0
   m_Name: Feet
   m_TagString: Untagged
@@ -1014,6 +1015,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.6309933, y: 0.29999998, z: 0.14404601}
   m_Center: {x: -0.002807647, y: 0.22500013, z: 0.5547072}
+--- !u!65 &1621780170317948686
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3940208249218731108}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4195113275844255172
 GameObject:
   m_ObjectHideFlags: 0
