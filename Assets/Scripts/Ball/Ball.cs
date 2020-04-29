@@ -27,4 +27,9 @@ public class Ball : MonoBehaviour
     public void setPositionInField(Areas area){
         positionInField = area;
     }
+
+    public void stopIt(){
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+    }
 }

@@ -18,7 +18,6 @@ public class HalfSideAreaBlue : MonoBehaviour
             gameEnvironment.setBallOutOfBoundsTimeOut(false);
             gameEnvironment.setOutOfBounds(false);
             Ball.setPositionInField(Ball.Areas.halfFieldBlue);
-            Debug.Log("Ball in HalfSide Blue");
         }
 
         foreach(AgentCore agentCore in gameEnvironment.redTeamAgents){

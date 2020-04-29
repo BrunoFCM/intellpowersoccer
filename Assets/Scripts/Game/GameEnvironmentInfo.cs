@@ -346,20 +346,20 @@ public class GameEnvironmentInfo : MonoBehaviour
 
                         //Since there's an opponnent already, we need to check if theres anyone commiting the two-on-one foul
                         for(int j = i+1; j < possibleAgentsNearBall.Count; j++){
-                            if(possibleAgentsNearBall[j].distanceToPlayer(playerWithBall) < 3){
+                            if(possibleAgentsNearBall[j].distanceToPlayer(playerWithBall) < 4.5){
                                 if(possibleAgentsNearBall[j].team == playerWithBall.team){
                                     if(possibleAgentsNearBall[j].type != AgentCore.Type.GOALKEEPER && possibleAgentsNearBall[j-1].type != AgentCore.Type.GOALKEEPER){
                                         
                                         if(j+1 < possibleAgentsNearBall.Count){
                                             if(possibleAgentsNearBall[j+1].type != AgentCore.Type.GOALKEEPER){
                                                 //Found a player commiting a foul
-                                                twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
                                                 Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
+                                                twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
                                             }
                                         }else{
                                             //Found a player commiting a foul
-                                            twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
                                             Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
+                                            twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
                                         }
 
                                         
@@ -507,24 +507,11 @@ public class GameEnvironmentInfo : MonoBehaviour
         return false;
     }
 
-    public void twoOnOnefoulMechanism(AgentCore playerWithBall, AgentCore opponent, AgentCore playerCommitedfoul){
+    public void twoOnOnefoulMechanism(AgentCore playerAssistCommitedfoul, AgentCore playerTakingTheKick, AgentCore playerCommitedfoul){
         setfoulCommited(true);
 
         if(!checkIfPenalty(playerCommitedfoul)){
-            if(playerCommitedfoul.team == AgentCore.Team.RED){
-                foreach(AgentCore agent in redTeamAgents){
-                    if(agent.distanceToBall() < 3){
-                        updatePlayerTwoOnOneRegularPosition(agent, AgentCore.Team.RED);
-                    }
-                }
-            }
-            else{
-                foreach(AgentCore agent in blueTeamAgents){
-                    if(agent.distanceToBall() < 3){
-                        updatePlayerTwoOnOneRegularPosition(agent, AgentCore.Team.BLUE);
-                    }
-                }
-            }
+                placeTeamByAreaFoul(playerTakingTheKick, playerTakingTheKick.team);
         }
         else{
             if(playerCommitedfoul.team == AgentCore.Team.RED){
@@ -556,37 +543,6 @@ public class GameEnvironmentInfo : MonoBehaviour
         
     }
 
-    public void updatePlayerTwoOnOneRegularPosition(AgentCore agent, AgentCore.Team team){
-        float distanceToBall = agent.distanceToBall();
-        float newX = 0;
-        
-        //Fall back 3m relative to the ball for their own part of the field
-        if(team == AgentCore.Team.RED){
-            //Agent is farest from his field
-            if(Ball.transform.localPosition.x < agent.transform.localPosition.x)
-                newX = agent.transform.localPosition.x - distanceToBall - 4.5f;
-            //Agent is nearest from his field
-            else{
-                newX = agent.transform.localPosition.x - distanceToBall;
-            }
-        }
-        else{
-            //Agent is farest from his field
-            if(Ball.transform.localPosition.x > agent.transform.localPosition.x)
-                newX = agent.transform.localPosition.x + distanceToBall + 4.5f;
-            //Agent is nearest from his field
-            else{
-                newX = agent.transform.localPosition.x + distanceToBall;
-            }
-        }
-        Debug.Log("Old X: " + agent.transform.localPosition.x);
-        Debug.Log("New X: " + newX);
-
-        agent.transform.localPosition = new Vector3(newX, agent.transform.localPosition.y, agent.transform.localPosition.z);
-
-        agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
-    }
-
     public bool threeInTheGoalAreafoul(){
 
         int teamMembersInAreaCounter = 0;
@@ -616,7 +572,6 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
         else if(playerWithBall.team == AgentCore.Team.BLUE){
-            Debug.Log("ENTRA QUARALHO 1 :" + playersAtSmallAreaRed.Count);
             if(playersAtSmallAreaRed.Count > 2){
                 for(int i = 0; i < playersAtSmallAreaRed.Count; i++){
                     if(playersAtSmallAreaRed[i].team == AgentCore.Team.RED){
@@ -624,7 +579,6 @@ public class GameEnvironmentInfo : MonoBehaviour
                     }
                 }
                 if(teamMembersInAreaCounter > 2){
-                    Debug.Log("ENTRA QUARALHO 2");
                     if(Ball.positionInField == Ball.Areas.smallRedArea){
                         Debug.Log("Penalty");
                         setPenaltyPositions(AgentCore.Team.BLUE);
@@ -694,6 +648,9 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         Vector3 ballSavedPosition = new Vector3(Ball.transform.localPosition.x, Ball.transform.localPosition.y, Ball.transform.localPosition.z);
         
+        Ball.stopIt();
+        Ball.transform.localPosition = ballSavedPosition;
+
         //BLUE ATTACKING
         if(teamTakingKick == AgentCore.Team.BLUE){
             List<AgentCore> remainBlueTeamAgents = new List<AgentCore>(blueTeamAgents.Count);
@@ -1044,9 +1001,9 @@ public class GameEnvironmentInfo : MonoBehaviour
             xGoal = 14;
         else
             xGoal = -14;
-            
+
         float zGoal = 0;
-        float t = -2f/Vector3.Distance(new Vector3(xBall, 0, zBall), new Vector3(xGoal, 0, zGoal));
+        float t = -1.5f/Vector3.Distance(new Vector3(xBall, 0, zBall), new Vector3(xGoal, 0, zGoal));
         float newX = ((1 - t)*xBall + t*xGoal);
         float newZ = ((1 - t)*zBall + t*zGoal);
 
@@ -1083,7 +1040,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
 
         foreach(AgentCore player in allPlayers){
-            if(agentTakingKick.distanceToPlayer(player) < 1.5){
+            if(agentTakingKick.distanceToPlayer(player) < 4.5){
                 if(player.team == AgentCore.Team.RED){
                     player.transform.localPosition = new Vector3(player.transform.localPosition.x - 2.5f, 0.25f, player.transform.localPosition.z);
                 }
