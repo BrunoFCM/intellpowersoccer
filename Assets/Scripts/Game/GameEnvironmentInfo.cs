@@ -28,6 +28,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         private AgentCore lastPlayerTouchingTheBall;
         //Players who are confronting the who has the ball in its possession (playerWithBall)
         private AgentCore opponent;
+        private bool initialPositions;
+        private AgentCore initialPlayerTakingKick;
+        private Vector3 initialPlayerTakingKickPos;
 
 
     //NUMBER OF PLAYERS AT EACH AREA OF THE FIELD
@@ -88,12 +91,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         else
             setInitialPositions(AgentCore.Team.RED);
 
-        //setBallPenaltyPos(AgentCore.Team.BLUE);
-        //setPenaltyPositions(AgentCore.Team.BLUE);
-        //setBallFreeGoalAreaKick(AgentCore.Team.BLUE);
-        //setFreeGoalAreaKickPositions(AgentCore.Team.BLUE);
+        
 
-        lastPlayerTouchingTheBall = redTeamAgents[0];
+        lastPlayerTouchingTheBall = null;
         faulTimeOut = false;
     
     }
@@ -114,10 +114,15 @@ public class GameEnvironmentInfo : MonoBehaviour
             Debug.Log("3 in the Goal Area Foul Committed");
         }
 
+        if(initialPositions){
+            limitInicialPosWalkingArea(initialPlayerTakingKick, initialPlayerTakingKickPos);
+        }
+
         if(lastPlayerTouchingTheBall != null){
             outOfBoundsAreaFreeKick = false;
             penaltyActive = false;
             foulTimeOut = false;
+            initialPositions = false;
         }
 
         if(penaltyActive){
@@ -126,8 +131,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if(foulTimeOut){
             limitFoulWalkingArea(foulAgent, foulAgentPos);
-        }
-  
+        }  
     }
 
     private void FixedUpdate() {
@@ -148,33 +152,56 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Sets the initial positions os the players in the field
     public void setInitialPositions(AgentCore.Team team){
+        
         if(team == AgentCore.Team.BLUE){
             redTeamAgents[0].transform.localPosition = new Vector3(-4f, 0.25f, 0f);
             redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
             redTeamAgents[2].transform.localPosition = new Vector3(-7, 0.25f, 4.5f);
             redTeamAgents[3].transform.localPosition = new Vector3(-7, 0.25f, -4.5f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(1.15f, 0.25f, 0f);
+            blueTeamAgents[0].transform.localPosition = new Vector3(1.5f, 0.25f, 0f);
             blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
             blueTeamAgents[2].transform.localPosition = new Vector3(2f, 0.25f, 5f);
             blueTeamAgents[3].transform.localPosition = new Vector3(2f, 0.25f, -5f);
+
+            initialPlayerTakingKick = blueTeamAgents[0];
+            initialPlayerTakingKickPos = blueTeamAgents[0].transform.localPosition;
         }
         else{
-            redTeamAgents[0].transform.localPosition = new Vector3(-1.15f, 0.25f, 0f);
+            redTeamAgents[0].transform.localPosition = new Vector3(-1.5f, 0.25f, 0f);
             redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
             redTeamAgents[2].transform.localPosition = new Vector3(-2, 0.25f, 5f);
             redTeamAgents[3].transform.localPosition = new Vector3(-2, 0.25f, -5f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(4f, 0.25f, 0f);
+            blueTeamAgents[0].transform.localPosition = new Vector3(4.25f, 0.25f, 0f);
             blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
             blueTeamAgents[2].transform.localPosition = new Vector3(7f, 0.25f, 4.5f);
             blueTeamAgents[3].transform.localPosition = new Vector3(7f, 0.25f, -4.5f);
+
+            initialPlayerTakingKick = redTeamAgents[0];
+            initialPlayerTakingKickPos = redTeamAgents[0].transform.localPosition;
         }
 
         foreach(AgentCore agent in redTeamAgents){
             agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
         }
         foreach(AgentCore agent in blueTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
+
+        lastPlayerTouchingTheBall = null;
+        initialPositions = true;
+    }
+
+    private void limitInicialPosWalkingArea(AgentCore agent, Vector3 pos){
+        Vector3 centerPosition = Ball.transform.localPosition; //center of circle
+        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
+        
+        if (distance > 3)
+        {
+            agent.transform.localPosition = initialPlayerTakingKickPos;
+            agent.stopChair();
+
             agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
         }
     }
@@ -1605,4 +1632,5 @@ public class GameEnvironmentInfo : MonoBehaviour
             return redTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[0];
         }
     }
+    
 }
