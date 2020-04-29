@@ -37,6 +37,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         private List<AgentCore> playersAtSmallAreaRed;
         private List<AgentCore> playersAtOutsideArea;
 
+
     //BALL OUT OF BOUNDS INFO
         //If outOfBound is set to true means that we are in a Ball Out Of Bounds period of the game (all agents are paused)
         private bool outOfBounds;
@@ -61,6 +62,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         private AgentCore penaltyAgent;
         private Vector3 penaltyAgentPos;
         private float penaltyAgentRot;
+        private bool faulTimeOut;
 
 
 
@@ -92,6 +94,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         //setFreeGoalAreaKickPositions(AgentCore.Team.BLUE);
 
         lastPlayerTouchingTheBall = redTeamAgents[0];
+        faulTimeOut = false;
     
     }
 
@@ -114,17 +117,29 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(lastPlayerTouchingTheBall != null){
             outOfBoundsAreaFreeKick = false;
             penaltyActive = false;
+            foulTimeOut = false;
         }
 
         if(penaltyActive){
             limitWalkingArea(penaltyAgent, penaltyAgentPos, penaltyAgentRot);
         }
+
+        if(foulTimeOut){
+            limitFoulWalkingArea(foulAgent, foulAgentPos);
+        }
   
     }
 
     private void FixedUpdate() {
-        detectPlayersAtSamePosBug();
+        //if(foulTimeOut || penaltyActive || outOfBoundsAreaFreeKick || outOfBounds)
+            //detectPlayersAtSamePosBug();
     }
+
+
+
+
+
+
 
 
 
@@ -163,7 +178,6 @@ public class GameEnvironmentInfo : MonoBehaviour
             agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
         }
     }
-
 
     public void setPenaltyPositions(AgentCore.Team teamTakingKick){
         setBallPenaltyPos(teamTakingKick);
@@ -376,6 +390,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     public bool getBallOutOfBoundsTimeOut(bool a){
         return ballOutOfBoundsTimeOut;
     }
+
     public void setBallOutOfBoundsTimeOut(bool a){
         ballOutOfBoundsTimeOut = a;
     }
@@ -383,7 +398,6 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setLastPlayerTouchingBall(AgentCore agent){
         lastPlayerTouchingTheBall = agent;
     }
-
 
     public void setPlayersAtHalfSideAreaBlue(AgentCore agent){
         playersAtHalfSideAreaRed.Remove(agent);
@@ -455,6 +469,12 @@ public class GameEnvironmentInfo : MonoBehaviour
         Debug.Log("Score: Blue - " + blueScore);
         Debug.Log("Score: Red - " + redScore);
     }
+
+
+
+
+
+
 
 
 
@@ -622,7 +642,6 @@ public class GameEnvironmentInfo : MonoBehaviour
         return false;
     }
 
-
     public void indirectFreeKickOutsideGoalArea(AgentCore agentSufferingFoul, AgentCore agentCommitingFoul, Vector3 foulPos){
         
         if(agentSufferingFoul.team == AgentCore.Team.RED){
@@ -653,7 +672,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         allPlayers.AddRange(blueTeamAgents);
         allPlayers.AddRange(redTeamAgents);
 
-        while(allPlayers.Count > 1){
+        while(allPlayers.Count > 2){
             for(int j = 1; j < allPlayers.Count; j++){
                 if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 0.7){
                     Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
@@ -934,7 +953,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 if(Ball.transform.localPosition.z > 0){
                     positionPlayer(blueTeamAgents[0], 0f, 2.5f, -90);
                     positionPlayer(blueTeamAgents[1], 10.5f, 0f, -90);
-                    positionPlayer(blueTeamAgents[2], 3f, 4f, -90);
+                    positionPlayer(blueTeamAgents[2], 4f, 1.5f, -90);
                     positionPlayer(blueTeamAgents[3], 3f, -0.5f, -90);
 
                     if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
@@ -951,7 +970,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 else{
                     positionPlayer(blueTeamAgents[0], 0f, -2.5f, -90);
                     positionPlayer(blueTeamAgents[1], 10.5f, 0f, -90);
-                    positionPlayer(blueTeamAgents[2], 3f, -4f, -90);
+                    positionPlayer(blueTeamAgents[2], 4f, -1.5f, -90);
                     positionPlayer(blueTeamAgents[3], 3f, -0.5f, -90);
 
                     if(remainRedTeamAgents[0].type == AgentCore.Type.GOALKEEPER){
@@ -1009,9 +1028,50 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
 
-        detectPlayersAtSamePosBugAfterFoul(playerTakingTheKick);
         Ball.transform.localPosition = ballSavedPosition;
+        positionAgentTakingKick(playerTakingTheKick);
+        detectPlayersAtSamePosBugAfterFoul(playerTakingTheKick);
 
+    }
+
+    public void positionAgentTakingKick(AgentCore playerTakingTheKick){
+
+        float xBall = Ball.transform.localPosition.x;
+        float zBall = Ball.transform.localPosition.z;
+        float xGoal;
+
+        if(playerTakingTheKick.team == AgentCore.Team.RED)
+            xGoal = 14;
+        else
+            xGoal = -14;
+            
+        float zGoal = 0;
+        float t = -2f/Vector3.Distance(new Vector3(xBall, 0, zBall), new Vector3(xGoal, 0, zGoal));
+        float newX = ((1 - t)*xBall + t*xGoal);
+        float newZ = ((1 - t)*zBall + t*zGoal);
+
+
+        playerTakingTheKick.transform.localPosition = new Vector3(newX, playerTakingTheKick.transform.localPosition.y, newZ);
+
+        playerTakingTheKick.stopChair();
+
+        foulAgent = playerTakingTheKick;
+        foulAgentPos = playerTakingTheKick.transform.localPosition;
+        foulBallPos = Ball.transform.localPosition;
+        foulTimeOut = true;
+        lastPlayerTouchingTheBall = null;
+    }
+
+    private void limitFoulWalkingArea(AgentCore agent, Vector3 pos){
+        Vector3 centerPosition = foulBallPos; //center of circle
+        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
+        
+        if (distance > 3)
+        {
+            agent.transform.localPosition = new Vector3(pos.x, pos.y, pos.z);
+            agent.stopChair();
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        }
     }
 
     public void detectPlayersAtSamePosBugAfterFoul(AgentCore agentTakingKick){
@@ -1033,6 +1093,13 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
     }
+
+
+
+
+
+
+
 
 
 
@@ -1560,14 +1627,14 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
     private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){ 
-        agent.getAgentRBody().transform.localPosition = new Vector3(x, y, z);
+        agent.transform.localPosition = new Vector3(x, y, z);
         agent.stopChair();
 
         outBoundsBallPos = Ball.transform.localPosition;
         outBoundsAgentPos = new Vector3(x, y, z);
         outBoundsAgentRot = rotation;
 
-        agent.getAgentRBody().transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
 
     }
 

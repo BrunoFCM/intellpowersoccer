@@ -106,6 +106,9 @@ public class AgentCore : MonoBehaviour
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+
+        wheelchairAgentController.motorForce = 0;
+        wheelchairAgentController.motorForce = 50;
     }
 
     public void disableChair(){
