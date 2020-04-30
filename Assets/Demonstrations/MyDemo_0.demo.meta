@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: 5c17dcd1bb3dcc5408044cb5b589e724
+guid: b902757cc30417d4db084980207bb61a
 ScriptedImporter:
   fileIDToRecycleName:
-    11400000: Assets/Demonstrations/ToutchBall.demo
+    11400000: Assets/Demonstrations/MyDemo_0.demo
   externalObjects: {}
   userData: ' (MLAgents.Demonstration)'
   assetBundleName: 
