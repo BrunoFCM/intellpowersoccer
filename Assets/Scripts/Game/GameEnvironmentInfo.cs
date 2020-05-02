@@ -1139,7 +1139,10 @@ public class GameEnvironmentInfo : MonoBehaviour
                         else{
                             allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
                         }
+                        Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
+                        //agentTakingKick.transform.localPosition = foulAgentPos;
                     }
+                    checkPlayersInSmallAreas(agentTakingKick);
                 }
                 allPlayers.Remove(allPlayers[0]);
             }
@@ -1165,6 +1168,11 @@ public class GameEnvironmentInfo : MonoBehaviour
                         else{
                             allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
                         }
+                        Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
+                        //agentTakingKick.transform.localPosition = foulAgentPos;
+                    }
+                    if(checkPlayersInSmallAreas(agentTakingKick)){
+                        bugged = true;
                     }
                 }
                 allPlayers.Remove(allPlayers[0]);
@@ -1177,34 +1185,128 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
 
-    /*public bool checkPositionBugInZ(AgentCore agentTakingKick){
-        List<AgentCore> allPlayers = new List<AgentCore>(blueTeamAgents.Count + redTeamAgents.Count);
+    public bool checkPlayersInSmallAreas(AgentCore agentTakingKick){
 
-        allPlayers.AddRange(blueTeamAgents);
-        allPlayers.AddRange(redTeamAgents);
-        allPlayers.Remove(agentTakingKick);
+        List<AgentCore> players;
+        List<AgentCore> playersInException;
 
+        if(agentTakingKick.team == AgentCore.Team.RED){
+            players = new List<AgentCore>(blueTeamAgents.Count);
+            players.AddRange(blueTeamAgents);
+            playersInException = new List<AgentCore>();
 
-        bool check = false;
-
-        foreach(AgentCore player in allPlayers){
-            if(agentTakingKick.distanceToPlayer(player) < 3){
-                if(player.transform.localPosition.z > 0){
-                    player.transform.localPosition = new Vector3(player.transform.localPosition.z - 2.5f, 0.25f, player.transform.localPosition.z);
-                    check = true;
+            foreach(AgentCore p in players){
+                if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
+                    if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                        playersInException.Add(p);
+                    }
                 }
-                else{
-                    player.transform.localPosition = new Vector3(player.transform.localPosition.z + 2.5f, 0.25f, player.transform.localPosition.z);
-                    check = true;
+            }
+
+            if(playersInException.Count > 2){
+
+                Debug.Log("Players in small are before: " + playersInException.Count);
+                playersInException.OrderBy(x => x.distanceToBall()).Reverse();
+
+                int counter = 0;
+
+                while(playersInException.Count > 2){
+                    if(playersInException[counter].type != AgentCore.Type.GOALKEEPER){
+                        Debug.Log("Player pos before: " + playersInException[counter].transform.localPosition.z);
+                        if(playersInException[counter].transform.localPosition.x > 0){
+                            playersInException[counter].transform.localPosition = new Vector3(
+                                playersInException[counter].transform.localPosition.x, 
+                                playersInException[counter].transform.localPosition.y, 
+                                playersInException[counter].transform.localPosition.z+1);
+                        }
+                        else{
+                            playersInException[counter].transform.localPosition = new Vector3(
+                                playersInException[counter].transform.localPosition.x, 
+                                playersInException[counter].transform.localPosition.y, 
+                                playersInException[counter].transform.localPosition.z-1);
+
+                        }
+                        Debug.Log("Player pos after: " + playersInException[counter].transform.localPosition.z);
+                    }
+
+                    players = new List<AgentCore>(blueTeamAgents.Count);
+                    players.AddRange(blueTeamAgents);
+                    playersInException = new List<AgentCore>();
+
+                    foreach(AgentCore p in players){
+                        if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
+                            if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                                playersInException.Add(p);
+                            }
+                        }
+                    }
+
+                    Debug.Log("Players in small are after: " + playersInException.Count);
                 }
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            players = new List<AgentCore>(redTeamAgents.Count);
+            players.AddRange(redTeamAgents);
+            playersInException = new List<AgentCore>();
+
+            foreach(AgentCore p in players){
+                if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
+                    if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                        playersInException.Add(p);
+                    }
+                }
+            }
+
+            if(playersInException.Count > 2){
+                Debug.Log("Players in small are before: " + playersInException.Count);
+                playersInException.OrderBy(x => x.distanceToBall()).Reverse();
+
+                int counter = 0;
+
+                while(playersInException.Count > 2){
+                    if(playersInException[counter].type != AgentCore.Type.GOALKEEPER){
+                        Debug.Log("Player pos before: " + playersInException[counter].transform.localPosition.z);
+                        if(playersInException[counter].transform.localPosition.x > 0){
+                            playersInException[counter].transform.localPosition = new Vector3(
+                                playersInException[counter].transform.localPosition.x, 
+                                playersInException[counter].transform.localPosition.y, 
+                                playersInException[counter].transform.localPosition.z+1);
+                        }
+                        else{
+                            playersInException[counter].transform.localPosition = new Vector3(
+                                playersInException[counter].transform.localPosition.x, 
+                                playersInException[counter].transform.localPosition.y, 
+                                playersInException[counter].transform.localPosition.z-1);
+
+                        }
+                        Debug.Log("Player pos after: " + playersInException[counter].transform.localPosition.z);
+                    }
+
+                    players = new List<AgentCore>(redTeamAgents.Count);
+                    players.AddRange(redTeamAgents);
+                    playersInException = new List<AgentCore>();
+
+                    foreach(AgentCore p in players){
+                        if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
+                            if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                                playersInException.Add(p);
+                            }
+                        }
+                    }
+                    Debug.Log("Players in small are after: " + playersInException.Count);
+                }
+            }
+            else{
+                return false;
             }
         }
 
-        if(check)
-            return true;
-
-        return false;
-    }*/
+        return true;
+    }
 
 
 
