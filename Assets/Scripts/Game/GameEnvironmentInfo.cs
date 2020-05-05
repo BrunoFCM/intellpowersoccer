@@ -1501,6 +1501,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             AgentCore a = playerRecieveingBall(agent);
             setOutOfBounds(true);
             placeTeamByAreaOutOfBounds(agent, a, agent.team);
+            detectPlayersAtSamePosBugAfterFoul(a);
         }
         else{
             outOfBoundsAreaFreeKick = true;
