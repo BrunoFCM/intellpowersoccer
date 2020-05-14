@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: b902757cc30417d4db084980207bb61a
+guid: e581b9e5a9be7104ab6de6cc5a67d2a5
 ScriptedImporter:
   fileIDToRecycleName:
-    11400000: Assets/Demonstrations/MyDemo_0.demo
+    11400000: Assets/Demonstrations/PassBall.demo
   externalObjects: {}
   userData: ' (MLAgents.Demonstration)'
   assetBundleName: 

@@ -144,7 +144,7 @@ namespace UniGLTF
                 foreach (var transform in t.Traverse())
                 {
                     var g = globalTransformMap[transform];
-                    transform.position = g.Position.ReverseZ();
+                    transform.localPosition = g.Position.ReverseZ();
                     transform.rotation = g.Rotation.ReverseZ();
                 }
             }

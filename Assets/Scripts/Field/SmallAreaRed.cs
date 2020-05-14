@@ -18,7 +18,6 @@ public class SmallAreaRed : MonoBehaviour
             gameEnvironment.setBallOutOfBoundsTimeOut(false);
             gameEnvironment.setOutOfBounds(false);
             Ball.setPositionInField(Ball.Areas.smallRedArea);
-            Debug.Log("Ball in SmallSide Red");
         }
 
         foreach(AgentCore agentCore in gameEnvironment.redTeamAgents){

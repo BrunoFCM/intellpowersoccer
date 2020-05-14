@@ -80,14 +80,13 @@ public class AgentCore : MonoBehaviour
 
     public void touchedBall(){
         gameEnvironment.setLastPlayerTouchingBall(this);
-        wheelchairAgentController.playerTouchedBall();
     }
 
     public void stopChair(){
         GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        /*gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         transform.GetChild(2).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
         transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -105,7 +104,7 @@ public class AgentCore : MonoBehaviour
 
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;*/
 
         wheelchairAgentController.motorForce = 0;
         wheelchairAgentController.motorForce = 50;

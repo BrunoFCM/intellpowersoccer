@@ -17,10 +17,10 @@ namespace UniHumanoid
             if (Draw && transform.parent != null)
             {
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawCube(transform.position, SIZE);
-                Gizmos.DrawLine(transform.parent.position, transform.position);
+                Gizmos.DrawCube(transform.localPosition, SIZE);
+                Gizmos.DrawLine(transform.parent.position, transform.localPosition);
 
-                UnityEditor.Handles.Label(transform.position, name);
+                UnityEditor.Handles.Label(transform.localPosition, name);
             }
 #endif
         }

@@ -254,7 +254,7 @@ animator.GetBoneTransform(x.Head), animator.GetBoneTransform(x.Tail)))
 
             public void Draw()
             {
-                Handles.DrawLine(Head.transform.position, Tail.transform.position);
+                Handles.DrawLine(Head.transform.localPosition, Tail.transform.localPosition);
             }
         }
 
@@ -396,7 +396,7 @@ animator.GetBoneTransform(x.Head), animator.GetBoneTransform(x.Tail)))
                 return;
             }
 
-            Handles.Label(go.transform.position,
+            Handles.Label(go.transform.localPosition,
                 go.name + "\n(" + bone.ToString() + ")");
         }
 

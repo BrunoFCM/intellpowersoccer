@@ -85,12 +85,12 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         ballOutOfBoundsTimeOut = false;
 
-        setBallCenterPos();
+        /*setBallCenterPos();
 
         if (new System.Random().Next(0, 2) == 0)
             setInitialPositions(AgentCore.Team.BLUE);
         else
-            setInitialPositions(AgentCore.Team.RED);
+            setInitialPositions(AgentCore.Team.RED);*/
 
         
 
@@ -104,7 +104,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {   
-        if(!foulCommited)
+        /*if(!foulCommited)
             foulControlSystem();
 
         if(outOfBounds)
@@ -135,7 +135,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if(foulTimeOut){
             limitFoulWalkingArea(foulAgent, foulAgentPos);
-        } 
+        } */
     }
 
     private void FixedUpdate() {
@@ -486,22 +486,29 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setGoalAtRedGoal(){
-        blueScore += 1;
+        /*blueScore += 1;
         setBallCenterPos();
         setInitialPositions(AgentCore.Team.RED);
         Debug.Log("Score: Blue - " + blueScore);
-        Debug.Log("Score: Red - " + redScore);
+        Debug.Log("Score: Red - " + redScore);*/
     }
 
     public void setGoalAtBlueGoal(){
-        redScore += 1;
+        /*redScore += 1;
         setBallCenterPos();
         setInitialPositions(AgentCore.Team.BLUE);
         Debug.Log("Score: Blue - " + blueScore);
-        Debug.Log("Score: Red - " + redScore);
+        Debug.Log("Score: Red - " + redScore);*/
     }
 
-
+    public AgentCore getNearestTeamMate(AgentCore agent){
+        if(agent.team == AgentCore.Team.RED){
+            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, agent.transform.localPosition)).ToList()[1];
+        }
+        else{
+            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, agent.transform.localPosition)).ToList()[1];
+        }
+    }
 
 
 
@@ -1320,7 +1327,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 // ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
 
     public void setBallOutOfBounds(){
-        if(!ballOutOfBoundsTimeOut){
+        /*if(!ballOutOfBoundsTimeOut){
             Debug.Log("Out of Bounds");
             outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
@@ -1331,7 +1338,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
             setOutOfBounds(true);
-        }
+        }*/
     }
 
     public AgentCore playerRecieveingBall(AgentCore agent){
@@ -1352,8 +1359,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             Debug.Log("Nr of players: "+redTeamAgents.Count);
 
             possibleAgent.transform.localPosition = newPos;
-            Debug.Log("Ball x: " + Ball.transform.position.x);
-            Debug.Log("Ball z: " + Ball.transform.position.z);
+            Debug.Log("Ball x: " + Ball.transform.localPosition.x);
+            Debug.Log("Ball z: " + Ball.transform.localPosition.z);
             possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
         }
         else{
@@ -1371,8 +1378,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             Debug.Log("Nr of players: "+blueTeamAgents.Count);
 
             possibleAgent.transform.localPosition = newPos;
-            Debug.Log("Ball x: " + Ball.transform.position.x);
-            Debug.Log("Ball z: " + Ball.transform.position.z);
+            Debug.Log("Ball x: " + Ball.transform.localPosition.x);
+            Debug.Log("Ball z: " + Ball.transform.localPosition.z);
             possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
         }
 
@@ -1405,14 +1412,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(z > 0){
                 //Top Left Half Field Bounds
                 if(z > 7.5){
-                    Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
+                    Ball.transform.localPosition = new Vector3(x, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, 8.65f, agent, 0);
                 }
                 //Top Left Corner
                 else{
-                    Ball.transform.position = new Vector3(-14f, 0.44f, 7.5f);
+                    Ball.transform.localPosition = new Vector3(-14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1428,7 +1435,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             else{
                 //Bottom Left Corner
                 if(z > -7.5){
-                    Ball.transform.position = new Vector3(-14f, 0.44f, -7.5f);
+                    Ball.transform.localPosition = new Vector3(-14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1442,7 +1449,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
                 //Bottom Left Half Field Bounds
                 else{
-                    Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
+                    Ball.transform.localPosition = new Vector3(x, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, -8.65f, agent, 180);
@@ -1452,14 +1459,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(z > 0){
                 //Top Right Half Field Bounds
                 if(z > 7.5){
-                    Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
+                    Ball.transform.localPosition = new Vector3(x, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, 8.65f, agent, 0);
                 }
                 //Top Right Corner
                 else{
-                    Ball.transform.position = new Vector3(14f, 0.44f, 7.5f);
+                    Ball.transform.localPosition = new Vector3(14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1475,7 +1482,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             else{
                 //Bottom Right Corner
                 if(z > -7.5){
-                    Ball.transform.position = new Vector3(14f, 0.44f, -7.5f);
+                    Ball.transform.localPosition = new Vector3(14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1489,7 +1496,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
                 //Bottom Right Half Field Bounds
                 else{
-                    Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
+                    Ball.transform.localPosition = new Vector3(x, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, -8.65f, agent, 180);
