@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: f09cc3a648a5f0b4f8f8c85d34ffd40f
+guid: f77bdf49971cbc94bbefa9229f837bcf
 ScriptedImporter:
   fileIDToRecycleName:
-    11400000: Assets/Demonstrations/PassTheBallAfter.demo
+    11400002: Assets/Demonstrations/StrikeBallNew.demo
   externalObjects: {}
   userData: ' (MLAgents.Demonstration)'
   assetBundleName: 

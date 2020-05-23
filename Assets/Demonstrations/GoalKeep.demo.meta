@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: faf8a78498fe8cb41b122287143b62dc
+guid: 79758530e1bf7ff488e7ce2eaea0f182
 ScriptedImporter:
   fileIDToRecycleName:
-    11400000: Assets/Demonstrations/PassingTheBall.demo
+    11400002: Assets/Demonstrations/GoalKeep.demo
   externalObjects: {}
   userData: ' (MLAgents.Demonstration)'
   assetBundleName: 

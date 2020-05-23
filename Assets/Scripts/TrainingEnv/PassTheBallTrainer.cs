@@ -312,9 +312,7 @@ public class PassTheBallTrainer : Agent
             //Debug.Log("Ball was kicked, REWARD: " + 30f / (61 - timeLeft));
             //SetReward(30f / (61 - timeLeft));
             SetReward(0.01f);
-            ballShooted = true;
-            Debug.Log("BOOOOOL TRUE");
-        }
+            ballShooted = true;        }
     }
 
     public void stopAgents(){
