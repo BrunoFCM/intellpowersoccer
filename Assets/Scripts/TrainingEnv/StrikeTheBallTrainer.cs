@@ -5,11 +5,11 @@ using System.Linq;
 
 public class StrikeTheBallTrainer : Agent
 {
-    Rigidbody agentRBody;
+    public Rigidbody agentRBody;
     public AgentCore agentCore;
     public WheelchairAgentController controller;
     public GameEnvironmentInfo gameEnvironment;
-    public GoalKeepTrainer goalKeepTrainer;
+    GoalKeepTrainer goalKeepTrainer;
     float timeLeft;
     float timeOfFullPass;
     public Ball Ball;
@@ -25,6 +25,8 @@ public class StrikeTheBallTrainer : Agent
 
     void Start()
     {
+        /*  -- ONLY FOR TRAINING --
+        
         agentRBody = GetComponent<Rigidbody>();
         ballShooted = false;
         timeOfFullPass = 1f;
@@ -36,30 +38,32 @@ public class StrikeTheBallTrainer : Agent
         goalKeeper = gameEnvironment.blueTeamAgents[0];
         site = Random.Range(0, 2);
         goalKeepTrainer.setSite(site);
+
+        */
+
+        ballShooted = false;
+        numberOfTouches = 0;
     }
 
     void Update()
-    {
-
+    {        
         timeLeft -= Time.deltaTime;
 
         if(ballShooted){
             timeOfFullPass += Time.deltaTime;
         }
 
-        if(timeLeft < 0){
-            goalKeepTrainer.SetReward(2);
-            goalKeepTrainer.Done();
-        }
-
         timeForTouches += Time.deltaTime;
  
         if(timeForTouches >= 0.5f){
             unlockTouches = true;
-        }
+        } 
+        
     }
 
     private void FixedUpdate() {
+        /*  -- ONLY FOR TRAINING --
+        
         if(agentOutOfPlay()){
             goalKeepTrainer.Done();
         }
@@ -69,11 +73,13 @@ public class StrikeTheBallTrainer : Agent
         }
 
         checkAgentPos();
-        checkBallPos();
+        checkBallPos(); */
     }
 
     public override void InitializeAgent() 
     {
+        /*  -- ONLY FOR TRAINING --
+        
         agentRBody = GetComponent<Rigidbody>();
         ballShooted = false;
         timeOfFullPass = 1f;
@@ -82,10 +88,14 @@ public class StrikeTheBallTrainer : Agent
         ballPos = Vector3.zero;
         site = Random.Range(0, 2);
         goalKeepTrainer.setSite(site);
-        goalKeeper = gameEnvironment.blueTeamAgents[0];
         
         positionBall();
         positionPlayers();
+        
+        */
+
+        ballShooted = false;
+        numberOfTouches = 0;
     }
 
     public override float[] Heuristic()
@@ -114,6 +124,8 @@ public class StrikeTheBallTrainer : Agent
 
     public override void AgentReset()
     {        
+        /*  -- ONLY FOR TRAINING --
+        
         site = Random.Range(0, 2);
         goalKeepTrainer.setSite(site);
         stopAgents();
@@ -125,6 +137,8 @@ public class StrikeTheBallTrainer : Agent
         timeLeft = 60f;
         angularVelocity = 0;
         numberOfTouches = 0;
+        
+        */
     }
 
     public void scoredRedGoal(){
@@ -252,5 +266,9 @@ public class StrikeTheBallTrainer : Agent
             goalKeepTrainer.SetReward(4);
             goalKeepTrainer.Done();
         }
+    }
+
+    public void setGoalKeeper(AgentCore agent){
+        goalKeeper = agent;     
     }
 }

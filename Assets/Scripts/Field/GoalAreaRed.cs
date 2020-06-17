@@ -17,7 +17,7 @@ public class GoalAreaRed : MonoBehaviour
     private void OnTriggerEnter(Collider collision) {
         if (collision.name == Ball.name){
             gameEnvironment.setGoalAtRedGoal();
-            strikeTheBallTrainer.scoredRedGoal();
+            //strikeTheBallTrainer.scoredRedGoal();
         }
     }
 }

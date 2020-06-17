@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using MLAgents;
-using System.Linq;
+
 
 public class PassTheBallTrainer : Agent
 {
-    Rigidbody agentRBody;
+    public Rigidbody agentRBody;
     public AgentCore agentCore;
     public WheelchairAgentController controller;
     public GameEnvironmentInfo gameEnvironment;
@@ -23,6 +22,8 @@ public class PassTheBallTrainer : Agent
 
     void Start()
     {
+        /*  -- ONLY FOR TRAINING --
+        
         agentRBody = GetComponent<Rigidbody>();
         ballShooted = false;
         timeOfFullPass = 1f;
@@ -32,11 +33,18 @@ public class PassTheBallTrainer : Agent
         nearestTeamMate = gameEnvironment.getNearestTeamMate(agentCore);
         numberOfTouches = 0;
         timeForTouches = 0;
+
+        */
+
+        timeLeft = 0f;
+        angularVelocity = 0;
+        nearestTeamMate = gameEnvironment.getNearestTeamMate(agentCore);        
     }
 
     void Update()
     {
-
+        /*  -- ONLY FOR TRAINING --
+        
         if(ballShooted){
             if(checkBallWasPassedToTeamMate())
                 Done();
@@ -59,9 +67,13 @@ public class PassTheBallTrainer : Agent
         if(timeForTouches >= 0.5f){
             unlockTouches = true;
         }
+
+        */
     }
 
     private void FixedUpdate() {
+        /*  -- ONLY FOR TRAINING --
+        
         if(agentOutOfPlay()){
             Done();
         }
@@ -72,10 +84,15 @@ public class PassTheBallTrainer : Agent
 
         checkAgentPos();
         checkBallPos();
+
+        */
     }
 
     public override void InitializeAgent() 
     {
+        //timeLeft = 60f;
+        /*  -- ONLY FOR TRAINING --
+        
         agentRBody = GetComponent<Rigidbody>();
         ballShooted = false;
         timeOfFullPass = 1f;
@@ -87,7 +104,10 @@ public class PassTheBallTrainer : Agent
         positionLearningAgent();
         positionPlayers();
         checkPositions();
-        positionBall();
+        positionBall(); 
+        
+        */
+
     }
 
     public override float[] Heuristic()
@@ -120,6 +140,8 @@ public class PassTheBallTrainer : Agent
 
     public override void AgentReset()
     {
+        /*  -- ONLY FOR TRAINING --
+        
         nearestTeamMate = gameEnvironment.getNearestTeamMate(agentCore);
         Debug.Log("Nearest TeamMate: "+nearestTeamMate.name);
 
@@ -132,6 +154,8 @@ public class PassTheBallTrainer : Agent
         timeLeft = 60f;
         angularVelocity = 0;
         numberOfTouches = 0;
+
+        */
     }
 
     

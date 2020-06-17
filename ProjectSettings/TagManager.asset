@@ -9,7 +9,10 @@ TagManager:
   - Agent3
   - Agent4
   - Agent1
-  - Puta
+  - Agent5
+  - Agent6
+  - Agent7
+  - Agent8
   layers:
   - Default
   - TransparentFX

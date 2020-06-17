@@ -7,8 +7,8 @@ public class FeetCollisions : MonoBehaviour
     public AgentCore agentCore;
     public GameObject Ball;
     //public PassTheBallTrainer passTheBallTrainer;
-    public StrikeTheBallTrainer strikeTheBallTrainer;
-    public GoalKeepTrainer goalKeepTrainer;
+    //public StrikeTheBallTrainer strikeTheBallTrainer;
+    //public GoalKeepTrainer goalKeepTrainer;
 
     // Start is called before the first frame update
     void Start()
@@ -22,10 +22,15 @@ public class FeetCollisions : MonoBehaviour
             //Ball.GetComponent<Rigidbody>().velocity = new Vector3 (collision.relativeVelocity.x, collision.relativeVelocity.y, collision.relativeVelocity.z);
             agentCore.touchedBall();
             //passTheBallTrainer.touchedBall();
+
+            /*  -- ONLY FOR TRAINING --
+        
             if(agentCore.name == "Agent1")
                 strikeTheBallTrainer.touchedBall();
             else if(agentCore.name == "Agent2")
                 goalKeepTrainer.touchedBall();
+
+            */
         }
     }
 
@@ -34,10 +39,15 @@ public class FeetCollisions : MonoBehaviour
         if (collision.collider.name == Ball.name){
             //Ball.GetComponent<Rigidbody>().velocity = new Vector3 (collision.relativeVelocity.x, collision.relativeVelocity.y, collision.relativeVelocity.z);
             agentCore.touchedBall();
+            
+            /*  -- ONLY FOR TRAINING --
+        
             if(agentCore.name == "Agent1")
                 strikeTheBallTrainer.touchedBall();
             else if(agentCore.name == "Agent2")
                 goalKeepTrainer.touchedBall();
+
+            */
         }
     }
 }

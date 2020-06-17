@@ -5,8 +5,13 @@ using UnityEngine;
 public class AgentCore : MonoBehaviour
 {
     Rigidbody agentRBody;
+    public GameObject tracker;
+    public BehaviourHandler behaviourHandler;
     public GameEnvironmentInfo gameEnvironment;
     public WheelchairAgentController wheelchairAgentController;
+
+    public HigherBehaviour higherBehaviour;
+    bool trackerBool;
 
     public enum Team{
         BLUE,
@@ -62,6 +67,7 @@ public class AgentCore : MonoBehaviour
     void Start()
     {
         agentRBody = GetComponent<Rigidbody>();
+        trackerBool = false;
     }
 
     // Update is called once per frame
@@ -230,5 +236,29 @@ public class AgentCore : MonoBehaviour
          isExpelled = true;
     }
 
+    public void disableTracker(){
+        behaviourHandler.disableAllBehaviours();
+        tracker.SetActive(false);
+        trackerBool = false;
+    }
+    public void enableTracker(){
+        tracker.SetActive(true);
+        trackerBool = true;
+    }
 
+    public bool getTrackerBool(){
+        return trackerBool;
+    }
+
+    public void setPassTheBallBehaviour(){
+        behaviourHandler.setPassTheBallBehaviour();
+    }
+
+    public void setStrikeTheBallBehaviour(){
+        behaviourHandler.setStrikeTheBallBehaviour();
+    }
+
+    public void setGoalKeepBehaviour(AgentCore shooter){
+        behaviourHandler.setGoalKeepBehaviour(shooter);
+    }
 }

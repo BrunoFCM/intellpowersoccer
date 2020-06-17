@@ -5,11 +5,11 @@ using System.Linq;
 
 public class GoalKeepTrainer : Agent
 {
-    Rigidbody agentRBody;
+    public Rigidbody agentRBody;
     public AgentCore agentCore;
     public WheelchairAgentController controller;
     public GameEnvironmentInfo gameEnvironment;
-    public StrikeTheBallTrainer strikeTheBallTrainer;
+    StrikeTheBallTrainer strikeTheBallTrainer;
     public Ball Ball;
     Vector3 ballPos;
     AgentCore shooter;
@@ -19,11 +19,18 @@ public class GoalKeepTrainer : Agent
 
     void Start()
     {
+        /*  -- ONLY FOR TRAINING --
+        
         agentRBody = GetComponent<Rigidbody>();
         ballPos = Vector3.zero;
         shooter = gameEnvironment.redTeamAgents[0];
         oponentStrike = false;
-        site = -1;
+        site = -1; 
+        
+        */
+
+        shooter = gameEnvironment.redTeamAgents[0];
+        oponentStrike = false;
     }
 
     void Update()
@@ -32,18 +39,31 @@ public class GoalKeepTrainer : Agent
     }
 
     private void FixedUpdate() {
+        /*  -- ONLY FOR TRAINING --
+
         if(agentOutOfPlay()){
             Done();
         }
+        
+        */
     }
 
     public override void InitializeAgent() 
     {
+        /*  -- ONLY FOR TRAINING --
+        
         agentRBody = GetComponent<Rigidbody>();
         ballPos = Vector3.zero;
         shooter = gameEnvironment.redTeamAgents[0];
         oponentStrike = false;
         site = -1;
+        
+        */
+
+        //agentRBody = GetComponent<Rigidbody>();
+        //shooter = gameEnvironment.getPlayerShooting();
+        //oponentStrike = false;
+
     }
 
     public override float[] Heuristic()
@@ -68,21 +88,25 @@ public class GoalKeepTrainer : Agent
     }
 
     public override void AgentReset()
-    {        
+    {   
+        /*  -- ONLY FOR TRAINING --
+        
         site = -1;
         oponentStrike = false;
         strikeTheBallTrainer.Done();
+
+        */
     }
 
     public void scoredRedGoal(){
         SetReward(-2);
-        Debug.Log("GOAL SCORED REWARD -2");
+        //Debug.Log("GOAL SCORED REWARD -2");
         Done();
     }
 
     public void scoredBlueGoal(){
         SetReward(-2);
-        Debug.Log("GOAL SCORED REWARD -2");
+        //Debug.Log("GOAL SCORED REWARD -2");
         Done();
     }
 
@@ -114,7 +138,7 @@ public class GoalKeepTrainer : Agent
     public void touchedBall(){
        if(oponentStrike){
            SetReward(5);
-           Debug.Log("GOAL AVOIDED REWARD 5");
+           //Debug.Log("GOAL AVOIDED REWARD 5");
            Done();
        }
     }
