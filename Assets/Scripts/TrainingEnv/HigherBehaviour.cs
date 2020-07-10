@@ -17,6 +17,7 @@ public class HigherBehaviour : Agent
 
     //1 means that a teammate has the ball, and 0 a opponent
     int teamBool;
+    float elapsed = 0f;
    
      
 
@@ -29,6 +30,14 @@ public class HigherBehaviour : Agent
     void Update()
     {
         setTeamBool();
+
+        elapsed += Time.deltaTime;
+        if(elapsed >= 1f) {
+            elapsed = elapsed % 1f;
+            ballPossessionOverTime();
+        }
+
+        checkDistances();
     }
 
     private void FixedUpdate() {
@@ -50,8 +59,24 @@ public class HigherBehaviour : Agent
     public override float[] Heuristic()
     {
         var action = new float[3];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
+
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            action[0] = 1f;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            action[0] = 2f;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            action[1] = 1f;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            action[1] = 2f;
+        }
 
 
         //DISABLE ALL BEHAVIOURS
@@ -88,28 +113,48 @@ public class HigherBehaviour : Agent
 
     public override void AgentAction(float[] vectorAction)
     {
-        if(agentCore.getTrackerBool() == true)
-            if(vectorAction[0] != 0 || vectorAction[1] != 0){
-                controller.Controller(vectorAction);
-            }
-            else if(vectorAction[2] == 1){
-                behaviourHandler.disableAllBehaviours();
-            }
-            else if(vectorAction[2] == 2){
-                behaviourHandler.setGoalKeepBehaviour(gameEnvironment.getNearestPlayerToBall());
-            }
-            else if(vectorAction[2] == 3){
-                behaviourHandler.setStrikeTheBallBehaviour();
-            }
-            else if(vectorAction[2] == 4){
-                behaviourHandler.setPassTheBallBehaviour();
-            }
+        if (vectorAction[0] == 1)
+        {
+            vectorAction[1] = 1;
+            vectorAction[0] = 0;
+            controller.Controller(vectorAction);
+        }
+        else if (vectorAction[0] == 2)
+        {
+            vectorAction[1] = 0;
+            vectorAction[0] = -1;
+            controller.Controller(vectorAction);
+        }
+        else if (vectorAction[1] == 1)
+        {
+            vectorAction[1] = -1;
+            vectorAction[0] = 0;
+            controller.Controller(vectorAction);
+        }
+        else if (vectorAction[1] == 2)
+        {
+            vectorAction[1] = 0;
+            vectorAction[0] = 1;
+            controller.Controller(vectorAction);
+        }
+        else if(vectorAction[2] == 1){
+            behaviourHandler.disableAllBehaviours();
+        }
+        else if(vectorAction[2] == 2){
+            behaviourHandler.setGoalKeepBehaviour(gameEnvironment.getNearestPlayerToBall());
+        }
+        else if(vectorAction[2] == 3){
+            behaviourHandler.setStrikeTheBallBehaviour();
+        }
+        else if(vectorAction[2] == 4){
+            behaviourHandler.setPassTheBallBehaviour();
+        }
         
     }
 
     public override void AgentReset()
     {        
-        
+        gameEnvironment.resetGame();
     }
 
 
@@ -153,33 +198,43 @@ public class HigherBehaviour : Agent
     // -------------------------------------------------- REWARDS SYSTEM -------------------------------------------------- //
 
     public void foulCommited(){
-        AddReward(-0.2f);
+        //AddReward(-3f);
     }
 
     public void ballOutOfBounds(){
-        AddReward(-0.05f);
+        //AddReward(-0.05f);
     }
 
     public void goalScored(AgentCore.Team team){
-        addTeamReward(team, 3f);
+        setTeamReward(team, 10f);
     }
 
     public void goalSuffered(AgentCore.Team team){
-        addTeamReward(team, -1f);
+        setTeamReward(team, -10f);
+        Done();
     }
 
     public void ballPossessionOverTime(){
-        if(gameEnvironment.getNearestPlayerToBall() != null){
+        /*if(gameEnvironment.getNearestPlayerToBall() != null){
             if(gameEnvironment.getNearestPlayerToBall().team == AgentCore.Team.BLUE){
-               addTeamReward(AgentCore.Team.BLUE, 0.002f);
+                addTeamReward(AgentCore.Team.BLUE, 0.002f);
             }else{
                 addTeamReward(AgentCore.Team.RED, 0.002f);
             }
-        }
+        }*/
     }
 
     public void matchWinner(AgentCore.Team winTeam){
-        addTeamReward(winTeam, 10f);
+        /*addTeamReward(winTeam, 10f);
+        Debug.Log("MATCH OVER - WINNER IS" + winTeam);*/
+        Done();
+    }
+
+    public void tie(){
+        /*addTeamReward(AgentCore.Team.BLUE, 3f);
+        addTeamReward(AgentCore.Team.RED, 3f);
+        Debug.Log("MATCH OVER TIE");*/
+        Done();
     }
 
     public void setTeamReward(AgentCore.Team team, float reward){
@@ -206,17 +261,32 @@ public class HigherBehaviour : Agent
         }
     }
 
+    public void checkDistances(){
+        foreach(AgentCore agent in gameEnvironment.redTeamAgents){
+            if(agentCore.distanceToPlayer(agent) < 2){
+                AddReward(-0.1f);
+            }
+        }
+        foreach(AgentCore agent in gameEnvironment.blueTeamAgents){
+            if(agentCore.distanceToPlayer(agent) < 2){
+                AddReward(-0.1f);
+            }
+        }
+    }
+
 
 
     // -------------------------------------------------- VERIFICATIONS -------------------------------------------------- //
 
     public bool agentOutOfPlay(){
         if(agentCore.transform.localPosition.x > 16.5 || agentCore.transform.localPosition.x < -16.5){
-            SetReward(-0.05f);
+            SetReward(-10f);
+            Debug.Log("AGENT OUT OF PLAY");
             return true;
         }
-        else if(agentCore.transform.localPosition.z > 9.5 || agentCore.transform.localPosition.z < -9.5){
-            SetReward(-0.05f);
+        else if(agentCore.transform.localPosition.z > 10 || agentCore.transform.localPosition.z < -10){
+            SetReward(-10f);
+            Debug.Log("AGENT OUT OF PLAY");
             return true;
         }
 
@@ -225,7 +295,8 @@ public class HigherBehaviour : Agent
 
     public bool ballOutOfPlay(){
         if(Ball.transform.localPosition.y < 0.2){
-            SetReward(-0.01f);
+            SetReward(-10f);
+            Debug.Log("BALL OUT OF PLAY");
             return true;
         }
         return false;

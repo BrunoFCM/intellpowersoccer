@@ -13,6 +13,15 @@ TagManager:
   - Agent6
   - Agent7
   - Agent8
+  - Point
+  - Point1
+  - Point2
+  - Point3
+  - Point4
+  - Point5
+  - Point6
+  - Point7
+  - Point8
   layers:
   - Default
   - TransparentFX

@@ -56,6 +56,7 @@ public class AgentCore : MonoBehaviour
         public SmallAreaBlue smallAreaBlue;
         public SmallAreaRed smallAreaRed;
         public OutsideArea outsideArea;
+        public IntersectBallTrainer intersectBallTrainer;
 
 
     //GAME OBJECTS
@@ -86,31 +87,38 @@ public class AgentCore : MonoBehaviour
 
     public void touchedBall(){
         gameEnvironment.setLastPlayerTouchingBall(this);
+
+        if(intersectBallTrainer != null)
+            intersectBallTrainer.touchedBall();
     }
 
     public void stopChair(){
         GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().transform.localRotation = Quaternion.Euler(0f,0f,0f);
 
-        /*gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        transform.GetChild(2).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        transform.GetChild(3).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                transform.GetChild(3).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        transform.GetChild(4).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                transform.GetChild(4).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        transform.GetChild(5).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    transform.GetChild(5).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
+        transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().transform.localRotation = Quaternion.Euler(-90f,0f,0f);
+        transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().transform.localPosition = new Vector3(0.2361405f, 0.2113286f, -0.2106989f);
+        
         transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.GetChild(7).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
+        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().transform.localRotation = Quaternion.Euler(-90f,0f,0f);
+        transform.GetChild(7).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().transform.localPosition = new Vector3(0.2359247f, 0.1291838f, -0.1733153f);
+
+
+        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().transform.localRotation = Quaternion.Euler(-90f,0f,0f);
+        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().transform.localPosition = new Vector3(-0.2361402f, 0.2113283f, -0.2106989f);
 
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;*/
+        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().transform.localRotation = Quaternion.Euler(-90f,0f,0f);
+        transform.GetChild(9).transform.GetChild(1).gameObject.GetComponent<Rigidbody>().transform.localPosition = new Vector3(-0.2359247f, 0.1291838f, -0.1733153f);
 
         wheelchairAgentController.motorForce = 0;
         wheelchairAgentController.motorForce = 50;
@@ -237,9 +245,10 @@ public class AgentCore : MonoBehaviour
     }
 
     public void disableTracker(){
+        /* COMMENT TO TRAIN
         behaviourHandler.disableAllBehaviours();
         tracker.SetActive(false);
-        trackerBool = false;
+        trackerBool = false;*/
     }
     public void enableTracker(){
         tracker.SetActive(true);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GameEnvironmentInfo : MonoBehaviour
+public class GameEnvironmentTraining : MonoBehaviour
 {
     //GAME VARS
         //Game Duration of 40min = 2400s
@@ -96,7 +96,6 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         ballOutOfBoundsTimeOut = false;
 
-        
         setBallCenterPos();
 
         if (new System.Random().Next(0, 2) == 0){
@@ -134,12 +133,10 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if (new System.Random().Next(0, 2) == 0){
             tossingWinner = AgentCore.Team.BLUE;
-            
             setInitialPositions(AgentCore.Team.BLUE);
         }   
         else{
             tossingWinner = AgentCore.Team.RED;
-            
             setInitialPositions(AgentCore.Team.RED);
         }
 
@@ -156,11 +153,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         setBallCenterPos();
 
         if (tossingWinner == AgentCore.Team.BLUE){
-            
             setInitialPositions(AgentCore.Team.RED);
         }  
         else{
-            
             setInitialPositions(AgentCore.Team.BLUE);
         }
     }
@@ -171,14 +166,12 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive)
             gameTime -= Time.deltaTime;
 
-        if(gameTime <= 0){
+        if(gameTime <= 2400f){
             //MATCH ENDED
             if(redScore > blueScore){
                 redTeamAgents[0].higherBehaviour.matchWinner(AgentCore.Team.RED);
-            }else if(redScore < blueScore){
-                blueTeamAgents[0].higherBehaviour.matchWinner(AgentCore.Team.BLUE);
             }else{
-                blueTeamAgents[0].higherBehaviour.tie();
+                blueTeamAgents[0].higherBehaviour.matchWinner(AgentCore.Team.BLUE);
             }
         }
 
@@ -236,7 +229,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     private void FixedUpdate() {
-
+        
     }
 
 
@@ -506,12 +499,12 @@ public class GameEnvironmentInfo : MonoBehaviour
                                         if(j+1 < possibleAgentsNearBall.Count){
                                             if(possibleAgentsNearBall[j+1].type != AgentCore.Type.GOALKEEPER){
                                                 //Found a player commiting a foul
-                                                Debug.Log("Two-on-One foul!");
+                                                Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
                                                 twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
                                             }
                                         }else{
                                             //Found a player commiting a foul
-                                            Debug.Log("Two-on-One foul!");
+                                            Debug.Log(possibleAgentsNearBall[j].name + " commited Two-on-One foul!");
                                             twoOnOnefoulMechanism(possibleAgentsNearBall[0], possibleAgentsNearBall[i], possibleAgentsNearBall[j]);
                                         }
 
@@ -608,7 +601,6 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setGoalAtRedGoal(){
-        
         blueScore += 1;
         setBallCenterPos();
         setInitialPositions(AgentCore.Team.RED);
@@ -619,7 +611,6 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setGoalAtBlueGoal(){
-        
         redScore += 1;
         setBallCenterPos();
         setInitialPositions(AgentCore.Team.BLUE);
@@ -635,15 +626,6 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
         else{
             return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, agent.transform.localPosition)).ToList()[1];
-        }
-    }
-
-    public AgentCore getNearestOpponentWithBall(AgentCore agent){
-        if(agent.team == AgentCore.Team.RED){
-            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0];
-        }
-        else{
-            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0];
         }
     }
 
@@ -1246,14 +1228,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             while(allPlayers.Count >= 2){
                 for(int j = 1; j < allPlayers.Count; j++){
                     if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 2.5){
-                       // Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
+                        Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
                         if(allPlayers[0].team == AgentCore.Team.RED){
                             allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x - 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
                         }
                         else{
                             allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
                         }
-                        //Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
+                        Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
                         //agentTakingKick.transform.localPosition = foulAgentPos;
                     }
                     checkPlayersInSmallAreas(agentTakingKick);
@@ -1274,7 +1256,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             while(allPlayers.Count >= 2){
                 for(int j = 1; j < allPlayers.Count; j++){
                     if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 2.5){
-                        //Debug.Log("FOUND BUG IN PLAYERS POSITIONS AGAIN");
+                        Debug.Log("FOUND BUG IN PLAYERS POSITIONS AGAIN");
                         bugged = true;
                         if(allPlayers[0].team == AgentCore.Team.RED){
                             allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x - 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
@@ -1282,7 +1264,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                         else{
                             allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
                         }
-                        //Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
+                        Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
                         //agentTakingKick.transform.localPosition = foulAgentPos;
                     }
                     if(checkPlayersInSmallAreas(agentTakingKick)){
@@ -1434,7 +1416,6 @@ public class GameEnvironmentInfo : MonoBehaviour
 // ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
 
     public void setBallOutOfBounds(){
-        
         if(!ballOutOfBoundsTimeOut){
             if(lastPlayerTouchingTheBall != null){
                 Debug.Log("Out of Bounds");
@@ -1469,8 +1450,11 @@ public class GameEnvironmentInfo : MonoBehaviour
                 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
             }
 
+            Debug.Log("Nr of players: "+redTeamAgents.Count);
+
             possibleAgent.transform.localPosition = newPos;
-   
+            Debug.Log("Ball x: " + Ball.transform.localPosition.x);
+            Debug.Log("Ball z: " + Ball.transform.localPosition.z);
             possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
         }
         else{
@@ -1485,9 +1469,11 @@ public class GameEnvironmentInfo : MonoBehaviour
                 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
             }
 
+            Debug.Log("Nr of players: "+blueTeamAgents.Count);
 
             possibleAgent.transform.localPosition = newPos;
-
+            Debug.Log("Ball x: " + Ball.transform.localPosition.x);
+            Debug.Log("Ball z: " + Ball.transform.localPosition.z);
             possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
         }
 

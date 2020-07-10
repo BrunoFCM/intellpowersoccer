@@ -6,6 +6,7 @@ public class FeetCollisions : MonoBehaviour
 {
     public AgentCore agentCore;
     public GameObject Ball;
+    //public DribbleBallTrainer dribbleBallTrainer;
     //public PassTheBallTrainer passTheBallTrainer;
     //public StrikeTheBallTrainer strikeTheBallTrainer;
     //public GoalKeepTrainer goalKeepTrainer;
@@ -21,6 +22,7 @@ public class FeetCollisions : MonoBehaviour
         if (collision.collider.name == Ball.name){
             //Ball.GetComponent<Rigidbody>().velocity = new Vector3 (collision.relativeVelocity.x, collision.relativeVelocity.y, collision.relativeVelocity.z);
             agentCore.touchedBall();
+            //dribbleBallTrainer.touchedBall();
             //passTheBallTrainer.touchedBall();
 
             /*  -- ONLY FOR TRAINING --

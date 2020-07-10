@@ -18,7 +18,7 @@ public class GameUI : MonoBehaviour
     void Update()
     {
         score.text = gameEnvironment.redScore + " - " + gameEnvironment.blueScore;
-        time.text = string.Format("{0}:{1:00}", (int)(30 - gameEnvironment.gameTime) / 60, (int)(30 - gameEnvironment.gameTime) % 60);
+        time.text = string.Format("{00}:{1:00}", (int)(2400f - gameEnvironment.gameTime) / 60, (int)(2400f - gameEnvironment.gameTime) % 60);
          
     }
 }
