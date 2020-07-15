@@ -50,7 +50,7 @@ public class DribbleBallTrainer : Agent
 
     public override void InitializeAgent() 
     {        
-        timeLeft = 60f;
+        //timeLeft = 60f;
         agentRBody = GetComponent<Rigidbody>();
         
         /*stopAgents();
@@ -91,13 +91,13 @@ public class DribbleBallTrainer : Agent
 
     public override void AgentReset()
     {
-        timeLeft = 60f;
+        /*timeLeft = 60f;
         agentRBody = GetComponent<Rigidbody>();
         
         stopAgents();
         positionPlayers();
         positionBall(); 
-        generatePoint();
+        generatePoint();*/
     }
 
 

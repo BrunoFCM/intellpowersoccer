@@ -240,11 +240,11 @@ public class HigherBehaviour : Agent
     public void setTeamReward(AgentCore.Team team, float reward){
         if(team == AgentCore.Team.BLUE){
             foreach(AgentCore agent in gameEnvironment.blueTeamAgents){
-                agent.higherBehaviour.SetReward(reward);
+                //agent.higherBehaviour.SetReward(reward);
             }
         }else{
             foreach(AgentCore agent in gameEnvironment.redTeamAgents){
-                agent.higherBehaviour.SetReward(reward);
+                //agent.higherBehaviour.SetReward(reward);
             }
         }
     }
@@ -252,11 +252,11 @@ public class HigherBehaviour : Agent
     public void addTeamReward(AgentCore.Team team, float reward){
         if(team == AgentCore.Team.BLUE){
             foreach(AgentCore agent in gameEnvironment.blueTeamAgents){
-                agent.higherBehaviour.AddReward(reward);
+                //agent.higherBehaviour.AddReward(reward);
             }
         }else{
             foreach(AgentCore agent in gameEnvironment.redTeamAgents){
-                agent.higherBehaviour.AddReward(reward);
+                //agent.higherBehaviour.AddReward(reward);
             }
         }
     }

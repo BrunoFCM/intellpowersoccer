@@ -9,9 +9,10 @@ public class AgentCore : MonoBehaviour
     public BehaviourHandler behaviourHandler;
     public GameEnvironmentInfo gameEnvironment;
     public WheelchairAgentController wheelchairAgentController;
-
-    public HigherBehaviour higherBehaviour;
+    public GameObject figurePoint;
     bool trackerBool;
+
+    Vector2 originalPosition;
 
     public enum Team{
         BLUE,
@@ -56,8 +57,6 @@ public class AgentCore : MonoBehaviour
         public SmallAreaBlue smallAreaBlue;
         public SmallAreaRed smallAreaRed;
         public OutsideArea outsideArea;
-        public IntersectBallTrainer intersectBallTrainer;
-
 
     //GAME OBJECTS
         //Ball Game object
@@ -88,8 +87,6 @@ public class AgentCore : MonoBehaviour
     public void touchedBall(){
         gameEnvironment.setLastPlayerTouchingBall(this);
 
-        if(intersectBallTrainer != null)
-            intersectBallTrainer.touchedBall();
     }
 
     public void stopChair(){
@@ -269,5 +266,46 @@ public class AgentCore : MonoBehaviour
 
     public void setGoalKeepBehaviour(AgentCore shooter){
         behaviourHandler.setGoalKeepBehaviour(shooter);
+    }
+
+    public void setDribbleBallBehaviour(Vector2 figurePos){
+        //Debug.Log(figurePos.magnitude);
+        figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
+        behaviourHandler.setDribbleBallBehaviour();
+    }
+
+    public void setMoveToPointBehaviour(Vector2 figurePos){
+        //Debug.Log(figurePos.magnitude);
+        figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
+        behaviourHandler.setMoveToPointBehaviour();
+    }
+
+    public void setIntersectBallBehaviour(AgentCore agent, AgentCore nearestPlayer){
+        behaviourHandler.setIntersectBallBehaviour(agent, nearestPlayer);
+    }
+
+    public void disableAllBehaviours(){
+        behaviourHandler.disableAllBehaviours();
+    }
+
+    public float getDistanceToGoal(){
+        if(team == AgentCore.Team.BLUE)
+            return Vector2.Distance(transform.position, new Vector3(14,0,0));
+        else
+            return Vector2.Distance(transform.position, new Vector3(-14,0,0));
+    }
+
+    public void setOriginalPosition(Vector2 pos){
+        originalPosition = pos;
+    }
+
+    public Vector2 getOriginalPosition(){
+        return originalPosition;
+    }
+
+    public void agentHandler(){
+        if(Vector2.Distance(transform.position, gameEnvironment.Ball.transform.position) < 2){
+
+        }
     }
 }

@@ -27,7 +27,7 @@ public class IntersectBallTrainer : Agent
 
     void Update()
     {
-        timeLeft -= Time.deltaTime;
+        /*timeLeft -= Time.deltaTime;
 
         if(timeLeft <= 0){
             AddReward(0.1f);
@@ -40,12 +40,12 @@ public class IntersectBallTrainer : Agent
             // Done();
         }
 
-        checkOpponentProximmity();
+        checkOpponentProximmity();*/
     }
 
     private void FixedUpdate() {
         
-        if(agentOutOfPlay()){
+        /*if(agentOutOfPlay()){
             // Done();
         }
         
@@ -53,7 +53,7 @@ public class IntersectBallTrainer : Agent
             // Done();
         }
 
-        checkAgentPos();
+        checkAgentPos();*/
     }
 
     public override void InitializeAgent() 

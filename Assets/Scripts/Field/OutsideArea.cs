@@ -15,8 +15,11 @@ public class OutsideArea : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision) {
         if (collision.name == Ball.name){
-            gameEnvironment.setBallOutOfBounds();
-            gameEnvironment.setBallOutOfBoundsTimeOut(true);
+            if(!gameEnvironment.getBallOutOfBounds())
+                gameEnvironment.setBallOutOfBounds();
+            else
+                gameEnvironment.limitWalKingAreaOutOfBounds();
+                //gameEnvironment.setBallOutOfBoundsTimeOut(true);
         }
     }
 }

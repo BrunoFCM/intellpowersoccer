@@ -67,6 +67,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         private Vector3 penaltyAgentPos;
         private float penaltyAgentRot;
         private bool faulTimeOut;
+        private bool threeInGoalBool;
 
     //AGENTS TRAINING INFO
         AgentCore playerPassing;
@@ -168,18 +169,20 @@ public class GameEnvironmentInfo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {   
-        if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive)
+        
+    }
+
+    private void FixedUpdate() {
+        
+    }
+
+    void LateUpdate() {
+        if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive && !ballOutOfBoundsTimeOut)
             gameTime -= Time.deltaTime;
 
         if(gameTime <= 0){
             //MATCH ENDED
-            if(redScore > blueScore){
-                redTeamAgents[0].higherBehaviour.matchWinner(AgentCore.Team.RED);
-            }else if(redScore < blueScore){
-                blueTeamAgents[0].higherBehaviour.matchWinner(AgentCore.Team.BLUE);
-            }else{
-                blueTeamAgents[0].higherBehaviour.tie();
-            }
+            
         }
 
         if(!secondHalf)
@@ -193,17 +196,28 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if(outOfBounds){
             limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
-            outBoundsAgent.setPassTheBallBehaviour();
+            /*outBoundsAgent.setPassTheBallBehaviour();
+            foreach(AgentCore agent in redTeamAgents){
+                if(!agent == outBoundsAgent){
+                    agent.disableAllBehaviours();
+                }
+            }
+
+            foreach(AgentCore agent in blueTeamAgents){
+                if(!agent == outBoundsAgent){
+                    agent.disableAllBehaviours();
+                }
+            }*/
         }
 
         if(outOfBoundsAreaFreeKick)
             limitWalkingArea(outBoundsFreeKickAgent, outBoundsAreaFreeKickAgentPos, outBoundsFreeKickAgentRot);
 
-        if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive)
+        /*if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive)
             if(threeInTheGoalAreafoul()){
                 Debug.Log("3 in the Goal Area Foul Committed");
                 foulAgent.setPassTheBallBehaviour();
-            }
+            }*/
 
         if(initialPositions){
             limitInicialPosWalkingArea(initialPlayerTakingKick, initialPlayerTakingKickPos);
@@ -235,8 +249,25 @@ public class GameEnvironmentInfo : MonoBehaviour
         setNearestPlayerToBall();
     }
 
-    private void FixedUpdate() {
+    public void limitWalKingAreaOutOfBounds(){
+        Ball.stopIt();
+        Ball.transform.position = outBoundsBallPos;
 
+        spawnWheelchairAtNewSpot(outBoundsAgentPos.x, outBoundsAgentPos.y, outBoundsAgentPos.z, outBoundsAgent, outBoundsAgentRot);
+    }
+
+    public bool checkGamePause(){
+        if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive && !ballOutOfBoundsTimeOut)
+            return false;
+        else
+            return true;
+    }
+
+    public bool checkPenalty(){
+        if(!penaltyActive)
+            return false;
+        else
+            return true;
     }
 
 
@@ -252,41 +283,61 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Sets the initial positions os the players in the field
     public void setInitialPositions(AgentCore.Team team){
-        
-        if(team == AgentCore.Team.BLUE){
-            redTeamAgents[0].transform.localPosition = new Vector3(-4f, 0.25f, 0f);
-            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
-            redTeamAgents[2].transform.localPosition = new Vector3(-7, 0.25f, 4.5f);
-            redTeamAgents[3].transform.localPosition = new Vector3(-7, 0.25f, -4.5f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(1.5f, 0.25f, 0f);
-            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
-            blueTeamAgents[2].transform.localPosition = new Vector3(2f, 0.25f, 5f);
-            blueTeamAgents[3].transform.localPosition = new Vector3(2f, 0.25f, -5f);
+        stopAllChairs();
+
+        if(team == AgentCore.Team.BLUE){
+            redTeamAgents[0].transform.position = new Vector3(-4f, 0.25f, 0f);
+            redTeamAgents[0].setOriginalPosition(new Vector2(-4f, 0f));
+            redTeamAgents[1].transform.position = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[1].setOriginalPosition(new Vector2(-11.5f, 0f));
+            redTeamAgents[2].transform.position = new Vector3(-7, 0.25f, 4.5f);
+            redTeamAgents[2].setOriginalPosition(new Vector2(-7, 4.5f));
+            redTeamAgents[3].transform.position = new Vector3(-7, 0.25f, -4.5f);
+            redTeamAgents[3].setOriginalPosition(new Vector2(-7, -4.5f));
+
+            blueTeamAgents[0].transform.position = new Vector3(1.5f, 0.25f, 0f);
+            blueTeamAgents[0].setOriginalPosition(new Vector2(1.5f, 0f));
+            blueTeamAgents[1].transform.position = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[1].setOriginalPosition(new Vector2(11.5f, 0f));
+            blueTeamAgents[2].transform.position = new Vector3(2f, 0.25f, 5f);
+            blueTeamAgents[2].setOriginalPosition(new Vector2(2f, 5f));
+            blueTeamAgents[3].transform.position = new Vector3(2f, 0.25f, -5f);
+            blueTeamAgents[3].setOriginalPosition(new Vector2(2f, -5f));
 
             initialPlayerTakingKick = blueTeamAgents[0];
-            initialPlayerTakingKickPos = blueTeamAgents[0].transform.localPosition;
+            initialPlayerTakingKickPos = blueTeamAgents[0].transform.position;
         }
         else{
-            redTeamAgents[0].transform.localPosition = new Vector3(-1.5f, 0.25f, 0f);
-            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
-            redTeamAgents[2].transform.localPosition = new Vector3(-2, 0.25f, 5f);
-            redTeamAgents[3].transform.localPosition = new Vector3(-2, 0.25f, -5f);
+            
+            redTeamAgents[0].transform.position = new Vector3(-1.5f, 0.25f, 0f);
+            redTeamAgents[0].setOriginalPosition(new Vector2(-1.5f, 0f));
+            redTeamAgents[1].transform.position = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[1].setOriginalPosition(new Vector2(-11.5f, 0f));
+            redTeamAgents[2].transform.position = new Vector3(-2, 0.25f, 5f);
+            redTeamAgents[2].setOriginalPosition(new Vector2(-2, 5f));
+            redTeamAgents[3].transform.position = new Vector3(-2, 0.25f, -5f);
+            redTeamAgents[3].setOriginalPosition(new Vector2(-2, -5f));
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(4.25f, 0.25f, 0f);
-            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
-            blueTeamAgents[2].transform.localPosition = new Vector3(7f, 0.25f, 4.5f);
-            blueTeamAgents[3].transform.localPosition = new Vector3(7f, 0.25f, -4.5f);
+            blueTeamAgents[0].transform.position = new Vector3(4.25f, 0.25f, 0f);
+            blueTeamAgents[0].setOriginalPosition(new Vector2(4.25f, 0f));
+            blueTeamAgents[1].transform.position = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[1].setOriginalPosition(new Vector2(11.5f, 0f));
+            blueTeamAgents[2].transform.position = new Vector3(7f, 0.25f, 4.5f);
+            blueTeamAgents[2].setOriginalPosition(new Vector2(7f, 4.5f));
+            blueTeamAgents[3].transform.position = new Vector3(7f, 0.25f, -4.5f);
+            blueTeamAgents[3].setOriginalPosition(new Vector2(7f, -4.5f));
 
             initialPlayerTakingKick = redTeamAgents[0];
-            initialPlayerTakingKickPos = redTeamAgents[0].transform.localPosition;
+            initialPlayerTakingKickPos = redTeamAgents[0].transform.position;
         }
+        
 
         foreach(AgentCore agent in redTeamAgents){
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
         foreach(AgentCore agent in blueTeamAgents){
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
 
         lastPlayerTouchingTheBall = null;
@@ -294,31 +345,34 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     private void limitInicialPosWalkingArea(AgentCore agent, Vector3 pos){
-        Vector3 centerPosition = Ball.transform.localPosition; //center of circle
-        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
+        Vector3 centerPosition = Ball.transform.position; //center of circle
+        float distance = Vector3.Distance(agent.transform.position, centerPosition);
         
         if (distance > 3)
         {
-            agent.transform.localPosition = initialPlayerTakingKickPos;
+            agent.transform.position = initialPlayerTakingKickPos;
             agent.stopChair();
 
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
     }
 
     public void setPenaltyPositions(AgentCore.Team teamTakingKick){
+
+        stopAllChairs();
+
         setBallPenaltyPos(teamTakingKick);
         
         if(teamTakingKick == AgentCore.Team.RED){
-            redTeamAgents[0].transform.localPosition = new Vector3(10f, 0.25f, 0f);
-            redTeamAgents[1].transform.localPosition = new Vector3(-3f, 0.25f, 0f);
-            redTeamAgents[2].transform.localPosition = new Vector3(4f, 0.25f, 4.5f);
-            redTeamAgents[3].transform.localPosition = new Vector3(4f, 0.25f, -4.5f);
+            redTeamAgents[0].transform.position = new Vector3(10f, 0.25f, 0f);
+            redTeamAgents[1].transform.position = new Vector3(-3f, 0.25f, 0f);
+            redTeamAgents[2].transform.position = new Vector3(4f, 0.25f, 4.5f);
+            redTeamAgents[3].transform.position = new Vector3(4f, 0.25f, -4.5f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(5f, 0.25f, 0f);
-            blueTeamAgents[1].transform.localPosition = new Vector3(14.5f, 0.25f, 0f);
-            blueTeamAgents[2].transform.localPosition = new Vector3(6f, 0.25f, 3f);
-            blueTeamAgents[3].transform.localPosition = new Vector3(6f, 0.25f, -3f);
+            blueTeamAgents[0].transform.position = new Vector3(5f, 0.25f, 0f);
+            blueTeamAgents[1].transform.position = new Vector3(14.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.position = new Vector3(6f, 0.25f, 3f);
+            blueTeamAgents[3].transform.position = new Vector3(6f, 0.25f, -3f);
 
             penaltyAgent = redTeamAgents[0];
             penaltyAgentPos = new Vector3(10f, 0.25f, 0f);
@@ -327,15 +381,15 @@ public class GameEnvironmentInfo : MonoBehaviour
             
         }
         else{
-            redTeamAgents[0].transform.localPosition = new Vector3(-5f, 0.25f, 0f);
-            redTeamAgents[1].transform.localPosition = new Vector3(-14.5f, 0.25f, 0f);
-            redTeamAgents[2].transform.localPosition = new Vector3(-6, 0.25f, 3f);
-            redTeamAgents[3].transform.localPosition = new Vector3(-6, 0.25f, -3f);
+            redTeamAgents[0].transform.position = new Vector3(-5f, 0.25f, 0f);
+            redTeamAgents[1].transform.position = new Vector3(-14.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.position = new Vector3(-6, 0.25f, 3f);
+            redTeamAgents[3].transform.position = new Vector3(-6, 0.25f, -3f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(-10f, 0.25f, 0f);
-            blueTeamAgents[1].transform.localPosition = new Vector3(3f, 0.25f, 0f);
-            blueTeamAgents[2].transform.localPosition = new Vector3(-4f, 0.25f, 4.5f);
-            blueTeamAgents[3].transform.localPosition = new Vector3(-4f, 0.25f, -4.5f);
+            blueTeamAgents[0].transform.position = new Vector3(-10f, 0.25f, 0f);
+            blueTeamAgents[1].transform.position = new Vector3(3f, 0.25f, 0f);
+            blueTeamAgents[2].transform.position = new Vector3(-4f, 0.25f, 4.5f);
+            blueTeamAgents[3].transform.position = new Vector3(-4f, 0.25f, -4.5f);
 
             penaltyAgent = blueTeamAgents[0];
             penaltyAgentPos = new Vector3(-10f, 0.25f, 0f);
@@ -343,41 +397,44 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
 
         foreach(AgentCore agent in redTeamAgents){
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
         foreach(AgentCore agent in blueTeamAgents){
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
     }
 
     public void setFreeGoalAreaKickPositions(AgentCore.Team teamTakingKick){
+
+        stopAllChairs();
+
         setBallFreeGoalAreaKick(teamTakingKick);
 
         if(teamTakingKick == AgentCore.Team.BLUE){
-            redTeamAgents[0].transform.localPosition = new Vector3(0f, 0.25f, 0f);
-            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
-            redTeamAgents[2].transform.localPosition = new Vector3(-3.5f, 0.25f, 4.5f);
-            redTeamAgents[3].transform.localPosition = new Vector3(-3.5f, 0.25f, -4.5f);
+            redTeamAgents[0].transform.position = new Vector3(0f, 0.25f, 0f);
+            redTeamAgents[1].transform.position = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.position = new Vector3(-3.5f, 0.25f, 4.5f);
+            redTeamAgents[3].transform.position = new Vector3(-3.5f, 0.25f, -4.5f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(4f, 0.25f, 0f);
-            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
-            blueTeamAgents[2].transform.localPosition = new Vector3(7f, 0.25f, 4f);
-            blueTeamAgents[3].transform.localPosition = new Vector3(7f, 0.25f, -4f);
+            blueTeamAgents[0].transform.position = new Vector3(4f, 0.25f, 0f);
+            blueTeamAgents[1].transform.position = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.position = new Vector3(7f, 0.25f, 4f);
+            blueTeamAgents[3].transform.position = new Vector3(7f, 0.25f, -4f);
 
             outBoundsAreaFreeKickAgentPos = new Vector3(11.5f, 0.25f, 0f);
             outBoundsFreeKickAgent = blueTeamAgents[1];
             outBoundsFreeKickAgentRot = 90;
         }
         else{
-            redTeamAgents[0].transform.localPosition = new Vector3(-4f, 0.25f, 0f);
-            redTeamAgents[1].transform.localPosition = new Vector3(-11.5f, 0.25f, 0f);
-            redTeamAgents[2].transform.localPosition = new Vector3(-7f, 0.25f, 4f);
-            redTeamAgents[3].transform.localPosition = new Vector3(-7f, 0.25f, -4f);
+            redTeamAgents[0].transform.position = new Vector3(-4f, 0.25f, 0f);
+            redTeamAgents[1].transform.position = new Vector3(-11.5f, 0.25f, 0f);
+            redTeamAgents[2].transform.position = new Vector3(-7f, 0.25f, 4f);
+            redTeamAgents[3].transform.position = new Vector3(-7f, 0.25f, -4f);
 
-            blueTeamAgents[0].transform.localPosition = new Vector3(0f, 0.25f, 0f);
-            blueTeamAgents[1].transform.localPosition = new Vector3(11.5f, 0.25f, 0f);
-            blueTeamAgents[2].transform.localPosition = new Vector3(3.5f, 0.25f, 4.5f);
-            blueTeamAgents[3].transform.localPosition = new Vector3(3.5f, 0.25f, -4.5f);
+            blueTeamAgents[0].transform.position = new Vector3(0f, 0.25f, 0f);
+            blueTeamAgents[1].transform.position = new Vector3(11.5f, 0.25f, 0f);
+            blueTeamAgents[2].transform.position = new Vector3(3.5f, 0.25f, 4.5f);
+            blueTeamAgents[3].transform.position = new Vector3(3.5f, 0.25f, -4.5f);
 
             outBoundsAreaFreeKickAgentPos = new Vector3(-11.5f, 0.25f, 0f);
             outBoundsFreeKickAgent = redTeamAgents[1];
@@ -385,23 +442,19 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
 
         foreach(AgentCore agent in redTeamAgents){
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
         foreach(AgentCore agent in blueTeamAgents){
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
     }
 
-    public void disableAllChairs(AgentCore exception1, AgentCore exception2){
+    public void stopAllChairs(){
         foreach(AgentCore agent in redTeamAgents){
-            if(agent != exception1 && agent != exception2){
-                agent.stopChair();
-            }
+            agent.stopChair();
         }
         foreach(AgentCore agent in blueTeamAgents){
-            if(agent != exception1 && agent != exception2){
                 agent.stopChair();
-            }
         }
     }
 
@@ -417,7 +470,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setBallCenterPos(){
         Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        Ball.transform.localPosition = new Vector3(0, 0.44f, 0);
+        Ball.transform.position = new Vector3(0, 0.44f, 0);
     }
 
     public void setBallFreeGoalAreaKick(AgentCore.Team teamTakingTheKick){
@@ -425,9 +478,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
         if(teamTakingTheKick == AgentCore.Team.BLUE)
-            Ball.transform.localPosition = new Vector3(10f, 0.44f, 0);
+            Ball.transform.position = new Vector3(10f, 0.44f, 0);
         else
-            Ball.transform.localPosition = new Vector3(-10f, 0.44f, 0);
+            Ball.transform.position = new Vector3(-10f, 0.44f, 0);
     }
 
     public void setPlayerTracker(AgentCore playerWithBall){
@@ -448,9 +501,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         possibleNearestPlayerToBall.AddRange(redTeamAgents);
         possibleNearestPlayerToBall.AddRange(blueTeamAgents);
 
-        if(nearestPlayerToBall != possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0]){
-            nearestPlayerToBall = possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0];
-            setPlayerTracker(possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0]);
+        if(nearestPlayerToBall != possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0]){
+            nearestPlayerToBall = possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0];
+            setPlayerTracker(possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0]);
         }    
     }
     public void setBallPenaltyPos(AgentCore.Team teamTakingTheKick){
@@ -458,9 +511,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
         if(teamTakingTheKick == AgentCore.Team.RED)
-            Ball.transform.localPosition = new Vector3(11.5f, 0.44f, 0);
+            Ball.transform.position = new Vector3(11.5f, 0.44f, 0);
         else
-            Ball.transform.localPosition = new Vector3(-11.5f, 0.44f, 0);
+            Ball.transform.position = new Vector3(-11.5f, 0.44f, 0);
     }
 
     // Sets the player that has the ball and the opponent; sets null if there is none respectively;
@@ -540,7 +593,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         }
     }
 
-    public bool getBallOutOfBoundsTimeOut(bool a){
+    public bool getBallOutOfBoundsTimeOut(){
         return ballOutOfBoundsTimeOut;
     }
 
@@ -614,8 +667,6 @@ public class GameEnvironmentInfo : MonoBehaviour
         setInitialPositions(AgentCore.Team.RED);
         Debug.Log("Score: Blue - " + blueScore);
         Debug.Log("Score: Red - " + redScore);
-        blueTeamAgents[0].higherBehaviour.goalScored(AgentCore.Team.BLUE);
-        redTeamAgents[0].higherBehaviour.goalSuffered(AgentCore.Team.RED);
     }
 
     public void setGoalAtBlueGoal(){
@@ -625,27 +676,34 @@ public class GameEnvironmentInfo : MonoBehaviour
         setInitialPositions(AgentCore.Team.BLUE);
         Debug.Log("Score: Blue - " + blueScore);
         Debug.Log("Score: Red - " + redScore);
-        blueTeamAgents[0].higherBehaviour.goalSuffered(AgentCore.Team.BLUE);
-        redTeamAgents[0].higherBehaviour.goalScored(AgentCore.Team.RED);
     }
 
     public AgentCore getNearestTeamMate(AgentCore agent){
         if(agent.team == AgentCore.Team.RED){
-            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, agent.transform.localPosition)).ToList()[1];
+            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.position, agent.transform.position)).ToList()[1];
         }
         else{
-            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, agent.transform.localPosition)).ToList()[1];
+            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.position, agent.transform.position)).ToList()[1];
         }
     }
 
     public AgentCore getNearestOpponentWithBall(AgentCore agent){
         if(agent.team == AgentCore.Team.RED){
-            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0];
+            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0];
         }
         else{
-            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.localPosition, Ball.transform.localPosition)).ToList()[0];
+            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0];
         }
     }
+
+    /*public AgentCore getNearestAgentToHisGoal(AgentCore agent){
+        if(agent.team == AgentCore.Team.RED){
+            return blueTeamAgents.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0];
+        }
+        else{
+            return redTeamAgents.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0];
+        }
+    }*/
 
 
 
@@ -702,7 +760,6 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
 
-        playerCommitedfoul.higherBehaviour.foulCommited();
         
     }
 
@@ -723,14 +780,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                 if(teamMembersInAreaCounter > 2){
                     if(Ball.positionInField == Ball.Areas.smallBlueArea){
                         Debug.Log("Penalty");
+                        threeInGoalBool = true;
                         setPenaltyPositions(AgentCore.Team.RED);
                         lastPlayerTouchingTheBall = null;
                         penaltyActive = true;
                     }else{
+                        threeInGoalBool = true;
                         placeTeamByAreaFoul(playerWithBall, playerWithBall.team);
                     }
-
-                    playerWithBall.higherBehaviour.foulCommited();
 
                     return true;
                 }
@@ -746,14 +803,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                 if(teamMembersInAreaCounter > 2){
                     if(Ball.positionInField == Ball.Areas.smallRedArea){
                         Debug.Log("Penalty");
+                        threeInGoalBool = true;
                         setPenaltyPositions(AgentCore.Team.BLUE);
                         lastPlayerTouchingTheBall = null;
                         penaltyActive = true;
                     }else{
+                        threeInGoalBool = true;
                         placeTeamByAreaFoul(playerWithBall, playerWithBall.team);
                     }
-
-                    playerWithBall.higherBehaviour.foulCommited();
 
                     return true;
                 }
@@ -765,10 +822,12 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void placeTeamByAreaFoul(AgentCore playerTakingTheKick, AgentCore.Team teamTakingKick){
 
-        Vector3 ballSavedPosition = new Vector3(Ball.transform.localPosition.x, Ball.transform.localPosition.y, Ball.transform.localPosition.z);
+        stopAllChairs();
+
+        Vector3 ballSavedPosition = new Vector3(Ball.transform.position.x, Ball.transform.position.y, Ball.transform.position.z);
         
         Ball.stopIt();
-        Ball.transform.localPosition = ballSavedPosition;
+        Ball.transform.position = ballSavedPosition;
 
         //BLUE ATTACKING
         if(teamTakingKick == AgentCore.Team.BLUE){
@@ -783,8 +842,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
 
             //ZONE 1
-            if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
-                if(Ball.transform.localPosition.z > 0){
+            if(Ball.transform.position.x >= -14 && Ball.transform.position.x < -7){
+                if(Ball.transform.position.z > 0){
 
                     positionPlayer(redTeamAgents[0], -7.5f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -13f, 0f, -90);
@@ -834,8 +893,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 2
-            else if(Ball.transform.localPosition.x >= -7 && Ball.transform.localPosition.x < 0){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= -7 && Ball.transform.position.x < 0){
+                if(Ball.transform.position.z > 0){
 
                     positionPlayer(redTeamAgents[0], -4.5f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -11.5f, 0f, -90);
@@ -885,8 +944,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
             }
             //ZONE 3
-            else if(Ball.transform.localPosition.x >= 0 && Ball.transform.localPosition.x < 7){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 0 && Ball.transform.position.x < 7){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(redTeamAgents[0], 0f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -10.5f, 0f, -90);
                     positionPlayer(redTeamAgents[2], -5.5f, 4f, -90);
@@ -932,8 +991,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 4
-            else if(Ball.transform.localPosition.x >= 7 && Ball.transform.localPosition.x <= 14){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 7 && Ball.transform.position.x <= 14){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(redTeamAgents[0], 4f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -6f, 0f, -90);
                     positionPlayer(redTeamAgents[2], -1.5f, 4f, -90);
@@ -989,8 +1048,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             remainRedTeamAgents.Remove(playerTakingTheKick);
 
             //ZONE 1
-            if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
-                if(Ball.transform.localPosition.z > 0){
+            if(Ball.transform.position.x >= -14 && Ball.transform.position.x < -7){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(blueTeamAgents[0], -4f, 2.5f, 90);
                     positionPlayer(blueTeamAgents[1], 6f, 0f, 90);
                     positionPlayer(blueTeamAgents[2], 1.5f, 4f, 90);
@@ -1037,8 +1096,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 2
-            else if(Ball.transform.localPosition.x >= -7 && Ball.transform.localPosition.x < 0){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= -7 && Ball.transform.position.x < 0){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(blueTeamAgents[0], 0f, 2.5f, 90);
                     positionPlayer(blueTeamAgents[1], 10.5f, 0f, 90);
                     positionPlayer(blueTeamAgents[2], 5.5f, 4f, 90);
@@ -1085,8 +1144,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
             }
             //ZONE 3
-            else if(Ball.transform.localPosition.x >= 0 && Ball.transform.localPosition.x < 7){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 0 && Ball.transform.position.x < 7){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(blueTeamAgents[0], 0f, 2.5f, -90);
                     positionPlayer(blueTeamAgents[1], 10.5f, 0f, -90);
                     positionPlayer(blueTeamAgents[2], 4f, 1.5f, -90);
@@ -1132,8 +1191,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 4
-            else if(Ball.transform.localPosition.x >= 7 && Ball.transform.localPosition.x <= 14){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 7 && Ball.transform.position.x <= 14){
+                if(Ball.transform.position.z > 0){
 
                     positionPlayer(blueTeamAgents[0], 7.5f, 2.5f, 90);
                     positionPlayer(blueTeamAgents[1], 13f, 0f, 90);
@@ -1183,7 +1242,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
 
-        Ball.transform.localPosition = ballSavedPosition;
+        Ball.transform.position = ballSavedPosition;
         positionAgentTakingKick(playerTakingTheKick);
         detectPlayersAtSamePosBugAfterFoul(playerTakingTheKick);
 
@@ -1193,8 +1252,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void positionAgentTakingKick(AgentCore playerTakingTheKick){
 
-        float xBall = Ball.transform.localPosition.x;
-        float zBall = Ball.transform.localPosition.z;
+        float xBall = Ball.transform.position.x;
+        float zBall = Ball.transform.position.z;
         float xGoal;
 
         if(playerTakingTheKick.team == AgentCore.Team.RED)
@@ -1208,30 +1267,31 @@ public class GameEnvironmentInfo : MonoBehaviour
         float newZ = ((1 - t)*zBall + t*zGoal);
 
 
-        playerTakingTheKick.transform.localPosition = new Vector3(newX, playerTakingTheKick.transform.localPosition.y, newZ);
+        playerTakingTheKick.transform.position = new Vector3(newX, playerTakingTheKick.transform.position.y, newZ);
 
         playerTakingTheKick.stopChair();
 
         foulAgent = playerTakingTheKick;
-        foulAgentPos = playerTakingTheKick.transform.localPosition;
-        foulBallPos = Ball.transform.localPosition;
+        foulAgentPos = playerTakingTheKick.transform.position;
+        foulBallPos = Ball.transform.position;
         foulTimeOut = true;
         lastPlayerTouchingTheBall = null;
     }
 
     private void limitFoulWalkingArea(AgentCore agent, Vector3 pos){
         Vector3 centerPosition = foulBallPos; //center of circle
-        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
+        float distance = Vector3.Distance(agent.transform.position, centerPosition);
         
         if (distance > 3)
         {
-            agent.transform.localPosition = new Vector3(pos.x, pos.y, pos.z);
+            agent.transform.position = new Vector3(pos.x, pos.y, pos.z);
             agent.stopChair();
-            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
         }
     }
 
     public void detectPlayersAtSamePosBugAfterFoul(AgentCore agentTakingKick){
+        stopAllChairs();
         List<AgentCore> allPlayers = new List<AgentCore>(blueTeamAgents.Count + redTeamAgents.Count);
 
         bool bugged = true;
@@ -1248,13 +1308,13 @@ public class GameEnvironmentInfo : MonoBehaviour
                     if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 2.5){
                        // Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
                         if(allPlayers[0].team == AgentCore.Team.RED){
-                            allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x - 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
+                            allPlayers[0].transform.position = new Vector3(allPlayers[0].transform.position.x - 0.8f, 0.25f, allPlayers[0].transform.position.z);
                         }
                         else{
-                            allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
+                            allPlayers[0].transform.position = new Vector3(allPlayers[0].transform.position.x + 0.8f, 0.25f, allPlayers[0].transform.position.z);
                         }
                         //Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
-                        //agentTakingKick.transform.localPosition = foulAgentPos;
+                        //agentTakingKick.transform.position = foulAgentPos;
                     }
                     checkPlayersInSmallAreas(agentTakingKick);
                 }
@@ -1277,13 +1337,13 @@ public class GameEnvironmentInfo : MonoBehaviour
                         //Debug.Log("FOUND BUG IN PLAYERS POSITIONS AGAIN");
                         bugged = true;
                         if(allPlayers[0].team == AgentCore.Team.RED){
-                            allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x - 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
+                            allPlayers[0].transform.position = new Vector3(allPlayers[0].transform.position.x - 0.8f, 0.25f, allPlayers[0].transform.position.z);
                         }
                         else{
-                            allPlayers[0].transform.localPosition = new Vector3(allPlayers[0].transform.localPosition.x + 0.8f, 0.25f, allPlayers[0].transform.localPosition.z);
+                            allPlayers[0].transform.position = new Vector3(allPlayers[0].transform.position.x + 0.8f, 0.25f, allPlayers[0].transform.position.z);
                         }
                         //Debug.Log("("+foulAgentPos.x + ", " + foulAgentPos.z+")");
-                        //agentTakingKick.transform.localPosition = foulAgentPos;
+                        //agentTakingKick.transform.position = foulAgentPos;
                     }
                     if(checkPlayersInSmallAreas(agentTakingKick)){
                         bugged = true;
@@ -1310,8 +1370,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             playersInException = new List<AgentCore>();
 
             foreach(AgentCore p in players){
-                if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
-                    if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                if(p.transform.position.x > 9 && p.transform.position.x < 14){
+                    if(p.transform.position.z > -4 && p.transform.position.z < 4){
                         playersInException.Add(p);
                     }
                 }
@@ -1326,21 +1386,21 @@ public class GameEnvironmentInfo : MonoBehaviour
 
                 while(playersInException.Count > 2){
                     if(playersInException[counter].type != AgentCore.Type.GOALKEEPER){
-                        Debug.Log("Player pos before: " + playersInException[counter].transform.localPosition.z);
-                        if(playersInException[counter].transform.localPosition.x > 0){
-                            playersInException[counter].transform.localPosition = new Vector3(
-                                playersInException[counter].transform.localPosition.x, 
-                                playersInException[counter].transform.localPosition.y, 
-                                playersInException[counter].transform.localPosition.z+1);
+                        Debug.Log("Player pos before: " + playersInException[counter].transform.position.z);
+                        if(playersInException[counter].transform.position.x > 0){
+                            playersInException[counter].transform.position = new Vector3(
+                                playersInException[counter].transform.position.x, 
+                                playersInException[counter].transform.position.y, 
+                                playersInException[counter].transform.position.z+1);
                         }
                         else{
-                            playersInException[counter].transform.localPosition = new Vector3(
-                                playersInException[counter].transform.localPosition.x, 
-                                playersInException[counter].transform.localPosition.y, 
-                                playersInException[counter].transform.localPosition.z-1);
+                            playersInException[counter].transform.position = new Vector3(
+                                playersInException[counter].transform.position.x, 
+                                playersInException[counter].transform.position.y, 
+                                playersInException[counter].transform.position.z-1);
 
                         }
-                        Debug.Log("Player pos after: " + playersInException[counter].transform.localPosition.z);
+                        Debug.Log("Player pos after: " + playersInException[counter].transform.position.z);
                     }
 
                     players = new List<AgentCore>(blueTeamAgents.Count);
@@ -1348,8 +1408,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                     playersInException = new List<AgentCore>();
 
                     foreach(AgentCore p in players){
-                        if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
-                            if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                        if(p.transform.position.x > 9 && p.transform.position.x < 14){
+                            if(p.transform.position.z > -4 && p.transform.position.z < 4){
                                 playersInException.Add(p);
                             }
                         }
@@ -1368,8 +1428,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             playersInException = new List<AgentCore>();
 
             foreach(AgentCore p in players){
-                if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
-                    if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                if(p.transform.position.x > 9 && p.transform.position.x < 14){
+                    if(p.transform.position.z > -4 && p.transform.position.z < 4){
                         playersInException.Add(p);
                     }
                 }
@@ -1383,21 +1443,21 @@ public class GameEnvironmentInfo : MonoBehaviour
 
                 while(playersInException.Count > 2){
                     if(playersInException[counter].type != AgentCore.Type.GOALKEEPER){
-                        Debug.Log("Player pos before: " + playersInException[counter].transform.localPosition.z);
-                        if(playersInException[counter].transform.localPosition.x > 0){
-                            playersInException[counter].transform.localPosition = new Vector3(
-                                playersInException[counter].transform.localPosition.x, 
-                                playersInException[counter].transform.localPosition.y, 
-                                playersInException[counter].transform.localPosition.z+1);
+                        Debug.Log("Player pos before: " + playersInException[counter].transform.position.z);
+                        if(playersInException[counter].transform.position.x > 0){
+                            playersInException[counter].transform.position = new Vector3(
+                                playersInException[counter].transform.position.x, 
+                                playersInException[counter].transform.position.y, 
+                                playersInException[counter].transform.position.z+1);
                         }
                         else{
-                            playersInException[counter].transform.localPosition = new Vector3(
-                                playersInException[counter].transform.localPosition.x, 
-                                playersInException[counter].transform.localPosition.y, 
-                                playersInException[counter].transform.localPosition.z-1);
+                            playersInException[counter].transform.position = new Vector3(
+                                playersInException[counter].transform.position.x, 
+                                playersInException[counter].transform.position.y, 
+                                playersInException[counter].transform.position.z-1);
 
                         }
-                        Debug.Log("Player pos after: " + playersInException[counter].transform.localPosition.z);
+                        Debug.Log("Player pos after: " + playersInException[counter].transform.position.z);
                     }
 
                     players = new List<AgentCore>(redTeamAgents.Count);
@@ -1405,8 +1465,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                     playersInException = new List<AgentCore>();
 
                     foreach(AgentCore p in players){
-                        if(p.transform.localPosition.x > 9 && p.transform.localPosition.x < 14){
-                            if(p.transform.localPosition.z > -4 && p.transform.localPosition.z < 4){
+                        if(p.transform.position.x > 9 && p.transform.position.x < 14){
+                            if(p.transform.position.z > -4 && p.transform.position.z < 4){
                                 playersInException.Add(p);
                             }
                         }
@@ -1434,13 +1494,16 @@ public class GameEnvironmentInfo : MonoBehaviour
 // ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
 
     public void setBallOutOfBounds(){
+            Debug.Log("Out of Bounds");
+            outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
+            ballOutOfBoundsMechanism(outBoundsAgent);
+            setOutOfBounds(true);
         
-        if(!ballOutOfBoundsTimeOut){
+        /*if(!ballOutOfBoundsTimeOut){
             if(lastPlayerTouchingTheBall != null){
                 Debug.Log("Out of Bounds");
                 outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
                 ballOutOfBoundsMechanism(outBoundsAgent);
-                lastPlayerTouchingTheBall.higherBehaviour.ballOutOfBounds();
                 lastPlayerTouchingTheBall = null;
             }
         }
@@ -1451,7 +1514,11 @@ public class GameEnvironmentInfo : MonoBehaviour
                 ballOutOfBoundsMechanism(outBoundsAgent);
                 setOutOfBounds(true);
             }
-        }
+        }*/
+    }
+
+    public bool getBallOutOfBounds(){
+        return outOfBounds;
     }
 
     public AgentCore playerRecieveingBall(AgentCore agent){
@@ -1469,9 +1536,9 @@ public class GameEnvironmentInfo : MonoBehaviour
                 newPos = calculatePlayerWhoRecievesTheBallNewPos(possibleAgent);
             }
 
-            possibleAgent.transform.localPosition = newPos;
+            possibleAgent.transform.position = newPos;
    
-            possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
+            possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - possibleAgent.transform.position));
         }
         else{
             possibleAgent = blueTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[1];
@@ -1486,9 +1553,9 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
 
 
-            possibleAgent.transform.localPosition = newPos;
+            possibleAgent.transform.position = newPos;
 
-            possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - possibleAgent.transform.localPosition));
+            possibleAgent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - possibleAgent.transform.position));
         }
 
         return possibleAgent;
@@ -1496,22 +1563,23 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public Vector3 calculatePlayerWhoRecievesTheBallNewPos(AgentCore agent){
 
-            float xBall = Ball.transform.localPosition.x;
-            float zBall = Ball.transform.localPosition.z;
-            float xAgent = agent.transform.localPosition.x;
-            float zAgent = agent.transform.localPosition.z;
+            float xBall = Ball.transform.position.x;
+            float zBall = Ball.transform.position.z;
+            float xAgent = agent.transform.position.x;
+            float zAgent = agent.transform.position.z;
             float t = 4.5f/agent.distanceToBall();
             float newX = ((1 - t)*xBall + t*xAgent);
             float newZ = ((1 - t)*zBall + t*zAgent);
 
-            return new Vector3(newX, agent.transform.localPosition.y, newZ);
+            return new Vector3(newX, agent.transform.position.y, newZ);
     }
 
     //Responsible for spawning player and ball at the right positions after BallOutOfBounds
     private void ballOutOfBoundsMechanism(AgentCore agent){
-        float x = Ball.transform.localPosition.x;
-        float y = Ball.transform.localPosition.y;
-        float z = Ball.transform.localPosition.z;
+        stopAllChairs();
+        float x = Ball.transform.position.x;
+        float y = Ball.transform.position.y;
+        float z = Ball.transform.position.z;
 
         bool notCorner = false;
 
@@ -1520,14 +1588,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(z > 0){
                 //Top Left Half Field Bounds
                 if(z > 7.5){
-                    Ball.transform.localPosition = new Vector3(x, 0.44f, 7.5f);
+                    Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, 9f, agent, 0);
                 }
                 //Top Left Corner
                 else{
-                    Ball.transform.localPosition = new Vector3(-14f, 0.44f, 7.5f);
+                    Ball.transform.position = new Vector3(-14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1543,7 +1611,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             else{
                 //Bottom Left Corner
                 if(z > -7.5){
-                    Ball.transform.localPosition = new Vector3(-14f, 0.44f, -7.5f);
+                    Ball.transform.position = new Vector3(-14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1557,7 +1625,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
                 //Bottom Left Half Field Bounds
                 else{
-                    Ball.transform.localPosition = new Vector3(x, 0.44f, -7.5f);
+                    Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, -9f, agent, 180);
@@ -1567,14 +1635,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(z > 0){
                 //Top Right Half Field Bounds
                 if(z > 7.5){
-                    Ball.transform.localPosition = new Vector3(x, 0.44f, 7.5f);
+                    Ball.transform.position = new Vector3(x, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, 9f, agent, 0);
                 }
                 //Top Right Corner
                 else{
-                    Ball.transform.localPosition = new Vector3(14f, 0.44f, 7.5f);
+                    Ball.transform.position = new Vector3(14f, 0.44f, 7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1590,7 +1658,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             else{
                 //Bottom Right Corner
                 if(z > -7.5){
-                    Ball.transform.localPosition = new Vector3(14f, 0.44f, -7.5f);
+                    Ball.transform.position = new Vector3(14f, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -1604,7 +1672,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
                 //Bottom Right Half Field Bounds
                 else{
-                    Ball.transform.localPosition = new Vector3(x, 0.44f, -7.5f);
+                    Ball.transform.position = new Vector3(x, 0.44f, -7.5f);
                     Ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     Ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
                     spawnWheelchairAtNewSpot(x, 0.2327683f, -9f, agent, 180);
@@ -1624,12 +1692,12 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void positionPlayer(AgentCore agent, float x, float z, float rotation){
-        agent.transform.localPosition = new Vector3(x, agent.transform.localPosition.y, z);
+        agent.transform.position = new Vector3(x, agent.transform.position.y, z);
         agent.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
     }
 
     public void placeTeamByAreaOutOfBounds(AgentCore playerTakingTheKick, AgentCore playerRecieveingBall, AgentCore.Team teamTakingKick){
-        
+        stopAllChairs();
         //BLUE ATTACKING
         if(teamTakingKick == AgentCore.Team.BLUE){
             List<AgentCore> remainBlueTeamAgents = new List<AgentCore>(blueTeamAgents.Count);
@@ -1645,8 +1713,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
 
             //ZONE 1
-            if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
-                if(Ball.transform.localPosition.z > 0){
+            if(Ball.transform.position.x >= -14 && Ball.transform.position.x < -7){
+                if(Ball.transform.position.z > 0){
 
                     positionPlayer(redTeamAgents[0], -7.5f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -13f, 0f, -90);
@@ -1682,8 +1750,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 2
-            else if(Ball.transform.localPosition.x >= -7 && Ball.transform.localPosition.x < 0){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= -7 && Ball.transform.position.x < 0){
+                if(Ball.transform.position.z > 0){
 
                     positionPlayer(redTeamAgents[0], -4.5f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -11.5f, 0f, -90);
@@ -1719,8 +1787,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
             }
             //ZONE 3
-            else if(Ball.transform.localPosition.x >= 0 && Ball.transform.localPosition.x < 7){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 0 && Ball.transform.position.x < 7){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(redTeamAgents[0], 0f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -10.5f, 0f, -90);
                     positionPlayer(redTeamAgents[2], -5.5f, 4f, -90);
@@ -1752,8 +1820,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 4
-            else if(Ball.transform.localPosition.x >= 7 && Ball.transform.localPosition.x <= 14){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 7 && Ball.transform.position.x <= 14){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(redTeamAgents[0], 4f, 2.5f, -90);
                     positionPlayer(redTeamAgents[1], -6f, 0f, -90);
                     positionPlayer(redTeamAgents[2], -1.5f, 4f, -90);
@@ -1796,8 +1864,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             remainRedTeamAgents.Remove(playerRecieveingBall);
 
             //ZONE 1
-            if(Ball.transform.localPosition.x >= -14 && Ball.transform.localPosition.x < -7){
-                if(Ball.transform.localPosition.z > 0){
+            if(Ball.transform.position.x >= -14 && Ball.transform.position.x < -7){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(blueTeamAgents[0], -4f, 2.5f, 90);
                     positionPlayer(blueTeamAgents[1], 6f, 0f, 90);
                     positionPlayer(blueTeamAgents[2], 1.5f, 4f, 90);
@@ -1830,8 +1898,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 2
-            else if(Ball.transform.localPosition.x >= -7 && Ball.transform.localPosition.x < 0){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= -7 && Ball.transform.position.x < 0){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(blueTeamAgents[0], 0f, 2.5f, 90);
                     positionPlayer(blueTeamAgents[1], 10.5f, 0f, 90);
                     positionPlayer(blueTeamAgents[2], 5.5f, 4f, 90);
@@ -1864,8 +1932,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
             }
             //ZONE 3
-            else if(Ball.transform.localPosition.x >= 0 && Ball.transform.localPosition.x < 7){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 0 && Ball.transform.position.x < 7){
+                if(Ball.transform.position.z > 0){
                     positionPlayer(blueTeamAgents[0], 0f, 2.5f, -90);
                     positionPlayer(blueTeamAgents[1], 10.5f, 0f, -90);
                     positionPlayer(blueTeamAgents[2], 5.5f, 4f, -90);
@@ -1897,8 +1965,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }
             //ZONE 4
-            else if(Ball.transform.localPosition.x >= 7 && Ball.transform.localPosition.x <= 14){
-                if(Ball.transform.localPosition.z > 0){
+            else if(Ball.transform.position.x >= 7 && Ball.transform.position.x <= 14){
+                if(Ball.transform.position.z > 0){
 
                     positionPlayer(blueTeamAgents[0], 7.5f, 2.5f, 90);
                     positionPlayer(blueTeamAgents[1], 13f, 0f, 90);
@@ -1947,7 +2015,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     //Limits the area which the agent/player can walk when in a free/indirect/outofbounds kick
     private void limitWalkingArea(AgentCore agent, Vector3 pos, float rot){
         Vector3 centerPosition = outBoundsBallPos; //center of circle
-        float distance = Vector3.Distance(agent.transform.localPosition, centerPosition);
+        float distance = Vector3.Distance(agent.transform.position, centerPosition);
         
         if (distance > 3)
         {
@@ -1957,14 +2025,14 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
     private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){ 
-        agent.transform.localPosition = new Vector3(x, y, z);
+        agent.transform.position = new Vector3(x, y, z);
         agent.stopChair();
 
-        outBoundsBallPos = Ball.transform.localPosition;
+        outBoundsBallPos = Ball.transform.position;
         outBoundsAgentPos = new Vector3(x, y, z);
         outBoundsAgentRot = rotation;
 
-        agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.localPosition - agent.transform.localPosition));
+        agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
 
     }
 

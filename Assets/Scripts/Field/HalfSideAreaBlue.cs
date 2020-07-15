@@ -15,6 +15,7 @@ public class HalfSideAreaBlue : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision) {
         if (collision.name == Ball.name){
+            //Debug.Log("ENJKDBKAKBAKJA FODASSE");
             gameEnvironment.setBallOutOfBoundsTimeOut(false);
             gameEnvironment.setOutOfBounds(false);
             Ball.setPositionInField(Ball.Areas.halfFieldBlue);

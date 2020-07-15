@@ -4,6 +4,7 @@ using UnityEngine;
 using Delaunay;
 using Delaunay.Geo;
 using UnityEditor;
+using System;
 
 public class VoronoiPort : MonoBehaviour
 {
@@ -18,20 +19,20 @@ public class VoronoiPort : MonoBehaviour
 
 	void Start()
 	{
-		time = 5;
+		time = 0;
 	}
 
 	void FixedUpdate ()
 	{
-		VoronoiTriangulation();
+		//VoronoiTriangulation();
 	}
 
 	void Update() {
-		/*time -= Time.deltaTime;
+		time -= Time.deltaTime;
 		if(time < 1){
 			VoronoiTriangulation();
 			time = 5;
-		}*/
+		}
 	}
 
 	private void VoronoiTriangulation()
@@ -60,6 +61,7 @@ public class VoronoiPort : MonoBehaviour
 
 
 	public Vector2 getPointToGo(int agentNr){
+		
 		List<Vector2> playerRegionPoints = new List<Vector2>();
 
 		foreach(Vector2 points in voronoi.Region(m_points[agentNr-1])){
@@ -94,9 +96,9 @@ public class VoronoiPort : MonoBehaviour
 			}
 		}
 
-		if (m_points != null && voronoi != null) {
+		/*if (m_points != null && voronoi != null) {
 			Gizmos.color = Color.cyan;
-			List<Vector2> region1 = voronoi.Region(m_points[0]);
+			List<Vector2> region1 = voronoi.Region(m_points[(int)Char.GetNumericValue(gameEnvironmentInfo.getNearestPlayerToBall().tag[5])-1]);
 
 			for (int i = 0; i< region1.Count-1; i++) {
 				Vector2 left = (Vector2)region1[i];
@@ -107,7 +109,7 @@ public class VoronoiPort : MonoBehaviour
 			Vector2 l = (Vector2)region1[region1.Count-1];
 			Vector2 r = (Vector2)region1[0];
 			Gizmos.DrawLine ((Vector3)l, (Vector3)r);
-		}
+		}*/
 
 		Gizmos.color = Color.white;
 		if (m_delaunayTriangulation != null) {
@@ -146,9 +148,9 @@ public class VoronoiPort : MonoBehaviour
 			}
 		}
 
-		if (m_points != null && voronoi != null) {
+		/*if (m_points != null && voronoi != null) {
 			Gizmos.color = Color.yellow;
 			Gizmos.DrawSphere(getPointToGo(1), 0.3f);
-		}
+		}*/
 	}
 }

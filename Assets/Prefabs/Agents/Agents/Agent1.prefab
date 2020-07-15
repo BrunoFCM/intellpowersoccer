@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7137204927884540503}
   m_Layer: 9
   m_Name: Caster_Wheel_Left
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 3207947719061314729}
   m_Layer: 9
   m_Name: Super_Small_Right_Wheel
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -739,7 +739,7 @@ GameObject:
   - component: {fileID: 5957389664592832676}
   m_Layer: 9
   m_Name: Super_Small_Left_Wheel
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1825,7 +1825,7 @@ GameObject:
   - component: {fileID: 505110075892535671}
   m_Layer: 9
   m_Name: Caster_Wheel_Right
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1862,7 +1862,7 @@ GameObject:
   - component: {fileID: 8063570481340153142}
   m_Layer: 9
   m_Name: Small_Wheel_Left
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2202,7 +2202,7 @@ MonoBehaviour:
   behaviourHandler: {fileID: 0}
   gameEnvironment: {fileID: 0}
   wheelchairAgentController: {fileID: 0}
-  higherBehaviour: {fileID: 0}
+  figurePoint: {fileID: 0}
   team: 0
   type: 0
   feetCollisions: {fileID: 0}
@@ -2213,7 +2213,6 @@ MonoBehaviour:
   smallAreaBlue: {fileID: 0}
   smallAreaRed: {fileID: 0}
   outsideArea: {fileID: 0}
-  intersectBallTrainer: {fileID: 0}
   ball: {fileID: 0}
 --- !u!1 &4774100743691135992
 GameObject:
@@ -2231,7 +2230,7 @@ GameObject:
   - component: {fileID: 7422994004737780557}
   m_Layer: 9
   m_Name: Small_Wheel_Right
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2791,7 +2790,7 @@ GameObject:
   - component: {fileID: 7185305730712755293}
   m_Layer: 9
   m_Name: Big_Right_Wheel
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3014,10 +3013,6 @@ MonoBehaviour:
   controller: {fileID: 0}
   gameEnvironment: {fileID: 0}
   Ball: {fileID: 0}
-  agent1: {fileID: 0}
-  passTheBallTrainerA1: {fileID: 0}
-  agent2: {fileID: 0}
-  passTheBallTrainerA2: {fileID: 0}
 --- !u!1 &7890015582446064665
 GameObject:
   m_ObjectHideFlags: 0
@@ -3034,7 +3029,7 @@ GameObject:
   - component: {fileID: 7890015582446064664}
   m_Layer: 9
   m_Name: Big_Left_Wheel
-  m_TagString: Untagged
+  m_TagString: wheels
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

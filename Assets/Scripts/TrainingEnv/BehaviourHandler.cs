@@ -24,41 +24,53 @@ public class BehaviourHandler : MonoBehaviour
     }
 
     public void setPassTheBallBehaviour(){
-        disableAllBehaviours();
-        gameObject.GetComponentInChildren<RayPerceptionSensorComponentBase>().detectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(agentCore).tag;
-        passTheBallTrainer.SetActive(true);
+        if(!passTheBallTrainer.activeSelf){
+            disableAllBehaviours();
+            passTheBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(agentCore).tag;
+            passTheBallTrainer.SetActive(true);
+        }
     }
 
     public void setStrikeTheBallBehaviour(){
-        disableAllBehaviours();
-        strikeTheBallTrainer.SetActive(true);
+        if(!strikeTheBallTrainer.activeSelf){
+            disableAllBehaviours();
+            strikeTheBallTrainer.SetActive(true);
+        }
     }
 
     public void setGoalKeepBehaviour(AgentCore shooter){
-        disableAllBehaviours();
-        gameObject.GetComponentInChildren<RayPerceptionSensorComponentBase>().detectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(shooter).tag;
-        goalKeepTrainer.SetActive(true);
+        if(!goalKeepTrainer.activeSelf){
+            disableAllBehaviours();
+            goalKeepTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(shooter).tag;
+            goalKeepTrainer.SetActive(true);
+        }
     }
 
-    public void setDribbleBallBehaviour(string PointTag){
-        disableAllBehaviours();
-        gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = PointTag;
-        gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].detectableTags[1] = PointTag; 
-        dribbleBallTrainer.SetActive(true);
+    public void setDribbleBallBehaviour(){
+        if(!dribbleBallTrainer.activeSelf){
+            disableAllBehaviours();
+            /*gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = PointTag;
+            gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].detectableTags[1] = PointTag; */
+            dribbleBallTrainer.SetActive(true);
+        }
     }
 
-    public void setMoveToPointBehaviour(string PointTag){
-        disableAllBehaviours();
-        gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[0] = PointTag;
-        gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].detectableTags[0] = PointTag;
-        moveToPointTrainer.SetActive(true);
+    public void setMoveToPointBehaviour(){
+        if(!moveToPointTrainer.activeSelf){
+            disableAllBehaviours();
+            /*gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[0] = PointTag;
+            gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].detectableTags[0] = PointTag;*/
+            moveToPointTrainer.SetActive(true);
+        }
     }
 
-    public void setIntersectBallBehaviour(){
-        disableAllBehaviours();
-        gameObject.GetComponentInChildren<RayPerceptionSensorComponentBase>().detectableTags[1] = gameEnvironmentInfo.getNearestPlayerToBall().tag;
-        gameObject.GetComponentInChildren<RayPerceptionSensorComponentBase>().detectableTags[2] = gameEnvironmentInfo.getNearestTeamMate(gameEnvironmentInfo.getNearestPlayerToBall()).tag;
-        intersectBallTrainer.SetActive(true);
+    public void setIntersectBallBehaviour(AgentCore agent, AgentCore nearestPlayer){
+        if(!intersectBallTrainer.activeSelf){
+            disableAllBehaviours();
+            intersectBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = agent.tag;
+            intersectBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[2] = nearestPlayer.tag;
+            intersectBallTrainer.SetActive(true);
+        }
     }
 
     public void disableAllBehaviours(){
@@ -68,5 +80,15 @@ public class BehaviourHandler : MonoBehaviour
         moveToPointTrainer.SetActive(false);
         dribbleBallTrainer.SetActive(false);
         intersectBallTrainer.SetActive(false); 
+    }
+
+    public void disableAllAgentBehaviours(){
+        foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
+            agent.disableAllBehaviours();
+        }
+
+        foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
+            agent.disableAllBehaviours();
+        }
     }
 }
