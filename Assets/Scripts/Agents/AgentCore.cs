@@ -61,6 +61,7 @@ public class AgentCore : MonoBehaviour
     //GAME OBJECTS
         //Ball Game object
         public GameObject ball;
+        public bool controllerDisabled;
 
 
     // Start is called before the first frame update
@@ -68,12 +69,24 @@ public class AgentCore : MonoBehaviour
     {
         agentRBody = GetComponent<Rigidbody>();
         trackerBool = false;
+        controllerDisabled = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         //DetectAreaCollisions();
+        if(!controllerDisabled)
+            if(GameEnvironmentInfo.choosenTeam){
+                if(tag == "Agent1"){
+                    wheelchairAgentController.Controller(null);
+                }
+            }else{
+                if(tag == "Agent5"){
+                    wheelchairAgentController.Controller(null);
+                }
+            }
+        
     }
 
     //Is the player near the ball? TRUE yes, FALSE no
@@ -89,6 +102,14 @@ public class AgentCore : MonoBehaviour
 
     }
 
+    public void disableController(){
+        controllerDisabled = true;
+    }
+
+    public void enableController()
+    {
+        controllerDisabled = false;
+    }
     public void stopChair(){
         GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -155,12 +176,12 @@ public class AgentCore : MonoBehaviour
 
     //Player Distance to another Player player
     public float distanceToPlayer(AgentCore player){
-        return Vector3.Distance(transform.localPosition, player.transform.localPosition);
+        return Vector3.Distance(transform.position, player.transform.position);
     }
 
     //Palyer distance to the Ball
     public float distanceToBall(){
-        return Vector3.Distance(transform.localPosition, ball.transform.localPosition);
+        return Vector3.Distance(transform.position, ball.transform.position);
     }
 
     public void setPlayersAtHalfSideAreaBlue(){
@@ -270,14 +291,18 @@ public class AgentCore : MonoBehaviour
 
     public void setDribbleBallBehaviour(Vector2 figurePos){
         //Debug.Log(figurePos.magnitude);
-        figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
-        behaviourHandler.setDribbleBallBehaviour();
+        //if(!behaviourHandler.dribbleBallTrainer.activeSelf){
+            figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
+            behaviourHandler.setDribbleBallBehaviour();
+        //}
     }
 
     public void setMoveToPointBehaviour(Vector2 figurePos){
         //Debug.Log(figurePos.magnitude);
-        figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
-        behaviourHandler.setMoveToPointBehaviour();
+        //if(!behaviourHandler.moveToPointTrainer.activeSelf){
+            figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
+            behaviourHandler.setMoveToPointBehaviour();
+        //}
     }
 
     public void setIntersectBallBehaviour(AgentCore agent, AgentCore nearestPlayer){
@@ -289,10 +314,10 @@ public class AgentCore : MonoBehaviour
     }
 
     public float getDistanceToGoal(){
-        if(team == AgentCore.Team.BLUE)
-            return Vector2.Distance(transform.position, new Vector3(14,0,0));
+        if(team == AgentCore.Team.RED)
+            return Vector3.Distance(transform.position, new Vector3(-14,0,0));
         else
-            return Vector2.Distance(transform.position, new Vector3(-14,0,0));
+            return Vector3.Distance(transform.position, new Vector3(14,0,0));
     }
 
     public void setOriginalPosition(Vector2 pos){
@@ -301,11 +326,5 @@ public class AgentCore : MonoBehaviour
 
     public Vector2 getOriginalPosition(){
         return originalPosition;
-    }
-
-    public void agentHandler(){
-        if(Vector2.Distance(transform.position, gameEnvironment.Ball.transform.position) < 2){
-
-        }
     }
 }

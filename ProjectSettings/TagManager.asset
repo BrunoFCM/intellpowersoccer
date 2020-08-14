@@ -22,6 +22,16 @@ TagManager:
   - Point6
   - Point7
   - Point8
+  - wheels
+  - field
+  - MainMenu
+  - play
+  - settings
+  - exit
+  - bluesTeam
+  - redsTeam
+  - backPlay
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -33,7 +43,7 @@ TagManager:
   - 
   - PostProcessing
   - WheelchairAgent1
-  - 
+  - dont
   - 
   - 
   - 

@@ -18,7 +18,7 @@ public class IgnoreAgentCollisions : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision) {
         //Debug.Log("COL: "+collision.gameObject.tag);
-        if (
+        /*if (
                 collision.gameObject.tag == "Agent1" || 
                 collision.gameObject.tag == "Agent2" || 
                 collision.gameObject.tag == "Agent3" || 
@@ -30,6 +30,6 @@ public class IgnoreAgentCollisions : MonoBehaviour
                 collision.gameObject.tag == "wheels"
             ) {
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
-            }
+            }*/
     }
 }

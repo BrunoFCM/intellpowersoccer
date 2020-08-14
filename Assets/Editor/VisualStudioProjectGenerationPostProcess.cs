@@ -7,7 +7,7 @@ public class VisualStudioProjectGenerationPostProcess : AssetPostprocessor
 {
     private static void OnGeneratedCSProjectFiles()
         {
-            Debug.Log("OnGeneratedCSProjectFiles");
+            //Debug.Log("OnGeneratedCSProjectFiles");
             var dir = Directory.GetCurrentDirectory();
             var files = Directory.GetFiles(dir, "*.csproj");
             foreach (var file in files)

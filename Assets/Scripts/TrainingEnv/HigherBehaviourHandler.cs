@@ -44,38 +44,39 @@ public class HigherBehaviourHandler : MonoBehaviour
 
     void LateUpdate() {
         if(gameEnvironmentInfo.getNearestPlayerToBall() != null)
-            behaviorHandler();
+            if(!pause)
+                behaviorHandler();
     }
 
     public void behaviorHandler(){
 
+        //Debug.Log("ENTRA, FDS");
+
         AgentCore nearestPlayer = gameEnvironmentInfo.getNearestPlayerToBall();
         AgentCore nearestOpponent = gameEnvironmentInfo.getNearestOpponentWithBall(nearestPlayer);
 
-        if(gameEnvironmentInfo.checkGamePause()){
-            Debug.Log("PAUSE");
-            if(gameEnvironmentInfo.checkPenalty()){
-
-            }
-            else{
-                foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
-                    if(!agent == nearestPlayer){
-                        agent.disableAllBehaviours();
-                    }
-                }
-
-                foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
-                    if(!agent == nearestPlayer){
-                        agent.disableAllBehaviours();
-                    }
-                }
-
-                nearestPlayer.setPassTheBallBehaviour();
-            }
-        }
-        else{
+        
             foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
-                if(agent == nearestPlayer){
+                if(agentIsOutOfBounds(agent)){
+                    //Debug.Log("FORA");
+                    if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 20f)
+                        agent.setMoveToPointBehaviour(newFracPoint(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y), 1f));
+                    else
+                        agent.setMoveToPointBehaviour(agent.getOriginalPosition());
+                }
+                else if (agent.type == AgentCore.Type.GOALKEEPER && agent != nearestPlayer){
+                    if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) < 1f){    
+                        if(Vector3.Distance(new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y), gameEnvironmentInfo.Ball.transform.position) < 6 && agent != nearestPlayer){
+                            agent.setGoalKeepBehaviour(nearestPlayer);
+                        }
+                        else{
+                            agent.disableAllBehaviours();
+                        }
+                    }else{
+                        agent.setMoveToPointBehaviour(agent.getOriginalPosition());
+                    }
+                }
+                else if(agent == nearestPlayer){
                     if(agent.getDistanceToGoal() < 7){
                         agent.setStrikeTheBallBehaviour();
                     }
@@ -84,24 +85,70 @@ public class HigherBehaviourHandler : MonoBehaviour
                     }
                 }
                 else if(agent == nearestOpponent){
-                    setIntersectBallBehaviour(nearestPlayer, agent);
+                    if(Vector3.Distance(agent.transform.position, gameEnvironmentInfo.Ball.transform.position) < 4f)
+                        setIntersectBallBehaviour(nearestPlayer, agent);
                 }
                 else{
-                    if(agent.getOriginalPosition() != null)
-                        if(Vector2.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 2f){
-                            if(Vector2.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 4f)
-                                agent.setMoveToPointBehaviour(Fraction((1/3), agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)));
+                    /*if(agent.getOriginalPosition() != null)
+                        if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 2.5f){
+                            if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 20f)
+                                agent.setMoveToPointBehaviour(newFracPoint(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y), 1f));
                             else
                                 agent.setMoveToPointBehaviour(agent.getOriginalPosition());
                         }
                         else
-                            agent.disableAllBehaviours();
+                            agent.disableAllBehaviours();*/
+                    /*if(teamIsAttacking(agent, nearestPlayer)){
+                        agent.setMoveToPointBehaviour(
+                            getPointAtXDistance(getVoronoiNewAttackingPoint(agent, nearestPlayer),
+                            new Vector2(nearestPlayer.transform.position.x, nearestPlayer.transform.position.z),
+                            3)
+                        );
+                    }
+                    else{
+                        agent.setMoveToPointBehaviour(
+                            getPointAtXDistance(getVoronoiNewDefensivePoint(agent, nearestOpponent),
+                            new Vector2(nearestOpponent.transform.position.x, nearestOpponent.transform.position.z),
+                            3)
+                        );
+                    }*/
+                    /*Vector2 pos = getVoronoiNewDefensivePoint(agent, nearestOpponent);
+                    if(Vector3.Distance(agent.transform.position, new Vector3(pos.x, 0, pos.y)) > 1f)
+                        agent.setMoveToPointBehaviour(pos);
+                    else
+                        agent.disableAllBehaviours();*/
+
+                    Vector2 pos = getOffensivePoint(agent);
+                    if(Vector3.Distance(agent.transform.position, new Vector3(pos.x, 0, pos.y)) > 1.0f)
+                        agent.setMoveToPointBehaviour(pos);
+                    else
+                        agent.disableAllBehaviours();
                 }
             }
 
             foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
-                if(agent == nearestPlayer){
-                    if(agent.getDistanceToGoal() < 7){
+                if(agentIsOutOfBounds(agent)){
+                    Debug.Log("FORA");
+                    if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 20f)
+                        agent.setMoveToPointBehaviour(newFracPoint(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y), 1f));
+                    else
+                        agent.setMoveToPointBehaviour(agent.getOriginalPosition());
+                }
+                else if (agent.type == AgentCore.Type.GOALKEEPER && agent != nearestPlayer){
+                    if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) < 1f){    
+                        if(Vector3.Distance(new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y), gameEnvironmentInfo.Ball.transform.position) < 6 && agent != nearestPlayer){
+                            agent.setGoalKeepBehaviour(nearestPlayer);
+                        }
+                        else{
+                            agent.disableAllBehaviours();
+                        }
+                    }else{
+                        agent.setMoveToPointBehaviour(agent.getOriginalPosition());
+                    }
+                }
+                else if(agent == nearestPlayer){
+                    //Debug.Log(agent.getDistanceToGoal());
+                    if(agent.getDistanceToGoal() < 6){
                         agent.setStrikeTheBallBehaviour();
                     }
                     else{
@@ -109,36 +156,190 @@ public class HigherBehaviourHandler : MonoBehaviour
                     }
                 }
                 else if(agent == nearestOpponent){
-                    setIntersectBallBehaviour(nearestPlayer, agent);
+                    if(Vector3.Distance(agent.transform.position, gameEnvironmentInfo.Ball.transform.position) < 4.0f)
+                        setIntersectBallBehaviour(nearestPlayer, agent);
                 }
                 else{
-                    if(agent.getOriginalPosition() != null)
-                        if(Vector2.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 2f){
-                            if(Vector2.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 4f)
-                                agent.setMoveToPointBehaviour(Fraction((1/3), agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)));
+                    /*if(agent.getOriginalPosition() != null)
+                        if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 2.5f){
+                            if(Vector3.Distance(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y)) > 20f)
+                                agent.setMoveToPointBehaviour(newFracPoint(agent.transform.position, new Vector3(agent.getOriginalPosition().x, 0, agent.getOriginalPosition().y), 1f));
                             else
                                 agent.setMoveToPointBehaviour(agent.getOriginalPosition());
                         }
                         else
-                            agent.disableAllBehaviours();
+                            agent.disableAllBehaviours();*/
+                    /*if(teamIsAttacking(agent, nearestPlayer)){
+                        agent.setMoveToPointBehaviour(
+                            getPointAtXDistance(getVoronoiNewAttackingPoint(agent, nearestPlayer),
+                            new Vector2(nearestPlayer.transform.position.x, nearestPlayer.transform.position.z),
+                            3)
+                        );
+                    }
+                    else{
+                        agent.setMoveToPointBehaviour(
+                            getPointAtXDistance(getVoronoiNewDefensivePoint(agent, nearestOpponent),
+                            new Vector2(nearestOpponent.transform.position.x, nearestOpponent.transform.position.z),
+                            3)
+                        );
+                        agent.setMoveToPointBehaviour(getVoronoiNewDefensivePoint(agent, nearestOpponent));
+                    }*/
+                    /*Vector2 pos = getVoronoiNewDefensivePoint(agent, nearestOpponent);
+                    if(Vector3.Distance(agent.transform.position, new Vector3(pos.x, 0, pos.y)) > 2.5f)
+                        agent.setMoveToPointBehaviour(pos);
+                    else
+                        agent.disableAllBehaviours();*/
+
+                    Vector2 pos = getOffensivePoint(agent);
+                    if(Vector3.Distance(agent.transform.position, new Vector3(pos.x, 0, pos.y)) > 1.5f)
+                        agent.setMoveToPointBehaviour(pos);
+                    else
+                        agent.disableAllBehaviours();
+
                 }
-            }
+            
         }
     }
 
-    public Vector2 Fraction(float frac, Vector2 p1, Vector2 p2) {
-        return new Vector2(p1.x + frac*(p2.x-p1.x), p1.y + frac*(p2.y-p1.y));
-   }
+    public Vector2 getOffensivePoint(AgentCore agent){
+        float distance = 0.6f;
+        /*if(agent.team == AgentCore.Team.RED){
+            distance = -3;
+        }
+        else{
+            distance = -3;
+        }*/
+        
+        Vector2 newPoint;
+        Vector2 originalPos = agent.getOriginalPosition();
+        Vector2 currentPos = new Vector2(agent.transform.position.x, agent.transform.position.z);
+        Vector2 ballPos = new Vector2(gameEnvironmentInfo.Ball.transform.position.x, gameEnvironmentInfo.Ball.transform.position.z);
+        Vector2 intersectPoint = new Vector2(ballPos.x, originalPos.y);
+
+        newPoint = Vector2.Lerp(originalPos, intersectPoint, distance);
+
+        return newPoint;
+    }
+
+    public Vector2 getPointAtXDistance(Vector2 p1, Vector2 p2, float d){
+
+        if(Vector2.Distance(p1,p2) > d){
+            return p1;
+        }
+
+        float t = d/Vector2.Distance(p1,p2);
+
+        return new Vector2(((1-t)*p1.x+t*p2.x), ((1-t)*p1.y+t*p2.y));
+    }
+
+    public bool teamIsAttacking(AgentCore agent, AgentCore nearestAgent){
+        if(agent.team == nearestAgent.team)
+            return true;
+        else
+            return false;
+    }
+
+    public void setPause(bool p){
+        pause = p;
+        
+        if(!p){
+            foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
+            agent.enableController();
+        }
+
+        foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
+            agent.enableController();
+        }
+        }
+    }
+
+    public Vector2 newFracPoint(Vector3 p1, Vector3 p2, float frac){
+        
+        //Vector3 P = Vector3.Lerp(A, B, x / (A-B).Length());
+
+        Vector3 newPoint = 2.5f * Vector3.Normalize(p2 - p1) + p1;
+
+        //Vector3 newPoint = Vector3.Lerp(p1, p2, 3 / (p1-p2).);
+
+        return new Vector2(newPoint.x, newPoint.z);
+    }
+
+    public bool agentIsOutOfBounds(AgentCore agent){
+        if(agent.transform.position.x < -13 ||  agent.transform.position.x > 13){
+            return true;
+        }
+        else if(agent.transform.position.z < -6.5f ||  agent.transform.position.z > 6.5f){
+            return true;
+        }
+
+        return false;
+    }
 
     public Vector2 getVoronoiNewPoint(AgentCore agent){
         Vector2 pointToGo = voronoiPort.getPointToGo((int)Char.GetNumericValue(agent.tag[5]));
 
-        return new Vector2(pointToGo.x-50, pointToGo.y-50);        
+        return new Vector2(pointToGo.x-14, pointToGo.y-7.5f);        
+    }
+
+    public Vector2 getVoronoiNewAttackingPoint(AgentCore agent, AgentCore playerWithBall){
+        Vector2 pointToGo = voronoiPort.getPointToGoAttacking((int)Char.GetNumericValue(agent.tag[5]), playerWithBall);
+
+        return new Vector2(pointToGo.x-14, pointToGo.y-7.5f);        
+    }
+
+    public Vector2 getVoronoiNewDefensivePoint(AgentCore agent, AgentCore playerWithBall){
+        Vector2 pointToGo = voronoiPort.getPointToGoDefending((int)Char.GetNumericValue(agent.tag[5]), playerWithBall);
+
+        return new Vector2(pointToGo.x-14, pointToGo.y-7.5f);        
     }
 
     public void setIntersectBallBehaviour(AgentCore agent, AgentCore nearestOpponent){
         if(gameEnvironmentInfo.getNearestPlayerToBall() != null){
             nearestOpponent.setIntersectBallBehaviour(agent, nearestOpponent);
         }
+    }
+
+    public void pauseHandler(AgentCore nearestPlayer){
+        Debug.Log("PAUSE");
+        setPause(true);
+
+        foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
+            if(agent != nearestPlayer){
+                agent.disableAllBehaviours();
+                agent.disableController();
+            }
+        }
+
+        foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
+            if(agent != nearestPlayer){
+                agent.disableAllBehaviours();
+                agent.disableController();
+            }
+        }
+
+        nearestPlayer.setPassTheBallBehaviour();
+    }
+
+    public void penaltyPauseHandler(AgentCore nearestPlayer, AgentCore defendingPlayer){
+        Debug.Log("PAUSE PENALTY");
+        setPause(true);
+
+        //nearestPlayer.setStrikeTheBallBehaviour();
+
+        foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
+            if(agent != nearestPlayer && agent != defendingPlayer){
+                agent.disableAllBehaviours();
+                agent.disableController();
+            }
+        }
+
+        foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
+            if(agent != nearestPlayer && agent != defendingPlayer){
+                agent.disableAllBehaviours();
+                agent.disableController();
+            }
+        }
+
+        //nearestPlayer.setPassTheBallBehaviour();
     }
 }

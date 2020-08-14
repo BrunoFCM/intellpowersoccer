@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: e4c7a871f2c79d94180dac07dce51c84
+  - enabled: 1
+    path: Assets/Scenes/GenericLoadingScreen.unity
+    guid: a537865f59b218b41b76db65f787a8e0
+  - enabled: 1
+    path: Assets/Scenes/IntellPowerSoccer.unity
+    guid: ccf09ecf5c342e1499efa03d494dc6a3
   m_configObjects: {}

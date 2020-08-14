@@ -29,10 +29,10 @@ public class VoronoiPort : MonoBehaviour
 
 	void Update() {
 		time -= Time.deltaTime;
-		if(time < 1){
+		//if(time < 1){
 			VoronoiTriangulation();
-			time = 5;
-		}
+		//	time = 3;
+		//}
 	}
 
 	private void VoronoiTriangulation()
@@ -43,16 +43,25 @@ public class VoronoiPort : MonoBehaviour
 
 		foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
 			colors.Add (0);
-			m_points.Add (new Vector2 (agent.transform.localPosition.x+50, agent.transform.localPosition.z+50f));
+			m_points.Add (new Vector2 (agent.transform.position.x+14, agent.transform.position.z+7.5f));
 		}
 
 		foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
 			colors.Add (0);
-			m_points.Add (new Vector2 (agent.transform.localPosition.x+50, agent.transform.localPosition.z+50f));
+			m_points.Add (new Vector2 (agent.transform.position.x+14, agent.transform.position.z+7.5f));
 		}
+
+		/*colors.Add (0);
+		m_points.Add(new Vector2 (14f+14, 7.5f+14f));
+		colors.Add (0);
+		m_points.Add(new Vector2 (-14f+14, 7.5f+14f));
+		colors.Add (0);
+		m_points.Add(new Vector2 (14f+14, -7.5f+14f));
+		colors.Add (0);
+		m_points.Add(new Vector2 (-14f+14, -7.5f+14f));*/
 	
 
-		voronoi = new Delaunay.Voronoi (m_points, colors, new Rect(0, 0, 50+28, 50+15));
+		voronoi = new Delaunay.Voronoi (m_points, colors, new Rect(0, 0, 28, 15));
 		m_edges = voronoi.VoronoiDiagram ();
 			
 		m_spanningTree = voronoi.SpanningTree (KruskalType.MINIMUM);
@@ -78,11 +87,72 @@ public class VoronoiPort : MonoBehaviour
 		}
 
 
-		playerRegionPoints.Sort((v1,v2) =>Vector2.Distance(new Vector2(v1.x-50, v1.y-50), goal)
-			.CompareTo(Vector2.Distance(new Vector2(v2.x-50, v2.y-50), goal)));
+		playerRegionPoints.Sort((v1,v2) =>Vector2.Distance(new Vector2(v1.x-14, v1.y-7.5f), goal)
+			.CompareTo(Vector2.Distance(new Vector2(v2.x-14, v2.y-7.5f), goal)));
 
 
 		return playerRegionPoints[0];
+	}
+
+	public Vector2 getPointToGoAttacking(int agentNr, AgentCore playerWithBall){
+		
+		List<Vector2> playerRegionPoints = new List<Vector2>();
+
+		foreach(Vector2 points in voronoi.Region(m_points[agentNr-1])){
+			playerRegionPoints.Add(points);
+		}
+
+		/*Vector2 goal = new Vector2(playerWithBall.transform.position.x, playerWithBall.transform.position.z);
+
+
+		playerRegionPoints.Sort((v1,v2) =>Vector2.Distance(new Vector2(v1.x-14, v1.y-7.5f), goal)
+			.CompareTo(Vector2.Distance(new Vector2(v2.x-14, v2.y-7.5f), goal)));
+
+
+		return playerRegionPoints[0];*/
+
+		return GetCentroid(playerRegionPoints);
+	}
+
+	public Vector2 getPointToGoDefending(int agentNr, AgentCore playerDefending){
+		
+		List<Vector2> playerRegionPoints = new List<Vector2>();
+
+		foreach(Vector2 points in voronoi.Region(m_points[agentNr-1])){
+			playerRegionPoints.Add(points);
+		}
+
+		/*Vector2 goal = new Vector2(playerDefending.transform.position.x, playerDefending.transform.position.z);
+
+
+		playerRegionPoints.Sort((v1,v2) =>Vector2.Distance(new Vector2(v1.x-14, v1.y-7.5f), goal)
+			.CompareTo(Vector2.Distance(new Vector2(v2.x-14, v2.y-7.5f), goal)));
+
+
+		return playerRegionPoints[0];*/
+
+		return GetCentroid(playerRegionPoints);
+	}
+
+	public static Vector2 GetCentroid(List<Vector2> poly)
+	{
+		float accumulatedArea = 0.0f;
+		float centerX = 0.0f;
+		float centerY = 0.0f;
+
+		for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+		{
+		float temp = poly[i].x * poly[j].y - poly[j].x * poly[i].y;
+		accumulatedArea += temp;
+		centerX += (poly[i].x + poly[j].x) * temp;
+		centerY += (poly[i].y + poly[j].y) * temp;
+		}
+
+		if (Math.Abs(accumulatedArea) < 1E-7f)
+		return new Vector2();  // Avoid division by zero
+
+		accumulatedArea *= 3f;
+		return new Vector2(centerX / accumulatedArea, centerY / accumulatedArea);
 	}
 
 	void OnDrawGizmos ()
@@ -95,6 +165,15 @@ public class VoronoiPort : MonoBehaviour
 				Gizmos.DrawLine ((Vector3)left, (Vector3)right);
 			}
 		}
+
+
+		if(voronoi != null){
+			Gizmos.color = Color.green;
+			foreach(List<Vector2> region in voronoi.Regions()){
+				Gizmos.DrawSphere(GetCentroid(region), 0.2f);
+			}
+		}
+		
 
 		/*if (m_points != null && voronoi != null) {
 			Gizmos.color = Color.cyan;
@@ -131,10 +210,10 @@ public class VoronoiPort : MonoBehaviour
 		}*/
 
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawLine (new Vector2 (14+50, 7.5f+50f), new Vector2 (14+50, -7.5f+50f));
-		Gizmos.DrawLine (new Vector2 (14+50, -7.5f+50f), new Vector2 (-14+50, -7.5f+50f));
-		Gizmos.DrawLine (new Vector2 (-14+50, -7.5f+50f), new Vector2 (-14+50, 7.5f+50f));
-		Gizmos.DrawLine (new Vector2 (-14+50, 7.5f+50f), new Vector2 (14+50, 7.5f+50f));
+		Gizmos.DrawLine (new Vector2 (14+14, 7.5f+7.5f), new Vector2 (14+14, -7.5f+7.5f));
+		Gizmos.DrawLine (new Vector2 (14+14, -7.5f+7.5f), new Vector2 (-14+14, -7.5f+7.5f));
+		Gizmos.DrawLine (new Vector2 (-14+14, -7.5f+7.5f), new Vector2 (-14+14, 7.5f+7.5f));
+		Gizmos.DrawLine (new Vector2 (-14+14, 7.5f+7.5f), new Vector2 (14+14, 7.5f+7.5f));
 
 
 		Gizmos.color = Color.red;
