@@ -80,10 +80,12 @@ public class AgentCore : MonoBehaviour
             if(GameEnvironmentInfo.choosenTeam){
                 if(tag == "Agent1"){
                     wheelchairAgentController.Controller(null);
+                    transform.GetChild(11).gameObject.SetActive(true);
                 }
             }else{
                 if(tag == "Agent5"){
                     wheelchairAgentController.Controller(null);
+                    transform.GetChild(11).gameObject.SetActive(true);
                 }
             }
         
@@ -278,20 +280,24 @@ public class AgentCore : MonoBehaviour
     }
 
     public void setPassTheBallBehaviour(){
+        figurePoint.SetActive(false);
         behaviourHandler.setPassTheBallBehaviour();
     }
 
     public void setStrikeTheBallBehaviour(){
+        figurePoint.SetActive(false);
         behaviourHandler.setStrikeTheBallBehaviour();
     }
 
     public void setGoalKeepBehaviour(AgentCore shooter){
         behaviourHandler.setGoalKeepBehaviour(shooter);
+        figurePoint.SetActive(false);
     }
 
     public void setDribbleBallBehaviour(Vector2 figurePos){
         //Debug.Log(figurePos.magnitude);
         //if(!behaviourHandler.dribbleBallTrainer.activeSelf){
+            figurePoint.SetActive(true);
             figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
             behaviourHandler.setDribbleBallBehaviour();
         //}
@@ -300,16 +306,19 @@ public class AgentCore : MonoBehaviour
     public void setMoveToPointBehaviour(Vector2 figurePos){
         //Debug.Log(figurePos.magnitude);
         //if(!behaviourHandler.moveToPointTrainer.activeSelf){
+            figurePoint.SetActive(true);
             figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
             behaviourHandler.setMoveToPointBehaviour();
         //}
     }
 
     public void setIntersectBallBehaviour(AgentCore agent, AgentCore nearestPlayer){
+        figurePoint.SetActive(false);
         behaviourHandler.setIntersectBallBehaviour(agent, nearestPlayer);
     }
 
     public void disableAllBehaviours(){
+        figurePoint.SetActive(false);
         behaviourHandler.disableAllBehaviours();
     }
 

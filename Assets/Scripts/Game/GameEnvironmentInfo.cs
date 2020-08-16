@@ -81,6 +81,9 @@ public class GameEnvironmentInfo : MonoBehaviour
         public HigherBehaviourHandler higherBehaviourHandler;
 
         public GameObject outOfBoundsScreen;
+        public GameObject penaltyScreen;
+        public GameObject foulScreen;
+        public GameObject goalScreen;
 
         public static bool choosenTeam;
 
@@ -91,6 +94,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.visible = false;
         pause = false;
         gameTime = 2400f;
         playerWithBall = null;
@@ -105,6 +109,8 @@ public class GameEnvironmentInfo : MonoBehaviour
         playersAtOutsideArea = new List<AgentCore>();
 
         ballOutOfBoundsTimeOut = false;
+
+        nearestPlayerToBall = redTeamAgents[0];
 
         
         setBallCenterPos();
@@ -188,6 +194,12 @@ public class GameEnvironmentInfo : MonoBehaviour
     void LateUpdate() {
         if(!foulTimeOut && !outOfBounds && !outOfBoundsAreaFreeKick && !initialPositions && !penaltyActive && !ballOutOfBoundsTimeOut){
             higherBehaviourHandler.setPause(false); 
+            if(!secondHalf)
+                if(gameTime <= 1200f){
+                    //Debug.Log("SECOND FUCKING PART");
+                    setSecondHalf();
+                    gameTime = 1200f;
+                }
         }
 
         gameTime -= Time.deltaTime;
@@ -197,18 +209,13 @@ public class GameEnvironmentInfo : MonoBehaviour
             
         }
 
-        if(!secondHalf)
-            if(gameTime <= 1200f){
-                setSecondHalf();
-                gameTime = 1200f;
-            }
-
         if(!foulCommited)
             foulControlSystem();
 
         if(outOfBounds){
             limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
             higherBehaviourHandler.pauseHandler(outBoundsAgent);
+            clearPlayersInAreas();
             /*outBoundsAgent.setPassTheBallBehaviour();
             foreach(AgentCore agent in redTeamAgents){
                 if(!agent == outBoundsAgent){
@@ -226,6 +233,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(outOfBoundsAreaFreeKick){
             limitWalkingArea(outBoundsFreeKickAgent, outBoundsAreaFreeKickAgentPos, outBoundsFreeKickAgentRot);
             higherBehaviourHandler.pauseHandler(outBoundsFreeKickAgent);
+            clearPlayersInAreas();
         }
             
 
@@ -233,6 +241,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(threeInTheGoalAreafoul()){
                 Debug.Log("3 in the Goal Area Foul Committed");
                 foulAgent.setPassTheBallBehaviour();
+                clearPlayersInAreas();
             }
 
         if(initialPositions){
@@ -269,6 +278,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(foulTimeOut){
             limitFoulWalkingArea(foulAgent, foulAgentPos);
             higherBehaviourHandler.pauseHandler(foulAgent);
+            clearPlayersInAreas();
         }
 
         setNearestPlayerToBall();
@@ -383,6 +393,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setPenaltyPositions(AgentCore.Team teamTakingKick){
+        
 
         stopAllChairs();
 
@@ -517,7 +528,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 agent.disableTracker();
         }
 
-        playerWithBall.enableTracker();
+        //playerWithBall.enableTracker();
     }
 
     public void setNearestPlayerToBall(){
@@ -528,7 +539,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if(nearestPlayerToBall != possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0]){
             nearestPlayerToBall = possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0];
-            setPlayerTracker(possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0]);
+            //setPlayerTracker(possibleNearestPlayerToBall.OrderBy(x => Vector3.Distance(x.transform.position, Ball.transform.position)).ToList()[0]);
         }    
     }
     public void setBallPenaltyPos(AgentCore.Team teamTakingTheKick){
@@ -688,6 +699,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setGoalAtRedGoal(){
         
         blueScore += 1;
+        StartCoroutine(goalAsyncScreen());
         setBallCenterPos();
         setInitialPositions(AgentCore.Team.RED);
         Debug.Log("Score: Blue - " + blueScore);
@@ -697,6 +709,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setGoalAtBlueGoal(){
         
         redScore += 1;
+        StartCoroutine(goalAsyncScreen());
         setBallCenterPos();
         setInitialPositions(AgentCore.Team.BLUE);
         Debug.Log("Score: Blue - " + blueScore);
@@ -759,11 +772,13 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(playerCommitedfoul.team == AgentCore.Team.BLUE){
             if(Ball.positionInField == Ball.Areas.smallBlueArea){
                 Debug.Log("Penalty");
+                StartCoroutine(penaltyAsyncScreen());
                 return true;
             }
         }else{
             if(Ball.positionInField == Ball.Areas.smallRedArea){
                 Debug.Log("Penalty");
+                StartCoroutine(penaltyAsyncScreen());
                 return true;
             }
         }
@@ -776,6 +791,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         if(!checkIfPenalty(playerCommitedfoul)){
                 placeTeamByAreaFoul(playerTakingTheKick, playerTakingTheKick.team);
+                StartCoroutine(foulsAsyncScreen());
         }
         else{
             if(playerCommitedfoul.team == AgentCore.Team.RED){
@@ -813,12 +829,15 @@ public class GameEnvironmentInfo : MonoBehaviour
                 if(teamMembersInAreaCounter > 2){
                     if(Ball.positionInField == Ball.Areas.smallBlueArea){
                         Debug.Log("Penalty");
+
                         threeInGoalBool = true;
+                        StartCoroutine(penaltyAsyncScreen());
                         setPenaltyPositions(AgentCore.Team.RED);
                         lastPlayerTouchingTheBall = null;
                         penaltyActive = true;
                     }else{
                         threeInGoalBool = true;
+                        StartCoroutine(foulsAsyncScreen());
                         placeTeamByAreaFoul(playerWithBall, playerWithBall.team);
                     }
 
@@ -837,11 +856,13 @@ public class GameEnvironmentInfo : MonoBehaviour
                     if(Ball.positionInField == Ball.Areas.smallRedArea){
                         Debug.Log("Penalty");
                         threeInGoalBool = true;
+                        StartCoroutine(penaltyAsyncScreen());
                         setPenaltyPositions(AgentCore.Team.BLUE);
                         lastPlayerTouchingTheBall = null;
                         penaltyActive = true;
                     }else{
                         threeInGoalBool = true;
+                        StartCoroutine(foulsAsyncScreen());
                         placeTeamByAreaFoul(playerWithBall, playerWithBall.team);
                     }
 
@@ -1281,6 +1302,18 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         playerTakingTheKick.setPassTheBallBehaviour();
 
+
+        setPlayersLookAtBall();
+    }
+
+    public void setPlayersLookAtBall(){
+        foreach(AgentCore agent in redTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
+        }
+
+        foreach(AgentCore agent in blueTeamAgents){
+            agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
+        }
     }
 
     public void positionAgentTakingKick(AgentCore playerTakingTheKick){
@@ -1403,8 +1436,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             playersInException = new List<AgentCore>();
 
             foreach(AgentCore p in players){
-                if(p.transform.position.x > 9 && p.transform.position.x < 14){
-                    if(p.transform.position.z > -4 && p.transform.position.z < 4){
+                if(p.transform.position.x > 8 && p.transform.position.x < 14){
+                    if(p.transform.position.z > -5 && p.transform.position.z < 5){
                         playersInException.Add(p);
                     }
                 }
@@ -1441,8 +1474,8 @@ public class GameEnvironmentInfo : MonoBehaviour
                     playersInException = new List<AgentCore>();
 
                     foreach(AgentCore p in players){
-                        if(p.transform.position.x > 9 && p.transform.position.x < 14){
-                            if(p.transform.position.z > -4 && p.transform.position.z < 4){
+                        if(p.transform.position.x > 8 && p.transform.position.x < 14){
+                            if(p.transform.position.z > -5 && p.transform.position.z < 5){
                                 playersInException.Add(p);
                             }
                         }
@@ -1721,11 +1754,14 @@ public class GameEnvironmentInfo : MonoBehaviour
             }
         }
 
+        setPlayersLookAtBall();
+
         if(!notCorner){
             AgentCore a = playerRecieveingBall(agent);
             setOutOfBounds(true);
             placeTeamByAreaOutOfBounds(agent, a, agent.team);
             detectPlayersAtSamePosBugAfterFoul(a);
+            setPlayersLookAtBall();
         }
         else{
             outOfBoundsAreaFreeKick = true;
@@ -2055,8 +2091,26 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     IEnumerator outOfBoundsAsyncScreen(){
         outOfBoundsScreen.SetActive(true);
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
         outOfBoundsScreen.SetActive(false);
+    }
+
+    IEnumerator penaltyAsyncScreen(){
+        penaltyScreen.SetActive(true);
+        yield return new WaitForSeconds(1);
+        penaltyScreen.SetActive(false);
+    }
+
+    IEnumerator foulsAsyncScreen(){
+        foulScreen.SetActive(true);
+        yield return new WaitForSeconds(1);
+        foulScreen.SetActive(false);
+    }
+
+    IEnumerator goalAsyncScreen(){
+        goalScreen.SetActive(true);
+        yield return new WaitForSeconds(1);
+        goalScreen.SetActive(false);
     }
 
     public void setfoulCommited(bool b){
