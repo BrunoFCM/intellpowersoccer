@@ -4,8 +4,8 @@ using UnityEngine;
  
 public class MoveCamera : MonoBehaviour
 {
-    public float speedH = 1f;
-    public float speedV = 1f;
+    public float speedH = 0.5f;
+    public float speedV = 0.5f;
 
     public Transform player;
 
@@ -31,14 +31,36 @@ public class MoveCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0){
+            Debug.Log("cona");
 
-        yaw += speedH * Input.GetAxis("Mouse X");
-        pitch -= speedV * Input.GetAxis("Mouse Y");
+            yaw += speedH * Input.GetAxis("Mouse X");
+            pitch -= speedV * Input.GetAxis("Mouse Y");
 
-        yaw = Mathf.Clamp(yaw, 100f, 260f);
-        pitch = Mathf.Clamp(pitch, 15f, 25f);
+            yaw = Mathf.Clamp(yaw, 120f, 240f);
+            pitch = Mathf.Clamp(pitch, 0f, 25f);
 
-        transform.eulerAngles = new Vector3(pitch, yaw+player.eulerAngles.y, 0.0f);
+            transform.eulerAngles = new Vector3(pitch, yaw+player.localEulerAngles.y, 0.0f);
+        }
+        else if(!(Input.GetAxis("Right X Joystick") >= -0.2f && Input.GetAxis("Right X Joystick") <= 0.2f) ||
+            !(Input.GetAxis("Right Y Joystick") >= -0.2f && Input.GetAxis("Right Y Joystick") <= 0.2f)){
 
+            Debug.Log("cona");
+
+            float newSpeedH = speedH + 1.5f;
+            float newSpeedV = speedV + 1.5f;
+
+            yaw += newSpeedH * Input.GetAxis("Right X Joystick");
+            pitch -= newSpeedV * Input.GetAxis("Right Y Joystick");
+
+            yaw = Mathf.Clamp(yaw, 120f, 240f);
+            pitch = Mathf.Clamp(pitch, 0f, 25f);
+
+            transform.eulerAngles = new Vector3(pitch, yaw+player.localEulerAngles.y, 0.0f);
+        }
+        else{
+            //transform.eulerAngles = new Vector3(rotX, rotY, rotZ);
+        }
+    
     }
 }

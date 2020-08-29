@@ -81,11 +81,13 @@ public class AgentCore : MonoBehaviour
                 if(tag == "Agent1"){
                     wheelchairAgentController.Controller(null);
                     transform.GetChild(11).gameObject.SetActive(true);
+                    //wheelchairAgentController.setMaxAngularSpeed(18f);
                 }
             }else{
                 if(tag == "Agent5"){
                     wheelchairAgentController.Controller(null);
                     transform.GetChild(11).gameObject.SetActive(true);
+                    //wheelchairAgentController.setMaxAngularSpeed(18f);
                 }
             }
         

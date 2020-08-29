@@ -79,7 +79,7 @@ public class HigherBehaviourHandler : MonoBehaviour
                 }
             }
             else if(agent == nearestPlayer){
-                if(agent.getDistanceToGoal() < 7){
+                if(agent.getDistanceToGoal() < 3.5f){
                     agent.setStrikeTheBallBehaviour();
                 }
                 else{
@@ -150,7 +150,7 @@ public class HigherBehaviourHandler : MonoBehaviour
             }
             else if(agent == nearestPlayer){
                 //Debug.Log(agent.getDistanceToGoal());
-                if(agent.getDistanceToGoal() < 6){
+                if(agent.getDistanceToGoal() < 3.5f){
                     agent.setStrikeTheBallBehaviour();
                 }
                 else{
@@ -337,7 +337,7 @@ public class HigherBehaviourHandler : MonoBehaviour
     }
 
     public void pauseHandler(AgentCore nearestPlayer){
-        Debug.Log("PAUSE");
+        //Debug.Log("PAUSE");
         setPause(true);
 
         foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){

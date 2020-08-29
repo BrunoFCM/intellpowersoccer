@@ -25,12 +25,14 @@ public class ClickScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
     {
         if(!uiHandler.getCameraBool()){
-            Debug.Log("Mouse is over GameObject.");
-            if(this.tag != "bluesTeam" && this.tag != "redsTeam" && this.tag != "backPlay"){
-                rect.transform.position = new Vector3(rect.transform.position.x+200, rect.transform.position.y, rect.transform.position.z);
-            }
-            else{
-                rect.transform.position = new Vector3(rect.transform.position.x-200, rect.transform.position.y, rect.transform.position.z);
+            if(this.tag != "rulesClose"){
+                Debug.Log("Mouse is over GameObject.");
+                if(this.tag != "bluesTeam" && this.tag != "redsTeam" && this.tag != "backPlay"){
+                    rect.transform.position = new Vector3(rect.transform.position.x+200, rect.transform.position.y, rect.transform.position.z);
+                }
+                else{
+                    rect.transform.position = new Vector3(rect.transform.position.x-200, rect.transform.position.y, rect.transform.position.z);
+                }
             }
         }
         
@@ -39,12 +41,14 @@ public class ClickScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerExit(PointerEventData eventData)
     {
         if(!uiHandler.getCameraBool()){
-            Debug.Log("Mouse is no longer on GameObject.");
-            if(this.tag != "bluesTeam" && this.tag != "redsTeam" && this.tag != "backPlay"){
-                rect.transform.position = new Vector3(rect.transform.position.x-200, rect.transform.position.y, rect.transform.position.z);
-            }
-            else{
-                rect.transform.position = new Vector3(rect.transform.position.x+200, rect.transform.position.y, rect.transform.position.z);
+            if(this.tag != "rulesClose"){
+                Debug.Log("Mouse is no longer on GameObject.");
+                if(this.tag != "bluesTeam" && this.tag != "redsTeam" && this.tag != "backPlay"){
+                    rect.transform.position = new Vector3(rect.transform.position.x-200, rect.transform.position.y, rect.transform.position.z);
+                }
+                else{
+                    rect.transform.position = new Vector3(rect.transform.position.x+200, rect.transform.position.y, rect.transform.position.z);
+                }
             }
         }
     }
@@ -56,8 +60,11 @@ public class ClickScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             rect.transform.position = rectPos;
             playMenu();
         }
-        else if(this.tag == "settings"){
-
+        else if(this.tag == "rules"){
+            transform.parent.GetChild(3).gameObject.SetActive(true);
+        }
+        else if(this.tag == "rulesClose"){
+            transform.parent.gameObject.SetActive(false);
         }
         else if(this.tag == "exit"){
             Application.Quit();

@@ -817,7 +817,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         if(playerWithBall == null)
             return false;
 
-            Debug.Log(playersAtSmallAreaBlue.Count);
+            //Debug.Log(playersAtSmallAreaBlue.Count);
 
         if(playerWithBall.team == AgentCore.Team.RED){
             if(playersAtSmallAreaBlue.Count > 2){
@@ -1560,12 +1560,12 @@ public class GameEnvironmentInfo : MonoBehaviour
 // ----------------------------------------------------------- BALL OUT OF BOUNDS FUNCS -----------------------------------------------------------
 
     public void setBallOutOfBounds(){
-            Debug.Log("Out of Bounds");
+            /*Debug.Log("Out of Bounds");
             outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
             ballOutOfBoundsMechanism(outBoundsAgent);
-            setOutOfBounds(true);
+            setOutOfBounds(true);*/
         
-        /*if(!ballOutOfBoundsTimeOut){
+        if(!ballOutOfBoundsTimeOut){
             if(lastPlayerTouchingTheBall != null){
                 Debug.Log("Out of Bounds");
                 outBoundsAgent = getPlayerTakingsKick(lastPlayerTouchingTheBall);
@@ -1580,7 +1580,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 ballOutOfBoundsMechanism(outBoundsAgent);
                 setOutOfBounds(true);
             }
-        }*/
+        }
     }
 
     public bool getBallOutOfBounds(){
@@ -2122,7 +2122,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         Vector3 centerPosition = outBoundsBallPos; //center of circle
         float distance = Vector3.Distance(agent.transform.position, centerPosition);
         
-        if (distance > 3)
+        if (distance > 4)
         {
             spawnWheelchairAtNewSpot(pos.x, pos.y, pos.z, agent, rot);
         }

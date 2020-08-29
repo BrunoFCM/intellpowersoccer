@@ -78,6 +78,10 @@ public class WheelchairAgentController : MonoBehaviour
 		else return 0;
 	}
 
+	public void setMaxAngularSpeed(float mang){
+        maxAngularVelocity = mang;
+    }
+
     public void Controller(float[] vectorAction){
 
 
