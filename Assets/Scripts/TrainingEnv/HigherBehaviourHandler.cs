@@ -281,12 +281,14 @@ public class HigherBehaviourHandler : MonoBehaviour
         
         if(!p){
             foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
-            agent.enableController();
-        }
+                agent.enableController();
+                agent.unsetPlayerExceptionInController();
+            }
 
-        foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
-            agent.enableController();
-        }
+            foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
+                agent.enableController();
+                agent.unsetPlayerExceptionInController();
+            }
         }
     }
 
@@ -343,14 +345,14 @@ public class HigherBehaviourHandler : MonoBehaviour
         foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
             if(agent != nearestPlayer){
                 agent.disableAllBehaviours();
-                agent.disableController();
+                agent.setPlayerExceptionInController();
             }
         }
 
         foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
             if(agent != nearestPlayer){
                 agent.disableAllBehaviours();
-                agent.disableController();
+                agent.setPlayerExceptionInController();
             }
         }
 
@@ -366,14 +368,14 @@ public class HigherBehaviourHandler : MonoBehaviour
         foreach(AgentCore agent in gameEnvironmentInfo.redTeamAgents){
             if(agent != nearestPlayer && agent != defendingPlayer){
                 agent.disableAllBehaviours();
-                agent.disableController();
+                agent.setPlayerExceptionInController();
             }
         }
 
         foreach(AgentCore agent in gameEnvironmentInfo.blueTeamAgents){
             if(agent != nearestPlayer && agent != defendingPlayer){
                 agent.disableAllBehaviours();
-                agent.disableController();
+                agent.setPlayerExceptionInController();
             }
         }
 

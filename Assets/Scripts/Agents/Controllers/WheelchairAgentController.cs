@@ -12,6 +12,7 @@ public class WheelchairAgentController : MonoBehaviour
 	public Transform largeWheelLT, largeWheelRT;
 	public float motorForce;
 	public float maxAngularVelocity;
+	private bool verticalCrontrolActive;
      
 
     void Start()
@@ -19,11 +20,16 @@ public class WheelchairAgentController : MonoBehaviour
         agentRBody = GetComponent<Rigidbody>();
         largeWheelL.maxAngularVelocity = maxAngularVelocity;
 		largeWheelR.maxAngularVelocity = maxAngularVelocity;
+		verticalCrontrolActive = true;
     }
 
     private void FixedUpdate() {
         //Controller(null);
     }
+
+	public void setVerticalControl(bool b){
+		verticalCrontrolActive = b;
+	}
 
 
     private float CalculateConstantC(float controllerAngle, bool right){
@@ -93,6 +99,10 @@ public class WheelchairAgentController : MonoBehaviour
             m_horizontalInput = vectorAction[0];
             m_verticalInput = vectorAction[1];
         }
+		
+		if(!verticalCrontrolActive){
+			m_verticalInput = 0;
+		}
 
         float controllerAngle = Mathf.Atan2(m_verticalInput, m_horizontalInput) * Mathf.Rad2Deg;
 

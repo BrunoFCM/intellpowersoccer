@@ -84,16 +84,23 @@ public class GameEnvironmentInfo : MonoBehaviour
         public GameObject penaltyScreen;
         public GameObject foulScreen;
         public GameObject goalScreen;
+        public GameObject escapeScreen;
+        public GameObject secondPartScreen;
+        public GameObject gameEndedScreen;
+        public bool screenBool;
 
         public static bool choosenTeam;
 
         public bool pause;
+        public bool escapeKey;
+        public float timeoutOutOfBounds;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
+        screenBool = false;
         Cursor.visible = false;
         pause = false;
         gameTime = 2400f;
@@ -101,6 +108,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         lastPlayerTouchingTheBall = null;
         opponent = null;
         secondHalf = false;
+        escapeKey = false;
 
         playersAtHalfSideAreaBlue = new List<AgentCore>();
         playersAtHalfSideAreaRed = new List<AgentCore>();
@@ -133,10 +141,16 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void resetGame(){
+
+        screenBool = false;
+        Cursor.visible = false;
+        pause = false;
         gameTime = 2400f;
         playerWithBall = null;
+        lastPlayerTouchingTheBall = null;
         opponent = null;
         secondHalf = false;
+        escapeKey = false;
 
         playersAtHalfSideAreaBlue = new List<AgentCore>();
         playersAtHalfSideAreaRed = new List<AgentCore>();
@@ -146,16 +160,17 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         ballOutOfBoundsTimeOut = false;
 
+        nearestPlayerToBall = redTeamAgents[0];
+
+        
         setBallCenterPos();
 
         if (new System.Random().Next(0, 2) == 0){
             tossingWinner = AgentCore.Team.BLUE;
-            
             setInitialPositions(AgentCore.Team.BLUE);
-        }   
+        }  
         else{
             tossingWinner = AgentCore.Team.RED;
-            
             setInitialPositions(AgentCore.Team.RED);
         }
 
@@ -170,6 +185,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     public void setSecondHalf(){
         secondHalf = true;
         setBallCenterPos();
+        Debug.Log("ENTRA SECOND PART");
 
         if (tossingWinner == AgentCore.Team.BLUE){
             
@@ -179,6 +195,8 @@ public class GameEnvironmentInfo : MonoBehaviour
             
             setInitialPositions(AgentCore.Team.BLUE);
         }
+
+        setSecondPartScreen();
     }
 
     // Update is called once per frame
@@ -196,16 +214,16 @@ public class GameEnvironmentInfo : MonoBehaviour
             higherBehaviourHandler.setPause(false); 
             if(!secondHalf)
                 if(gameTime <= 1200f){
-                    //Debug.Log("SECOND FUCKING PART");
                     setSecondHalf();
                     gameTime = 1200f;
                 }
         }
 
-        gameTime -= Time.deltaTime;
+        gameTime -= Time.deltaTime*4;
             
         if(gameTime <= 0){
             //MATCH ENDED
+            setFinalScreen();
             
         }
 
@@ -213,8 +231,15 @@ public class GameEnvironmentInfo : MonoBehaviour
             foulControlSystem();
 
         if(outOfBounds){
+            timeoutOutOfBounds += Time.deltaTime;
+            if(timeoutOutOfBounds > 15){
+                Debug.Log("OUT OF BOUNDS TIMEOUT");
+                Ball.GetComponent<Rigidbody>().AddForce(outBoundsAgent.transform.forward*-100);
+                timeoutOutOfBounds = 0;
+            }
             limitWalkingArea(outBoundsAgent, outBoundsAgentPos, outBoundsAgentRot);
             higherBehaviourHandler.pauseHandler(outBoundsAgent);
+            outBoundsAgent.unsetPlayerExceptionInController();
             clearPlayersInAreas();
             /*outBoundsAgent.setPassTheBallBehaviour();
             foreach(AgentCore agent in redTeamAgents){
@@ -229,10 +254,14 @@ public class GameEnvironmentInfo : MonoBehaviour
                 }
             }*/
         }
+        else{
+            timeoutOutOfBounds = 0;
+        }
 
         if(outOfBoundsAreaFreeKick){
             limitWalkingArea(outBoundsFreeKickAgent, outBoundsAreaFreeKickAgentPos, outBoundsFreeKickAgentRot);
             higherBehaviourHandler.pauseHandler(outBoundsFreeKickAgent);
+            outBoundsFreeKickAgent.unsetPlayerExceptionInController();
             clearPlayersInAreas();
         }
             
@@ -241,6 +270,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             if(threeInTheGoalAreafoul()){
                 Debug.Log("3 in the Goal Area Foul Committed");
                 foulAgent.setPassTheBallBehaviour();
+                foulAgent.unsetPlayerExceptionInController();
                 clearPlayersInAreas();
             }
 
@@ -273,15 +303,62 @@ public class GameEnvironmentInfo : MonoBehaviour
             penaltyAgent.setStrikeTheBallBehaviour();
 
             higherBehaviourHandler.penaltyPauseHandler(penaltyAgent, defendingAgent);
+            penaltyAgent.unsetPlayerExceptionInController();
         }
 
         if(foulTimeOut){
             limitFoulWalkingArea(foulAgent, foulAgentPos);
+            foulAgent.unsetPlayerExceptionInController();
             higherBehaviourHandler.pauseHandler(foulAgent);
             clearPlayersInAreas();
         }
 
         setNearestPlayerToBall();
+
+        if(!screenBool)
+            checkEscInput();
+    }
+
+    public void checkEscInput(){
+        if(Input.GetKeyDown("escape")) {
+            escapeKey = !escapeKey;
+            if(escapeKey){
+                PauseGame();
+            }
+            else{
+                ResumeGame();
+            }
+        }
+    }
+
+    public void setSecondPartScreen(){
+        screenBool = true;
+        Time.timeScale = 0;
+        secondPartScreen.SetActive(true);
+        Cursor.visible = true;
+    }
+
+    public void setFinalScreen(){
+        screenBool = true;
+        Time.timeScale = 0;
+        Cursor.visible = true;
+        gameEndedScreen.SetActive(true);
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0;
+        escapeScreen.SetActive(true);
+        Cursor.visible = true;
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        escapeScreen.SetActive(false);
+        secondPartScreen.SetActive(false);
+        Cursor.visible = false;
+        screenBool = false;
     }
 
     public void limitWalKingAreaOutOfBounds(){
@@ -377,6 +454,8 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         lastPlayerTouchingTheBall = null;
         initialPositions = true;
+
+        initialPlayerTakingKick.unsetPlayerExceptionInController();
     }
 
     private void limitInicialPosWalkingArea(AgentCore agent, Vector3 pos){

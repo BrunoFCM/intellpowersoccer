@@ -34,6 +34,8 @@ TagManager:
   - Wall
   - rules
   - rulesClose
+  - restart
+  - resume
   layers:
   - Default
   - TransparentFX

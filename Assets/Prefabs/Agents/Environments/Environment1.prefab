@@ -353,9 +353,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd0560e1d2007b74ab30759bfcc526ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameTime: 2400
+  redScore: 0
+  blueScore: 0
   redTeamAgents: []
   blueTeamAgents: []
   Ball: {fileID: 419523652658996931}
+  higherBehaviourHandler: {fileID: 0}
+  outOfBoundsScreen: {fileID: 0}
+  penaltyScreen: {fileID: 0}
+  foulScreen: {fileID: 0}
+  goalScreen: {fileID: 0}
+  pause: 0
 --- !u!1 &6367237888220636608
 GameObject:
   m_ObjectHideFlags: 0

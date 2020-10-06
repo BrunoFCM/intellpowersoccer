@@ -17,6 +17,7 @@ public class UiHandler : MonoBehaviour
     public GameObject blueTeamBox;
     public GameObject redTeamBox;
     public GameObject backBox;
+    public float timeMult;
 
 
     //BACK PLAY MENU VARS
@@ -25,6 +26,7 @@ public class UiHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        timeMult = Time.deltaTime*3.5f;
         playCameraRotationBool = false;
         backPlayCameraRotationBool = false;
     }
@@ -45,15 +47,16 @@ public class UiHandler : MonoBehaviour
             setCameraBool(false);
         } 
         else{
-            mainMenuCamera.transform.Rotate( Vector3.up * ( 12 * Time.deltaTime ));
+            
+            mainMenuCamera.transform.Rotate( Vector3.up * ( 12 * timeMult));
 
-            playBox.transform.position = new Vector3(playBox.transform.position.x - 310 * Time.deltaTime, playBox.transform.position.y, playBox.transform.position.z);
-            settingsBox.transform.position = new Vector3(settingsBox.transform.position.x - 210 * Time.deltaTime, settingsBox.transform.position.y, settingsBox.transform.position.z);
-            quitBox.transform.position = new Vector3(quitBox.transform.position.x - 160 * Time.deltaTime, quitBox.transform.position.y, quitBox.transform.position.z);
+            playBox.transform.position = new Vector3(playBox.transform.position.x - 310 * timeMult, playBox.transform.position.y, playBox.transform.position.z);
+            settingsBox.transform.position = new Vector3(settingsBox.transform.position.x - 210 * timeMult, settingsBox.transform.position.y, settingsBox.transform.position.z);
+            quitBox.transform.position = new Vector3(quitBox.transform.position.x - 160 * timeMult, quitBox.transform.position.y, quitBox.transform.position.z);
 
-            blueTeamBox.transform.position = new Vector3(blueTeamBox.transform.position.x - 210 * Time.deltaTime, blueTeamBox.transform.position.y, blueTeamBox.transform.position.z);
-            redTeamBox.transform.position = new Vector3(redTeamBox.transform.position.x - 210 * Time.deltaTime, redTeamBox.transform.position.y, redTeamBox.transform.position.z);
-            backBox.transform.position = new Vector3(backBox.transform.position.x - 210 * Time.deltaTime, backBox.transform.position.y, backBox.transform.position.z);
+            blueTeamBox.transform.position = new Vector3(blueTeamBox.transform.position.x - 210 * timeMult, blueTeamBox.transform.position.y, blueTeamBox.transform.position.z);
+            redTeamBox.transform.position = new Vector3(redTeamBox.transform.position.x - 210 * timeMult, redTeamBox.transform.position.y, redTeamBox.transform.position.z);
+            backBox.transform.position = new Vector3(backBox.transform.position.x - 210 * timeMult, backBox.transform.position.y, backBox.transform.position.z);
         }
     }
 
@@ -63,15 +66,15 @@ public class UiHandler : MonoBehaviour
             setCameraBackPlayBool(false);
         } 
         else{
-            mainMenuCamera.transform.Rotate( Vector3.up * ( -12 * Time.deltaTime ));
+            mainMenuCamera.transform.Rotate( Vector3.up * ( -12 * timeMult ));
 
-            playBox.transform.position = new Vector3(playBox.transform.position.x + 310 * Time.deltaTime, playBox.transform.position.y, playBox.transform.position.z);
-            settingsBox.transform.position = new Vector3(settingsBox.transform.position.x + 210 * Time.deltaTime, settingsBox.transform.position.y, settingsBox.transform.position.z);
-            quitBox.transform.position = new Vector3(quitBox.transform.position.x + 160 * Time.deltaTime, quitBox.transform.position.y, quitBox.transform.position.z);
+            playBox.transform.position = new Vector3(playBox.transform.position.x + 310 * timeMult, playBox.transform.position.y, playBox.transform.position.z);
+            settingsBox.transform.position = new Vector3(settingsBox.transform.position.x + 210 * timeMult, settingsBox.transform.position.y, settingsBox.transform.position.z);
+            quitBox.transform.position = new Vector3(quitBox.transform.position.x + 160 * timeMult, quitBox.transform.position.y, quitBox.transform.position.z);
 
-            blueTeamBox.transform.position = new Vector3(blueTeamBox.transform.position.x + 210 * Time.deltaTime, blueTeamBox.transform.position.y, blueTeamBox.transform.position.z);
-            redTeamBox.transform.position = new Vector3(redTeamBox.transform.position.x + 210 * Time.deltaTime, redTeamBox.transform.position.y, redTeamBox.transform.position.z);
-            backBox.transform.position = new Vector3(backBox.transform.position.x + 210 * Time.deltaTime, backBox.transform.position.y, backBox.transform.position.z);
+            blueTeamBox.transform.position = new Vector3(blueTeamBox.transform.position.x + 210 * timeMult, blueTeamBox.transform.position.y, blueTeamBox.transform.position.z);
+            redTeamBox.transform.position = new Vector3(redTeamBox.transform.position.x + 210 * timeMult, redTeamBox.transform.position.y, redTeamBox.transform.position.z);
+            backBox.transform.position = new Vector3(backBox.transform.position.x + 210 * timeMult, backBox.transform.position.y, backBox.transform.position.z);
         }
     }
 

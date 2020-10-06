@@ -76,7 +76,7 @@ public class AgentCore : MonoBehaviour
     void Update()
     {
         //DetectAreaCollisions();
-        if(!controllerDisabled)
+        //if(!controllerDisabled)
             if(GameEnvironmentInfo.choosenTeam){
                 if(tag == "Agent1"){
                     wheelchairAgentController.Controller(null);
@@ -144,6 +144,36 @@ public class AgentCore : MonoBehaviour
 
         wheelchairAgentController.motorForce = 0;
         wheelchairAgentController.motorForce = 50;
+
+        setPlayerExceptionInController();
+    }
+
+    public void setPlayerExceptionInController(){
+        if(GameEnvironmentInfo.choosenTeam){
+            if(tag == "Agent1"){
+                wheelchairAgentController.motorForce = 50;
+                wheelchairAgentController.setVerticalControl(false);
+            }
+        }else{
+            if(tag == "Agent5"){
+                wheelchairAgentController.motorForce = 50;
+                wheelchairAgentController.setVerticalControl(false);
+            }
+        }
+    }
+
+    public void unsetPlayerExceptionInController(){
+        if(GameEnvironmentInfo.choosenTeam){
+            if(tag == "Agent1"){
+                wheelchairAgentController.motorForce = 50;
+                wheelchairAgentController.setVerticalControl(true);
+            }
+        }else{
+            if(tag == "Agent5"){
+                wheelchairAgentController.motorForce = 50;
+                wheelchairAgentController.setVerticalControl(true);
+            }
+        }
     }
 
     public void disableChair(){
@@ -171,10 +201,12 @@ public class AgentCore : MonoBehaviour
         transform.GetChild(9).transform.GetChild(0).gameObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
 
         wheelchairAgentController.motorForce = 0;
+        setPlayerExceptionInController();
     }
 
     public void enableChair(){
         wheelchairAgentController.motorForce = 50;
+        unsetPlayerExceptionInController();
     }
 
 
