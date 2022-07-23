@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.MLAgents.Actuators;
 
 public class WheelchairAgentController : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class WheelchairAgentController : MonoBehaviour
 	public Transform largeWheelLT, largeWheelRT;
 	public float motorForce;
 	public float maxAngularVelocity;
-	private bool verticalCrontrolActive;
+	private bool verticalControlActive;
      
 
     void Start()
@@ -20,7 +21,7 @@ public class WheelchairAgentController : MonoBehaviour
         agentRBody = GetComponent<Rigidbody>();
         largeWheelL.maxAngularVelocity = maxAngularVelocity;
 		largeWheelR.maxAngularVelocity = maxAngularVelocity;
-		verticalCrontrolActive = true;
+		verticalControlActive = true;
     }
 
     private void FixedUpdate() {
@@ -28,7 +29,7 @@ public class WheelchairAgentController : MonoBehaviour
     }
 
 	public void setVerticalControl(bool b){
-		verticalCrontrolActive = b;
+		verticalControlActive = b;
 	}
 
 
@@ -88,19 +89,18 @@ public class WheelchairAgentController : MonoBehaviour
         maxAngularVelocity = mang;
     }
 
-    public void Controller(float[] vectorAction){
-
-
+    public void Controller(in ActionBuffers buffer){
+		var vectorAction = buffer.ContinuousActions;
       
         var m_horizontalInput = Input.GetAxis("Horizontal");
         var m_verticalInput = Input.GetAxis("Vertical");
 
-        if(vectorAction != null){
+        if(vectorAction.Length != 0){
             m_horizontalInput = vectorAction[0];
             m_verticalInput = vectorAction[1];
         }
 		
-		if(!verticalCrontrolActive){
+		if(!verticalControlActive){
 			m_verticalInput = 0;
 		}
 

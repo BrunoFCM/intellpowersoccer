@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using MLAgents.Sensor;
+using Unity.MLAgents.Sensors;
 
 public class BehaviourHandler : MonoBehaviour
 {
@@ -35,7 +35,7 @@ public class BehaviourHandler : MonoBehaviour
 
         if(!passTheBallTrainer.activeSelf){
             disableAllBehaviours();
-            passTheBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(agentCore).tag;
+            passTheBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].DetectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(agentCore).tag;
             passTheBallTrainer.SetActive(true);
         }
     }
@@ -68,7 +68,7 @@ public class BehaviourHandler : MonoBehaviour
 
         if(!goalKeepTrainer.activeSelf){
             disableAllBehaviours();
-            goalKeepTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(shooter).tag;
+            goalKeepTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].DetectableTags[1] = gameEnvironmentInfo.getNearestTeamMate(shooter).tag;
             goalKeepTrainer.SetActive(true);
         }
     }
@@ -85,8 +85,8 @@ public class BehaviourHandler : MonoBehaviour
 
         if(!dribbleBallTrainer.activeSelf){
             disableAllBehaviours();
-            /*gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = PointTag;
-            gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].detectableTags[1] = PointTag; */
+            /*gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].DetectableTags[1] = PointTag;
+            gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].DetectableTags[1] = PointTag; */
             dribbleBallTrainer.SetActive(true);
         }
     }
@@ -103,8 +103,8 @@ public class BehaviourHandler : MonoBehaviour
 
         if(!moveToPointTrainer.activeSelf){
             disableAllBehaviours();
-            /*gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[0] = PointTag;
-            gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].detectableTags[0] = PointTag;*/
+            /*gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].DetectableTags[0] = PointTag;
+            gameObject.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[1].DetectableTags[0] = PointTag;*/
             moveToPointTrainer.SetActive(true);
         }
     }
@@ -121,8 +121,8 @@ public class BehaviourHandler : MonoBehaviour
         
         if(!intersectBallTrainer.activeSelf){
             disableAllBehaviours();
-            intersectBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[1] = agent.tag;
-            intersectBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].detectableTags[2] = nearestPlayer.tag;
+            intersectBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].DetectableTags[1] = agent.tag;
+            intersectBallTrainer.GetComponentsInChildren<RayPerceptionSensorComponentBase>()[0].DetectableTags[2] = nearestPlayer.tag;
             intersectBallTrainer.SetActive(true);
         }
     }

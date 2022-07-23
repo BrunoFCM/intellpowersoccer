@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 using System.Linq;
 
 public class HigherBehaviour : Agent
@@ -43,99 +45,98 @@ public class HigherBehaviour : Agent
     private void FixedUpdate() {
 
         if(agentOutOfPlay()){
-            Done();
+            EndEpisode();
         }
         
         if(ballOutOfPlay()){
-            Done();
+            EndEpisode();
         }
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {
         
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[3];
-
+        var actions = actionsOut.ContinuousActions;
 
         if (Input.GetKey(KeyCode.W))
         {
-            action[0] = 1f;
+            actions[0] = 1f;
         }
         if (Input.GetKey(KeyCode.A))
         {
-            action[0] = 2f;
+            actions[0] = 2f;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            action[1] = 1f;
+            actions[1] = 1f;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            action[1] = 2f;
+            actions[1] = 2f;
         }
 
 
         //DISABLE ALL BEHAVIOURS
         if (Input.GetKey(KeyCode.V))
         {
-            action[2] = 1f;
+            actions[2] = 1f;
         }
         //DEFEND THE BALL
         if (Input.GetKey(KeyCode.B))
         {
-            action[2] = 2f;
+            actions[2] = 2f;
         }
         //SHOOT THE BALL
         if (Input.GetKey(KeyCode.N))
         {
-            action[2] = 3f;
+            actions[2] = 3f;
         }
         //PASS THE BALL
         if (Input.GetKey(KeyCode.M))
         {
-            action[2] = 4f;
+            actions[2] = 4f;
         }
-
-        return action;
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
-        AddVectorObs(agentRBody.angularVelocity.magnitude);
-        AddVectorObs(agentCore.distanceToBall());
-        AddVectorObs(angleBetweenAgentAndBall());
-        AddVectorObs(teamBool);
+        sensor.AddObservation(agentRBody.angularVelocity.magnitude);
+        sensor.AddObservation(agentCore.distanceToBall());
+        sensor.AddObservation(angleBetweenAgentAndBall());
+        sensor.AddObservation(teamBool);
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers actions)
     {
+        var vectorAction = actions.ContinuousActions;
+
         if (vectorAction[0] == 1)
         {
             vectorAction[1] = 1;
             vectorAction[0] = 0;
-            controller.Controller(vectorAction);
+            controller.Controller(actions);
         }
         else if (vectorAction[0] == 2)
         {
             vectorAction[1] = 0;
             vectorAction[0] = -1;
-            controller.Controller(vectorAction);
+            controller.Controller(actions);
         }
         else if (vectorAction[1] == 1)
         {
             vectorAction[1] = -1;
             vectorAction[0] = 0;
-            controller.Controller(vectorAction);
+            controller.Controller(actions);
         }
         else if (vectorAction[1] == 2)
         {
             vectorAction[1] = 0;
             vectorAction[0] = 1;
-            controller.Controller(vectorAction);
+            controller.Controller(actions);
         }
         else if(vectorAction[2] == 1){
             behaviourHandler.disableAllBehaviours();
@@ -152,7 +153,7 @@ public class HigherBehaviour : Agent
         
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {        
         gameEnvironment.resetGame();
     }
@@ -211,7 +212,7 @@ public class HigherBehaviour : Agent
 
     public void goalSuffered(AgentCore.Team team){
         setTeamReward(team, -10f);
-        Done();
+        EndEpisode();
     }
 
     public void ballPossessionOverTime(){
@@ -227,14 +228,14 @@ public class HigherBehaviour : Agent
     public void matchWinner(AgentCore.Team winTeam){
         /*addTeamReward(winTeam, 10f);
         Debug.Log("MATCH OVER - WINNER IS" + winTeam);*/
-        Done();
+        EndEpisode();
     }
 
     public void tie(){
         /*addTeamReward(AgentCore.Team.BLUE, 3f);
         addTeamReward(AgentCore.Team.RED, 3f);
         Debug.Log("MATCH OVER TIE");*/
-        Done();
+        EndEpisode();
     }
 
     public void setTeamReward(AgentCore.Team team, float reward){

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
 
 public class DribbleBallTrainer : Agent
@@ -25,30 +27,30 @@ public class DribbleBallTrainer : Agent
 
         if(timeLeft <= 0){
             AddReward(-0.1f);
-            //Done();
+            //EndEpisode();
         }
 
         if(checkBallIsInPoint()){
             SetReward(10);
             Debug.Log("SET 10 REWARD! CONGRATS");
-            //Done();
+            //EndEpisode();
         }*/
     }
 
     private void FixedUpdate() {
         
         /*if(agentOutOfPlay()){
-            //Done();
+            //EndEpisode();
         }
         
         if(ballOutOfPlay()){
-            //Done();
+            //EndEpisode();
         }
 
         //checkAgentPos();*/
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {        
         //timeLeft = 60f;
         agentRBody = GetComponent<Rigidbody>();
@@ -60,36 +62,35 @@ public class DribbleBallTrainer : Agent
 
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[2];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
-        return action;
+        var actions = actionsOut.ContinuousActions;
+        actions[0] = Input.GetAxis("Horizontal");
+        actions[1] = Input.GetAxis("Vertical");
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
-        /*AddVectorObs(agentCore.transform.localPosition.x);
-        AddVectorObs(agentCore.transform.localPosition.z);
+        /*sensor.AddObservation(agentCore.transform.localPosition.x);
+        sensor.AddObservation(agentCore.transform.localPosition.z);
 
-        AddVectorObs(point.x);
-        AddVectorObs(point.y);
+        sensor.AddObservation(point.x);
+        sensor.AddObservation(point.y);
         
-        AddVectorObs(agentCore.distanceToBall());
-        AddVectorObs(angleBetweenAgentAndBall());
+        sensor.AddObservation(agentCore.distanceToBall());
+        sensor.AddObservation(angleBetweenAgentAndBall());
 
-        AddVectorObs(agentRBody.velocity.magnitude);*/
-        AddVectorObs(Vector3.Distance(Ball.transform.localPosition, new Vector3(point.x, 0, point.y)));
+        sensor.AddObservation(agentRBody.velocity.magnitude);*/
+        sensor.AddObservation(Vector3.Distance(Ball.transform.localPosition, new Vector3(point.x, 0, point.y)));
         
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers vectorAction)
     {
         controller.Controller(vectorAction);
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {
         /*timeLeft = 60f;
         agentRBody = GetComponent<Rigidbody>();
@@ -258,7 +259,7 @@ public class DribbleBallTrainer : Agent
     public void checkAgentPos(){
         if(Vector3.Distance(agentCore.transform.localPosition, ballPos) > 6){
             SetReward(-0.5f);
-            ////Done();
+            ////EndEpisode();
         }
     }
 

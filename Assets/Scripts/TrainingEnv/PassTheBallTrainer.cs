@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
 
 public class PassTheBallTrainer : Agent
@@ -47,9 +49,9 @@ public class PassTheBallTrainer : Agent
         
         if(ballShooted){
             if(checkBallWasPassedToTeamMate())
-                Done();
+                EndEpisode();
             //if(checkBallWasPassedToOponent())
-                //Done();
+                //EndEpisode();
         }
 
         timeLeft -= Time.deltaTime;
@@ -59,7 +61,7 @@ public class PassTheBallTrainer : Agent
         }
 
         if(timeLeft < 0){
-            Done();
+            EndEpisode();
         }
 
         timeForTouches += Time.deltaTime;
@@ -75,11 +77,11 @@ public class PassTheBallTrainer : Agent
         /*  -- ONLY FOR TRAINING --
         
         if(agentOutOfPlay()){
-            Done();
+            EndEpisode();
         }
         
         if(ballOutOfPlay()){
-            Done();
+            EndEpisode();
         }
 
         checkAgentPos();
@@ -88,7 +90,7 @@ public class PassTheBallTrainer : Agent
         */
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {
         //timeLeft = 60f;
         /*  -- ONLY FOR TRAINING --
@@ -110,35 +112,34 @@ public class PassTheBallTrainer : Agent
 
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[2];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
-        return action;
+        var actions = actionsOut.ContinuousActions;
+        actions[0] = Input.GetAxis("Horizontal");
+        actions[1] = Input.GetAxis("Vertical");
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
         // Agent velocity
-        AddVectorObs(agentRBody.angularVelocity.magnitude);
+        sensor.AddObservation(agentRBody.angularVelocity.magnitude);
 
-        AddVectorObs(agentCore.distanceToBall());
-        AddVectorObs(angleBetweenAgentAndBall());
+        sensor.AddObservation(agentCore.distanceToBall());
+        sensor.AddObservation(angleBetweenAgentAndBall());
 
-        AddVectorObs(Vector3.Distance(agentCore.transform.localPosition, nearestTeamMate.transform.localPosition));
-        AddVectorObs(angleBetweenAgentAndTeamMate(nearestTeamMate));
+        sensor.AddObservation(Vector3.Distance(agentCore.transform.localPosition, nearestTeamMate.transform.localPosition));
+        sensor.AddObservation(angleBetweenAgentAndTeamMate(nearestTeamMate));
 
-        AddVectorObs(numberOfTouches);
+        sensor.AddObservation(numberOfTouches);
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers vectorAction)
     {
         //vectorAction = Heuristic();
         controller.Controller(vectorAction);
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {
         /*  -- ONLY FOR TRAINING --
         
@@ -377,14 +378,14 @@ public class PassTheBallTrainer : Agent
     public void checkBallPos(){
         if(Vector3.Distance(Ball.transform.localPosition, ballPos) > 6){
             //AddReward(0.01f);
-            Done();
+            EndEpisode();
         }
     }
 
     public void checkAgentPos(){
         if(Vector3.Distance(agentCore.transform.localPosition, ballPos) > 6){
             SetReward(-0.5f);
-            Done();
+            EndEpisode();
         }
     }
 }

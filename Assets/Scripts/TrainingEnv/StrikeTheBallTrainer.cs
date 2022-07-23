@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 using System.Linq;
 
 public class StrikeTheBallTrainer : Agent
@@ -65,18 +67,18 @@ public class StrikeTheBallTrainer : Agent
         /*  -- ONLY FOR TRAINING --
         
         if(agentOutOfPlay()){
-            goalKeepTrainer.Done();
+            goalKeepTrainer.EndEpisode();
         }
         
         if(ballOutOfPlay()){
-            goalKeepTrainer.Done();
+            goalKeepTrainer.EndEpisode();
         }
 
         checkAgentPos();
         checkBallPos(); */
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {
         /*  -- ONLY FOR TRAINING --
         
@@ -98,31 +100,30 @@ public class StrikeTheBallTrainer : Agent
         numberOfTouches = 0;
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[2];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
-        return action;
+        var actions = actionsOut.ContinuousActions;
+        actions[0] = Input.GetAxis("Horizontal");
+        actions[1] = Input.GetAxis("Vertical");
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
         // Agent velocity
-        AddVectorObs(agentRBody.angularVelocity.magnitude);
+        sensor.AddObservation(agentRBody.angularVelocity.magnitude);
 
-        AddVectorObs(agentCore.distanceToBall());
-        AddVectorObs(angleBetweenAgentAndBall());
+        sensor.AddObservation(agentCore.distanceToBall());
+        sensor.AddObservation(angleBetweenAgentAndBall());
 
-        AddVectorObs(numberOfTouches);
+        sensor.AddObservation(numberOfTouches);
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers vectorAction)
     {
         controller.Controller(vectorAction);
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {        
         /*  -- ONLY FOR TRAINING --
         
@@ -147,7 +148,7 @@ public class StrikeTheBallTrainer : Agent
             if(site < 1){
                 SetReward((10.0f/timeOfFullPass) - 0.2f*numberOfTouches);
                 //Debug.Log("GOAL SCORED. REWARD: " + ((10.0f/timeOfFullPass) - 0.2f*numberOfTouches));
-                goalKeepTrainer.Done();
+                goalKeepTrainer.EndEpisode();
             }
     }
 
@@ -157,7 +158,7 @@ public class StrikeTheBallTrainer : Agent
             if(site > 0){
                 SetReward((10.0f/timeOfFullPass) - 0.2f*numberOfTouches);
                 //Debug.Log("GOAL SCORED. REWARD: " + ((10.0f/timeOfFullPass) - 0.2f*numberOfTouches));
-                goalKeepTrainer.Done();
+                goalKeepTrainer.EndEpisode();
             }
     }
 
@@ -256,7 +257,7 @@ public class StrikeTheBallTrainer : Agent
         if(Vector3.Distance(Ball.transform.localPosition, ballPos) > 6){
             //AddReward(0.01f);
             goalKeepTrainer.SetReward(4);
-            goalKeepTrainer.Done();
+            goalKeepTrainer.EndEpisode();
         }
     }
 
@@ -264,7 +265,7 @@ public class StrikeTheBallTrainer : Agent
         if(Vector3.Distance(agentCore.transform.localPosition, ballPos) > 3){
             SetReward(-0.5f);
             goalKeepTrainer.SetReward(4);
-            goalKeepTrainer.Done();
+            goalKeepTrainer.EndEpisode();
         }
     }
 

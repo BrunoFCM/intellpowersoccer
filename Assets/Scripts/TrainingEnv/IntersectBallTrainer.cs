@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
 
 public class IntersectBallTrainer : Agent
@@ -31,13 +33,13 @@ public class IntersectBallTrainer : Agent
 
         if(timeLeft <= 0){
             AddReward(0.1f);
-            // Done();
+            // EndEpisode();
         }
 
         if(checkBallWassPassed()){
             Debug.Log("BALL WAS PASSED, REWARD -1");
             SetReward(-1);
-            // Done();
+            // EndEpisode();
         }
 
         checkOpponentProximmity();*/
@@ -46,17 +48,17 @@ public class IntersectBallTrainer : Agent
     private void FixedUpdate() {
         
         /*if(agentOutOfPlay()){
-            // Done();
+            // EndEpisode();
         }
         
         if(ballOutOfPlay()){
-            // Done();
+            // EndEpisode();
         }
 
         checkAgentPos();*/
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {        
         timeLeft = 15f;
         agentRBody = GetComponent<Rigidbody>();
@@ -75,33 +77,32 @@ public class IntersectBallTrainer : Agent
         opponentRecieveingBall = gameEnvironment.getNearestTeamMate(opponentWithBall);
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[2];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
-        return action;
+        var actions = actionsOut.ContinuousActions;
+        actions[0] = Input.GetAxis("Horizontal");
+        actions[1] = Input.GetAxis("Vertical");
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
-        AddVectorObs(opponentWithBall.transform.localPosition.x);
-        AddVectorObs(opponentWithBall.transform.localPosition.z);
+        sensor.AddObservation(opponentWithBall.transform.localPosition.x);
+        sensor.AddObservation(opponentWithBall.transform.localPosition.z);
 
-        AddVectorObs(opponentRecieveingBall.transform.localPosition.x);
-        AddVectorObs(opponentRecieveingBall.transform.localPosition.z);
+        sensor.AddObservation(opponentRecieveingBall.transform.localPosition.x);
+        sensor.AddObservation(opponentRecieveingBall.transform.localPosition.z);
         
-        AddVectorObs(agentCore.distanceToBall());
+        sensor.AddObservation(agentCore.distanceToBall());
         
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers vectorAction)
     {
         //vectorAction = Heuristic();
         controller.Controller(vectorAction);
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {
         /*timeLeft = 15f;
         agentRBody = GetComponent<Rigidbody>();
@@ -237,7 +238,7 @@ public class IntersectBallTrainer : Agent
     public void touchedBall(){
         Debug.Log("OBJECTIVE COMPLETE, REWARD 5");
         AddReward(5);
-        // Done();
+        // EndEpisode();
     }
 
     public void stopAgents(){
@@ -278,7 +279,7 @@ public class IntersectBallTrainer : Agent
     public void checkAgentPos(){
         if(Vector3.Distance(agentCore.transform.localPosition, ballPos) > 6){
             SetReward(-0.5f);
-            // Done();
+            // EndEpisode();
         }
     }
     public bool checkBallWassPassed(){

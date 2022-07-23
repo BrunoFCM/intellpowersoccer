@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
 
 public class MoveToPointTrainer : Agent
@@ -31,23 +33,23 @@ public class MoveToPointTrainer : Agent
 
         if(timeLeft <= 0){
             AddReward(-0.1f);
-            //Done();
+            //EndEpisode();
         }
 
         if(checkAgentIsInPoint()){
             SetReward(10);
             Debug.Log("SET 10 REWARD! CONGRATS");
-            //Done();
+            //EndEpisode();
         }*/
     }
 
     private void FixedUpdate() {    
         /*if(agentOutOfPlay()){
-            //Done();
+            //EndEpisode();
         }*/
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {        
         /*timeLeft = 60f;
         timeSec = 10f;
@@ -59,25 +61,24 @@ public class MoveToPointTrainer : Agent
 
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[2];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
-        return action;
+        var actions = actionsOut.ContinuousActions;
+        actions[0] = Input.GetAxis("Horizontal");
+        actions[1] = Input.GetAxis("Vertical");
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
-        AddVectorObs(Vector3.Distance(agentCore.transform.localPosition, new Vector3(point.x, 0, point.y)));
+        sensor.AddObservation(Vector3.Distance(agentCore.transform.localPosition, new Vector3(point.x, 0, point.y)));
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers vectorAction)
     {
         controller.Controller(vectorAction);
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {
         timeLeft = 60f;
         timeSec = 10f;

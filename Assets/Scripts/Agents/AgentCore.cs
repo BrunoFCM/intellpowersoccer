@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.MLAgents.Actuators;
 
 public class AgentCore : MonoBehaviour
 {
@@ -79,13 +80,13 @@ public class AgentCore : MonoBehaviour
         //if(!controllerDisabled)
             if(GameEnvironmentInfo.choosenTeam){
                 if(tag == "Agent1"){
-                    wheelchairAgentController.Controller(null);
+                    wheelchairAgentController.Controller(ActionBuffers.Empty);
                     transform.GetChild(11).gameObject.SetActive(true);
                     //wheelchairAgentController.setMaxAngularSpeed(18f);
                 }
             }else{
                 if(tag == "Agent5"){
-                    wheelchairAgentController.Controller(null);
+                    wheelchairAgentController.Controller(ActionBuffers.Empty);
                     transform.GetChild(11).gameObject.SetActive(true);
                     //wheelchairAgentController.setMaxAngularSpeed(18f);
                 }

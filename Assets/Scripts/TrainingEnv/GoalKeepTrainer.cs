@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 using System.Linq;
 
 public class GoalKeepTrainer : Agent
@@ -42,13 +44,13 @@ public class GoalKeepTrainer : Agent
         /*  -- ONLY FOR TRAINING --
 
         if(agentOutOfPlay()){
-            Done();
+            EndEpisode();
         }
         
         */
     }
 
-    public override void InitializeAgent() 
+    public override void Initialize() 
     {
         /*  -- ONLY FOR TRAINING --
         
@@ -66,34 +68,33 @@ public class GoalKeepTrainer : Agent
 
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var action = new float[2];
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetAxis("Vertical");
-        return action;
+        var actions = actionsOut.ContinuousActions;
+        actions[0] = Input.GetAxis("Horizontal");
+        actions[1] = Input.GetAxis("Vertical");
     }
 
-    public override void CollectObservations()
+    public override void CollectObservations(VectorSensor sensor)
     {
-        AddVectorObs(agentCore.distanceToBall());
-        AddVectorObs(angleBetweenAgentAndBall());
-        AddVectorObs(agentCore.distanceToPlayer(shooter));
-        AddVectorObs(angleBetweenAgentAndShooter());
+        sensor.AddObservation(agentCore.distanceToBall());
+        sensor.AddObservation(angleBetweenAgentAndBall());
+        sensor.AddObservation(agentCore.distanceToPlayer(shooter));
+        sensor.AddObservation(angleBetweenAgentAndShooter());
     }
 
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers vectorAction)
     {
         controller.Controller(vectorAction);
     }
 
-    public override void AgentReset()
+    public override void OnEpisodeBegin()
     {   
         /*  -- ONLY FOR TRAINING --
         
         site = -1;
         oponentStrike = false;
-        strikeTheBallTrainer.Done();
+        strikeTheBallTrainer.EndEpisode();
 
         */
     }
@@ -101,13 +102,13 @@ public class GoalKeepTrainer : Agent
     public void scoredRedGoal(){
         SetReward(-2);
         //Debug.Log("GOAL SCORED REWARD -2");
-        Done();
+        EndEpisode();
     }
 
     public void scoredBlueGoal(){
         SetReward(-2);
         //Debug.Log("GOAL SCORED REWARD -2");
-        Done();
+        EndEpisode();
     }
 
     public float AngleDir(Vector3 fwd, Vector3 targetDir){
@@ -139,7 +140,7 @@ public class GoalKeepTrainer : Agent
        if(oponentStrike){
            SetReward(5);
            //Debug.Log("GOAL AVOIDED REWARD 5");
-           Done();
+           EndEpisode();
        }
     }
 
