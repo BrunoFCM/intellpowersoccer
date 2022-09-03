@@ -80,6 +80,7 @@ public class MoveToPointTrainer : Agent
 
     public override void OnEpisodeBegin()
     {
+        /*
         timeLeft = 60f;
         timeSec = 10f;
         agentRBody = GetComponent<Rigidbody>();
@@ -87,6 +88,7 @@ public class MoveToPointTrainer : Agent
         stopAgents();
         positionPlayers();
         generatePoint();
+        */
     }
 
 

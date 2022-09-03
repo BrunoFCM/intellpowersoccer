@@ -362,6 +362,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void limitWalKingAreaOutOfBounds(){
+        Debug.Log("limitWalKingAreaOutOfBounds");
         Ball.stopIt();
         Ball.transform.position = outBoundsBallPos;
 
@@ -395,6 +396,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Sets the initial positions os the players in the field
     public void setInitialPositions(AgentCore.Team team){
+        Debug.Log("setInitialPositions");
 
         stopAllChairs();
 
@@ -464,6 +466,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         
         if (distance > 3)
         {
+            Debug.Log("limitInicialPosWalkingArea");
             agent.transform.position = initialPlayerTakingKickPos;
             agent.stopChair();
 
@@ -472,7 +475,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void setPenaltyPositions(AgentCore.Team teamTakingKick){
-        
+        Debug.Log("setPenaltyPositions");
 
         stopAllChairs();
 
@@ -521,6 +524,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public void setFreeGoalAreaKickPositions(AgentCore.Team teamTakingKick){
 
+        Debug.Log("setFreeGoalAreaKickPositions");
         stopAllChairs();
 
         setBallFreeGoalAreaKick(teamTakingKick);
@@ -1412,6 +1416,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         float newZ = ((1 - t)*zBall + t*zGoal);
 
 
+        Debug.Log("positionAgentTakingKick");
         playerTakingTheKick.transform.position = new Vector3(newX, playerTakingTheKick.transform.position.y, newZ);
 
         playerTakingTheKick.stopChair();
@@ -1429,6 +1434,7 @@ public class GameEnvironmentInfo : MonoBehaviour
         
         if (distance > 3)
         {
+            Debug.Log("limitFoulWalkingArea");
             agent.transform.position = new Vector3(pos.x, pos.y, pos.z);
             agent.stopChair();
             agent.transform.rotation = Quaternion.LookRotation(-(Ball.transform.position - agent.transform.position));
@@ -1451,6 +1457,7 @@ public class GameEnvironmentInfo : MonoBehaviour
             while(allPlayers.Count >= 2){
                 for(int j = 1; j < allPlayers.Count; j++){
                     if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 2.5){
+                        Debug.Log("detectPlayersAtSamePosBugAfterFoul1");
                        // Debug.Log("FOUND BUG IN PLAYERS POSITIONS");
                         if(allPlayers[0].team == AgentCore.Team.RED){
                             allPlayers[0].transform.position = new Vector3(allPlayers[0].transform.position.x - 0.8f, 0.25f, allPlayers[0].transform.position.z);
@@ -1481,6 +1488,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                     if(allPlayers[0].distanceToPlayer(allPlayers[j]) < 2.5){
                         //Debug.Log("FOUND BUG IN PLAYERS POSITIONS AGAIN");
                         bugged = true;
+                        Debug.Log("detectPlayersAtSamePosBugAfterFoul2");
                         if(allPlayers[0].team == AgentCore.Team.RED){
                             allPlayers[0].transform.position = new Vector3(allPlayers[0].transform.position.x - 0.8f, 0.25f, allPlayers[0].transform.position.z);
                         }
@@ -1532,6 +1540,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 while(playersInException.Count > 2){
                     if(playersInException[counter].type != AgentCore.Type.GOALKEEPER){
                         Debug.Log("Player pos before: " + playersInException[counter].transform.position.z);
+                        Debug.Log("checkPlayersInSmallAreas");
                         if(playersInException[counter].transform.position.x > 0){
                             playersInException[counter].transform.position = new Vector3(
                                 playersInException[counter].transform.position.x, 
@@ -1589,6 +1598,7 @@ public class GameEnvironmentInfo : MonoBehaviour
                 while(playersInException.Count > 2){
                     if(playersInException[counter].type != AgentCore.Type.GOALKEEPER){
                         Debug.Log("Player pos before: " + playersInException[counter].transform.position.z);
+                        Debug.Log("checkPlayersInSmallAreas2");
                         if(playersInException[counter].transform.position.x > 0){
                             playersInException[counter].transform.position = new Vector3(
                                 playersInException[counter].transform.position.x, 
@@ -1668,6 +1678,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     public AgentCore playerRecieveingBall(AgentCore agent){
         AgentCore possibleAgent;
+        Debug.Log("playerRecieveingBall");
 
         if(agent.team != AgentCore.Team.BLUE){
             possibleAgent = redTeamAgents.OrderBy(x => x.distanceToBall()).ToList()[1];
@@ -1736,6 +1747,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
         bool notCorner = false;
 
+        Debug.Log("ballOutOfBoundsMechanism");
 
         if(x < 0){
             if(z > 0){
@@ -1848,6 +1860,7 @@ public class GameEnvironmentInfo : MonoBehaviour
     }
 
     public void positionPlayer(AgentCore agent, float x, float z, float rotation){
+        Debug.Log("positionPlayer");
         agent.stopChair();
         agent.transform.position = new Vector3(x, 0.24f, z);
         agent.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
@@ -2209,6 +2222,7 @@ public class GameEnvironmentInfo : MonoBehaviour
 
     //Spawns the player and Constrains the radius bounds of the indirect kick where player can move before shoot/pass the ball
     private void spawnWheelchairAtNewSpot(float x, float y, float z, AgentCore agent, float rotation){ 
+        Debug.Log("spawnWheelchairAtNewSpot");
         agent.transform.position = new Vector3(x, y, z);
         agent.stopChair();
 

@@ -333,6 +333,7 @@ public class AgentCore : MonoBehaviour
         //Debug.Log(figurePos.magnitude);
         //if(!behaviourHandler.dribbleBallTrainer.activeSelf){
             figurePoint.SetActive(true);
+            //Debug.Log("setDribbleBallBehaviour");
             figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
             behaviourHandler.setDribbleBallBehaviour();
         //}
@@ -342,6 +343,7 @@ public class AgentCore : MonoBehaviour
         //Debug.Log(figurePos.magnitude);
         //if(!behaviourHandler.moveToPointTrainer.activeSelf){
             figurePoint.SetActive(true);
+            //Debug.Log("setMoveToPointBehaviour");
             figurePoint.transform.position = new Vector3(figurePos.x, 0.5f, figurePos.y);
             behaviourHandler.setMoveToPointBehaviour();
         //}

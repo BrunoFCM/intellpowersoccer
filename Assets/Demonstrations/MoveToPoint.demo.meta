@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 169434156a64eca45af2d9aae9a8d056
 ScriptedImporter:
-  fileIDToRecycleName:
-    11400000: Assets/Demonstrations/MoveToPoint.demo
+  internalIDToNameTable:
+  - first:
+      114: 11400000
+    second: Assets/Demonstrations/MoveToPoint.demo
   externalObjects: {}
-  userData: ' (MLAgents.Demonstration)'
+  serializedVersion: 2
+  userData: ' (Unity.MLAgents.Demonstrations.DemonstrationSummary)'
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: 7bd65ce151aaa4a41a45312543c56be1, type: 3}
